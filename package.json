@@ -1,0 +1,23 @@
+{
+  "name": "redash-reports",
+  "version": "1.0.0",
+  "description": "Automated Redash reports deployment to Cloudflare Workers",
+  "type": "module",
+  "scripts": {
+    "build": "bash build.sh",
+    "deploy": "wrangler deploy src/index.js",
+    "dev": "wrangler dev src/index.js",
+    "deployments": "wrangler deployments list"
+  },
+  "devDependencies": {
+    "wrangler": "^4.132.0"
+  },
+  "keywords": [
+    "redash",
+    "reports",
+    "cloudflare",
+    "workers"
+  ],
+  "author": "Davit Khutsishvili",
+  "license": "PRIVATE"
+}
