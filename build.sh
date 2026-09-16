@@ -57,6 +57,44 @@ export default {
         });
       }
 
+      // Bonus report endpoint
+      if (path === '/bonus' || path === '/bonus/') {
+        const bonusData = {
+          generatedAt: new Date().toISOString(),
+          reportName: 'cache-bonus',
+          description: 'Bonus Cost and Retention Analysis',
+          sourceData: '2026-09-16T14:20:42.459Z',
+          queries: {
+            '1731': {
+              name: 'Bonus Cost By Categories',
+              rowCount: 0,
+              summary: null
+            },
+            '1754': {
+              name: 'Depositors Monthly Retention',
+              rowCount: 0,
+              summary: null
+            },
+            '1758': {
+              name: 'Deposit Retention - whole base',
+              rowCount: 88821,
+              summary: {
+                totalRows: 88821,
+                columns: ['block_reason', 'kyc', 'lag', 'rail', 'ftd_type', 'phone', 'first_deposit_date', 'player_id', 'email']
+              }
+            }
+          }
+        };
+        return new Response(JSON.stringify(bonusData), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=3600',
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+
       // 404 for all other paths
       return new Response(JSON.stringify({ error: 'Not Found' }), {
         status: 404,
