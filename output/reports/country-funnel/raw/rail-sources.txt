@@ -1,0 +1,599 @@
+Albania|$direct|1|1|5|4
+Albania|fortunejack.com|2|0|5|4
+Algeria|$direct|0|0|5|3
+Algeria|bitcointalk.org|0|0|1|1
+Algeria|fortunejack.com|2|0|3|1
+Algeria|www.google.com|0|0|1|0
+Angola|fortunejack.com|0|0|2|0
+Angola|l.facebook.com|0|0|1|0
+Argentina|$direct|2|1|133|91
+Argentina|argentina-bonusesfinder.com|0|0|1|1
+Argentina|bitcointalk.org|0|0|1|1
+Argentina|com.google.android.gm|0|0|2|0
+Argentina|fortunejack.com|5|0|209|136
+Argentina|heylink.me|0|0|1|0
+Argentina|instagram.com|2|0|28|4
+Argentina|keitaro.fortunejack.com|0|0|1|0
+Argentina|l.facebook.com|0|0|8|0
+Argentina|l.instagram.com|0|0|3|2
+Argentina|m.facebook.com|3|0|25|0
+Argentina|org.telegram.messenger.web|0|0|1|0
+Argentina|search.brave.com|0|0|1|1
+Argentina|t.co|0|0|1|0
+Argentina|tracker-pm2.fortunejackpartners.com|0|0|3|0
+Argentina|www.google.com|0|0|1|1
+Armenia|fortunejack.com|0|0|4|4
+Armenia|srt.bitcoin.com|1|0|1|1
+Armenia|www.google.com|0|0|2|2
+Australia|$direct|4|3|4|2
+Australia|casinobee.com|1|0|2|0
+Australia|com.google.android.gm|1|0|1|0
+Australia|dappgambl.com|0|0|1|1
+Australia|ezchthere.xyz|1|1|2|0
+Australia|fortunejack.com|28|9|36|18
+Australia|hottopcasino.com|0|0|1|0
+Australia|instagram.com|0|0|2|1
+Australia|l.facebook.com|0|0|1|0
+Australia|m.facebook.com|2|0|9|0
+Australia|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Australia|www.google.com|2|0|1|1
+Austria|$direct|2|0|19|19
+Austria|blockchainwelt.de|1|1|0|0
+Austria|dappgambl.com|0|0|1|1
+Austria|fortunejack.com|27|17|51|39
+Austria|instagram.com|1|0|0|0
+Austria|l.facebook.com|1|0|0|0
+Austria|m.facebook.com|0|0|1|0
+Azerbaijan|fortunejack.com|0|0|2|1
+Bahrain|instagram.com|1|0|0|0
+Belarus|www.google.com|0|0|1|1
+Bolivia|$direct|0|0|1|1
+Bolivia|fortunejack.com|0|0|3|2
+Bolivia|m.facebook.com|0|0|1|0
+Bolivia|www.google.com|0|0|2|1
+Bosnia and Herzegovina|$direct|0|0|4|2
+Bosnia and Herzegovina|com.google.android.gm|0|0|1|0
+Bosnia and Herzegovina|dappgambl.com|0|0|1|0
+Bosnia and Herzegovina|fortunejack.com|4|1|21|2
+Bosnia and Herzegovina|instagram.com|0|0|8|0
+Bosnia and Herzegovina|keitaro.fortunejack.com|0|0|2|0
+Bosnia and Herzegovina|l.facebook.com|0|0|3|0
+Bosnia and Herzegovina|m.facebook.com|4|0|13|0
+Bosnia and Herzegovina|silentbet.com|0|0|1|0
+Bosnia and Herzegovina|tracker-pm2.fortunejackpartners.com|0|0|3|0
+Bosnia and Herzegovina|www.google.com|0|0|3|2
+Brazil|$direct|5|2|17|13
+Brazil|bet.smartbettingguide.com|0|0|1|1
+Brazil|chipy.com|0|0|1|1
+Brazil|es.pornhub.com|1|1|0|0
+Brazil|fortunejack.com|49|39|102|58
+Brazil|instagram.com|2|1|5|1
+Brazil|keitaro.fortunejack.com|1|1|1|0
+Brazil|l.facebook.com|0|0|1|0
+Brazil|m.facebook.com|0|0|1|0
+Brazil|srt.bitcoin.com|0|0|1|0
+Brazil|t.co|0|0|2|1
+Brazil|www.betburger.com|0|0|1|1
+Brazil|www.google.com|3|1|8|4
+Brazil|www.spicycasinos.com|0|0|1|1
+Brunei|casinobee.com|0|0|1|0
+Bulgaria|$direct|0|0|2|1
+Bulgaria|fortunejack.com|3|0|4|0
+Bulgaria|instagram.com|0|0|1|0
+Bulgaria|m.facebook.com|1|0|1|0
+Cabo Verde|fortunejack.com|2|0|1|0
+Cameroon|fortunejack.com|0|0|1|0
+Cameroon|org.telegram.messenger|0|0|1|0
+Canada|$direct|2|1|14|13
+Canada|bojoko.ca|1|1|0|0
+Canada|casino.guru|0|0|1|1
+Canada|dappgambl.com|1|0|2|2
+Canada|fortunejack.com|40|9|94|68
+Canada|go.canadacasino.ca|0|0|1|0
+Canada|instagram.com|0|0|3|0
+Canada|l.facebook.com|0|0|5|0
+Canada|m.facebook.com|2|0|4|0
+Canada|t.co|0|0|2|0
+Canada|www.askgamblers.com|0|0|1|1
+Canada|www.google.com|0|0|2|2
+Chile|$direct|0|0|11|10
+Chile|fortunejack.com|1|0|94|79
+Chile|instagram.com|2|0|9|1
+Chile|l.facebook.com|0|0|2|0
+Chile|l.instagram.com|0|0|2|2
+Chile|m.facebook.com|0|0|5|0
+Chile|tracker-pm2.fortunejackpartners.com|1|0|1|0
+Colombia|bet.smartbettingguide.com|0|0|4|4
+Colombia|fortunejack.com|0|0|3|2
+Comoros|fortunejack.com|0|0|1|1
+Congo (DRC)|www.google.com|0|0|1|0
+Cook Islands|m.facebook.com|0|0|1|0
+Croatia|$direct|0|0|2|1
+Croatia|croatia-bonusesfinder.com|0|0|1|0
+Croatia|fortunejack.com|5|3|4|1
+Croatia|instagram.com|0|0|1|0
+Croatia|m.facebook.com|0|0|2|0
+Croatia|roulette77.us|1|0|0|0
+Curaçao|fortunejack.com|0|0|1|0
+Cyprus|$direct|0|0|1|1
+Cyprus|fortunejack.com|5|1|2|2
+Czechia|$direct|1|1|7|3
+Czechia|casinosblockchain.io|1|1|0|0
+Czechia|dappgambl.com|0|0|1|0
+Czechia|fortunejack.com|11|3|21|7
+Czechia|keitaro.fortunejack.com|0|0|1|0
+Czechia|links.webopedia.com|0|0|1|1
+Czechia|m.facebook.com|0|0|3|0
+Czechia|thecasinowizard.com|0|0|1|0
+Czechia|www.bookmakers.bet|1|0|0|0
+Czechia|www.google.com|3|2|2|1
+Denmark|$direct|7|5|7|6
+Denmark|beacons.ai|14|6|3|3
+Denmark|fortunejack.com|97|55|30|18
+Denmark|instagram.com|0|0|2|0
+Denmark|l.facebook.com|0|0|2|0
+Denmark|spinhub.gg|7|4|1|1
+Denmark|url7982.transactions.fortunejack.com|0|0|1|1
+Denmark|www.google.com|1|1|1|1
+Dominican Republic|$direct|0|0|1|0
+Dominican Republic|fortunejack.com|0|0|1|0
+Dominican Republic|www.betpack.com|1|0|0|0
+Dominican Republic|www.google.com|1|0|0|0
+Ecuador|$direct|2|0|10|2
+Ecuador|fortunejack.com|0|0|9|0
+Ecuador|instagram.com|1|0|1|0
+Ecuador|l.facebook.com|0|0|5|0
+Ecuador|m.facebook.com|3|0|16|0
+Ecuador|tracker-pm2.fortunejackpartners.com|0|0|4|1
+Egypt|$direct|0|0|2|1
+Egypt|chatgpt.com|0|0|1|0
+Egypt|fortunejack.com|2|0|5|3
+Egypt|www.google.com|0|0|1|1
+El Salvador|fortunejack.com|1|0|1|0
+El Salvador|tracker-pm2.fortunejackpartners.com|1|0|1|0
+Estonia|$direct|0|0|1|1
+Estonia|fortunejack.com|3|2|1|1
+Ethiopia|$direct|0|0|6|1
+Ethiopia|casinolandia.com|0|0|1|0
+Ethiopia|fortunejack.com|0|0|9|3
+Ethiopia|l.facebook.com|0|0|1|0
+Ethiopia|m.facebook.com|0|0|1|0
+Ethiopia|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Ethiopia|www.bookmakers.bet|0|0|1|0
+Ethiopia|www.google.com|0|0|4|4
+Finland|$direct|1|0|12|10
+Finland|bonukset.net|6|2|2|2
+Finland|casino.guru|0|0|1|1
+Finland|fortunejack.com|44|26|35|29
+Finland|kasinoaula.com|1|1|0|0
+Finland|links.webopedia.com|0|0|1|0
+Finland|m.facebook.com|0|0|1|0
+Finland|www.google.com|0|0|3|3
+Finland|www.google.lt|0|0|1|1
+Finland|www.slotsup.com|0|0|1|0
+France|$direct|1|1|3|1
+France|com.google.android.googlequicksearchbox|0|0|1|1
+France|fortunejack.com|0|0|10|8
+France|nostrabet.com|0|0|1|0
+France|t.co|0|0|1|0
+Georgia|$direct|16|0|32|8
+Georgia|casino.guru|0|0|1|1
+Georgia|fortunejack.com|3|0|9|7
+Georgia|fortunejack.dev|1|0|0|0
+Georgia|localhost:5173|13|0|4|0
+Georgia|t.co|0|0|3|3
+Georgia|www.bing.com|0|0|1|1
+Georgia|www.google.com|1|0|2|2
+Germany|$direct|13|6|62|38
+Germany|agomuk.com|1|0|0|0
+Germany|blockchainwelt.de|1|0|6|4
+Germany|bulgaria-bonusesfinder.com|0|0|1|0
+Germany|casinobee.com|0|0|1|0
+Germany|com.google.android.gm|0|0|2|0
+Germany|de.slotsup.com|1|1|0|0
+Germany|fortunejack.com|117|69|197|136
+Germany|gameheavenmax.shop|0|0|1|0
+Germany|glacialfulfilled.shop|1|1|0|0
+Germany|godliketips.net|0|0|2|2
+Germany|instagram.com|1|0|10|0
+Germany|l.facebook.com|1|1|5|1
+Germany|lipyix.com|0|0|1|0
+Germany|m.facebook.com|1|0|10|0
+Germany|nacho-brothers.com|0|0|2|2
+Germany|onlinegames-de.store|1|1|0|0
+Germany|search.brave.com|1|1|0|0
+Germany|t.co|0|0|1|1
+Germany|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Germany|tribuna.com|1|1|0|0
+Germany|www.google.com|6|4|10|9
+Germany|www.nightrush.com|1|0|0|0
+Germany|www.slotozilla.com|0|0|3|0
+Ghana|t.co|0|0|1|0
+Greece|$direct|1|1|1|1
+Greece|casinoguru-gr.com|1|0|0|0
+Greece|fortunejack.com|1|1|3|3
+Greece|hottopcasino.com|0|0|1|0
+Greece|instagram.com|0|0|1|0
+Greenland|fortunejack.com|0|0|1|1
+Guadeloupe|www.google.com|0|0|1|1
+Guam|fortunejack.com|0|0|1|0
+Guatemala|$direct|0|0|1|1
+Guinea|l.facebook.com|0|0|1|0
+Guinea|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Honduras|$direct|0|0|1|0
+Honduras|fortunejack.com|1|0|1|1
+Honduras|url7982.transactions.fortunejack.com|0|0|1|0
+Hong Kong|$direct|0|0|1|1
+Hong Kong|fortunejack.com|1|0|11|9
+Hong Kong|www.fortunejack.com|1|0|0|0
+Hungary|$direct|5|3|16|12
+Hungary|chipy.com|0|0|1|0
+Hungary|com.google.android.gm|0|0|1|0
+Hungary|fortunejack.com|29|21|39|27
+Hungary|instagram.com|0|0|2|0
+Hungary|l.facebook.com|0|0|3|0
+Hungary|m.facebook.com|0|0|6|0
+Hungary|m.hungary-bonusesfinder.com|0|0|1|0
+Hungary|nostrabet.com|0|0|1|0
+Hungary|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Hungary|www.bookmakers.bet|0|0|1|1
+Hungary|www.google.com|3|3|3|2
+Indonesia|$direct|0|0|1|1
+Indonesia|bonuscasino.org|0|0|1|0
+Indonesia|fortunejack.com|2|0|2|1
+Indonesia|hmkasinoindonesia.com|0|0|1|0
+Indonesia|indonesia-bonusesfinder.com|0|0|1|1
+Indonesia|t.co|0|0|3|1
+Indonesia|www.google.com|0|0|1|1
+Iraq|fortunejack.com|1|0|0|0
+Iraq|t.co|0|0|1|0
+Ireland|$direct|2|1|3|3
+Ireland|com.google.android.gm|1|0|0|0
+Ireland|fortunejack.com|16|9|20|16
+Ireland|scratchcardjoe.com|1|0|0|0
+Ireland|search.brave.com|0|0|1|1
+Ireland|www.askgamblers.com|1|1|0|0
+Ireland|www.betpack.com|1|1|0|0
+Ireland|www.google.com|0|0|1|1
+Ireland|www.moobslots.com|1|0|0|0
+Ireland|www.trustpilot.com|0|0|1|1
+Israel|$direct|7|0|19|19
+Israel|com.google.android.gm|0|0|3|3
+Israel|fortunejack.com|3|0|12|8
+Israel|www.google.com|0|0|1|1
+Italy|$direct|1|1|3|3
+Italy|fortunejack.com|7|2|11|7
+Italy|t.co|0|0|1|1
+Italy|www.google.com|0|0|1|1
+Italy|www.thepunterspage.com|0|0|1|1
+Ivory Coast|fortunejack.com|2|0|6|5
+Ivory Coast|www.google.com|0|0|4|4
+Jamaica|$direct|0|0|1|1
+Japan|$direct|3|0|5|5
+Japan|casinohex.jp|0|0|1|1
+Japan|cryptoslate.com|1|0|1|0
+Japan|fortunejack.com|5|0|20|15
+Japan|guildtech.net|0|0|1|0
+Japan|t.co|0|0|1|1
+Japan|vip-bet.com|0|0|5|5
+Japan|www.askgamblers.com|0|0|1|1
+Japan|www.google.com|0|0|1|1
+Japan|www.onlinecasino-gambler.net|0|0|1|0
+Japan|www.vip-grinders.com|0|0|1|1
+Jersey|fortunejack.com|1|0|0|0
+Jordan|fortunejack.com|0|0|2|2
+Kazakhstan|fortunejack.com|0|0|1|1
+Kenya|$direct|1|0|0|0
+Kenya|fortunejack.com|0|0|2|1
+Kosovo|$direct|1|0|1|1
+Kosovo|fortunejack.com|5|0|10|8
+Kosovo|instagram.com|1|0|0|0
+Kosovo|keitaro.fortunejack.com|0|0|1|0
+Kosovo|www.bookmakers.bet|1|0|0|0
+Kuwait|fortunejack.com|0|0|2|1
+Kuwait|www.google.com|1|1|0|0
+Laos|fortunejack.com|0|0|5|4
+Laos|m.facebook.com|0|0|1|0
+Latvia|$direct|0|0|1|1
+Latvia|fortunejack.com|2|0|4|2
+Latvia|www.google.com|0|0|1|1
+Lebanon|fortunejack.com|1|0|7|6
+Lebanon|url8039.fortunejack.com|0|0|1|1
+Lesotho|m.facebook.com|0|0|1|0
+Libya|fortunejack.com|0|0|1|1
+Lithuania|$direct|0|0|1|0
+Lithuania|casinoguru.lt|0|0|1|0
+Lithuania|casinohipster.com|0|0|1|0
+Lithuania|com.google.android.gm|0|0|1|0
+Lithuania|fortunejack.com|20|13|22|17
+Lithuania|godliketips.net|1|0|0|0
+Lithuania|lazybuguru.lt|4|4|3|2
+Lithuania|m.facebook.com|0|0|3|0
+Lithuania|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Lithuania|www.askgamblers.com|1|0|0|0
+Lithuania|www.bookmakers.bet|1|1|0|0
+Lithuania|www.google.com|0|0|1|1
+Luxembourg|fortunejack.com|3|0|5|5
+Luxembourg|www.google.com|0|0|1|1
+Madagascar|bestcrypto4u.com|0|0|1|0
+Madagascar|fortunejack.com|0|0|3|0
+Madagascar|m.facebook.com|0|0|1|0
+Malaysia|$direct|0|0|1|0
+Malaysia|fortunejack.com|0|0|2|1
+Malaysia|indonesia-bonusesfinder.com|0|0|1|0
+Malaysia|sigma.world|0|0|1|0
+Maldives|fortunejack.com|2|1|5|4
+Maldives|l.facebook.com|1|0|2|0
+Maldives|m.facebook.com|1|0|1|0
+Mali|$direct|0|0|1|0
+Mali|fortunejack.com|0|0|1|0
+Mali|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Malta|fortunejack.com|4|3|2|2
+Malta|sigma.world|0|0|1|0
+Mauritania|fortunejack.com|0|0|1|1
+Mexico|$direct|6|0|49|5
+Mexico|chipy.com|0|0|1|0
+Mexico|fortunejack.com|13|2|90|25
+Mexico|l.facebook.com|0|0|1|0
+Mexico|t.co|0|0|1|0
+Mexico|www.coincarp.com|0|0|1|1
+Mexico|www.google.com|0|0|5|5
+Moldova|$direct|0|0|1|1
+Moldova|fortunejack.com|1|0|2|2
+Moldova|www.google.com|0|0|1|1
+Montenegro|m.facebook.com|0|0|1|0
+Morocco|$direct|0|0|13|11
+Morocco|fortunejack.com|2|0|24|22
+Morocco|nostrabet.com|0|0|1|0
+Morocco|www.google.com|0|0|2|1
+Mozambique|fortunejack.com|0|0|1|0
+Myanmar|fortunejack.com|1|0|1|0
+Namibia|m.facebook.com|0|0|1|0
+Nepal|fortunejack.com|0|0|3|1
+Netherlands|www.google.com|1|1|1|1
+New Zealand|$direct|1|1|4|3
+New Zealand|bitcoinchaser.com|0|0|1|0
+New Zealand|cryptoslate.com|0|0|1|1
+New Zealand|fortunejack.com|9|3|26|25
+New Zealand|l.facebook.com|0|0|1|1
+New Zealand|links.webopedia.com|0|0|1|1
+New Zealand|m.facebook.com|0|0|5|4
+New Zealand|www.freeextrachips.com|0|0|1|0
+New Zealand|www.google.com|1|0|1|1
+New Zealand|www.spicycasinos.com|0|0|1|0
+Nigeria|$direct|0|0|3|2
+Nigeria|com.twitter.android|0|0|1|1
+Nigeria|fortunejack.com|1|0|45|33
+Nigeria|t.co|0|0|17|11
+Norway|$direct|4|0|28|27
+Norway|beacons.ai|2|1|1|1
+Norway|bitcointalk.org|0|0|1|1
+Norway|fortunejack.com|69|45|130|112
+Norway|instagram.com|1|1|0|0
+Norway|t.co|0|0|1|1
+Norway|www.askgamblers.com|1|1|1|1
+Norway|www.google.com|1|0|1|1
+Norway|www.norskcasinoguide.com|2|1|1|0
+Norway|www.oddspodden.com|4|2|1|1
+Oman|fortunejack.com|0|0|1|0
+Pakistan|$direct|0|0|1|0
+Pakistan|fortunejack.com|3|0|4|3
+Pakistan|t.co|0|0|1|0
+Pakistan|www.google.com|0|0|1|0
+Palestine|t.co|0|0|1|0
+Panama|fortunejack.com|0|0|1|1
+Papua New Guinea|com.google.android.gm|0|0|1|0
+Papua New Guinea|fortunejack.com|0|0|1|0
+Paraguay|$direct|0|0|4|2
+Paraguay|fortunejack.com|1|0|21|5
+Paraguay|instagram.com|0|0|5|0
+Paraguay|keitaro.fortunejack.com|1|0|1|0
+Paraguay|l.facebook.com|1|0|3|0
+Paraguay|m.facebook.com|3|0|13|0
+Paraguay|tracker-pm2.fortunejackpartners.com|0|0|2|0
+Peru|$direct|1|0|2|0
+Peru|fortunejack.com|0|0|5|3
+Peru|instagram.com|0|0|4|0
+Peru|keitaro.fortunejack.com|0|0|1|0
+Peru|l.facebook.com|0|0|2|0
+Peru|m.facebook.com|0|0|9|0
+Peru|tracker-pm2.fortunejackpartners.com|0|0|3|0
+Peru|www.google.com|2|0|1|1
+Philippines|$direct|1|0|1|0
+Philippines|com.google.android.gm|0|0|1|0
+Philippines|fortunejack.com|0|0|15|7
+Philippines|m.facebook.com|0|0|4|0
+Philippines|t.co|0|0|1|0
+Philippines|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Philippines|www.benitezgambles.com|0|0|1|1
+Poland|$direct|0|0|20|20
+Poland|fortunejack.com|6|3|15|15
+Poland|srt.bitcoin.com|1|1|1|1
+Poland|tracker-pm2.fortunejackpartners.com|1|0|0|0
+Poland|www.askgamblers.com|1|0|0|0
+Poland|www.google.com|0|0|1|1
+Portugal|$direct|1|1|56|54
+Portugal|fortunejack.com|35|31|194|188
+Portugal|www.betluck.tv|0|0|1|1
+Portugal|www.google.com|0|0|2|1
+Puerto Rico|fortunejack.com|1|0|0|0
+Puerto Rico|www.google.com|0|0|1|1
+Qatar|fortunejack.com|1|0|1|1
+Romania|$direct|3|2|3|1
+Romania|bookiesheist.com|1|1|0|0
+Romania|com.google.android.gm|0|0|1|0
+Romania|fortunejack.com|22|17|49|18
+Romania|godliketips.net|0|0|1|1
+Romania|instagram.com|0|0|4|0
+Romania|l.facebook.com|1|1|3|0
+Romania|m.facebook.com|1|0|23|0
+Romania|nostrabet.com|1|0|0|0
+Romania|romania-casinobonusesfinder.com|0|0|1|0
+Romania|tracker-pm2.fortunejackpartners.com|0|0|6|0
+Romania|www.25bahisno1.com|0|0|1|1
+Romania|www.google.com|3|1|1|1
+Russia|$direct|1|1|1|0
+Russia|efirbet.com|0|0|1|1
+Russia|fortunejack.com|0|0|2|2
+Russia|hellagood.marketing|0|0|1|1
+Rwanda|instagram.com|0|0|1|0
+Saudi Arabia|www.google.com|0|0|1|0
+Serbia|$direct|1|0|4|4
+Serbia|fortunejack.com|5|0|31|9
+Serbia|instagram.com|4|0|19|1
+Serbia|keitaro.fortunejack.com|0|0|2|0
+Serbia|l.facebook.com|1|0|1|0
+Serbia|m.facebook.com|3|0|22|0
+Serbia|tracker-pm2.fortunejackpartners.com|1|0|5|0
+Serbia|www.google.com|0|0|1|1
+Slovakia|$direct|0|0|1|1
+Slovakia|askbonus.com|1|1|0|0
+Slovakia|fortunejack.com|4|1|8|4
+Slovakia|l.facebook.com|0|0|1|0
+Slovakia|m.facebook.com|0|0|3|0
+Slovakia|t.co|1|0|1|0
+Slovenia|fortunejack.com|0|0|1|1
+Somalia|m.facebook.com|0|0|2|0
+Somalia|www.google.com|0|0|1|1
+South Africa|$direct|1|0|10|0
+South Africa|bitcoinchaser.com|0|0|1|0
+South Africa|casinobee.com|1|0|2|0
+South Africa|casinobonuscodes365.com|1|0|1|0
+South Africa|casinolandia.com|0|0|1|0
+South Africa|chipy.com|0|0|2|0
+South Africa|com.google.android.gm|0|0|3|0
+South Africa|efirbet.com|0|0|2|0
+South Africa|fortunejack.com|11|0|59|1
+South Africa|l.facebook.com|2|0|3|0
+South Africa|m.facebook.com|0|0|25|0
+South Africa|plinko-game.org.za|0|0|2|0
+South Africa|silentbet.com|1|0|6|0
+South Africa|t.co|0|0|1|0
+South Africa|tracker-pm2.fortunejackpartners.com|1|0|3|0
+South Africa|www.bestbitcoincasino.com|0|0|1|0
+South Africa|www.bonusbets.com|0|0|1|0
+South Africa|www.google.com|0|0|3|0
+South Africa|www.mamabonus.com|0|0|1|0
+South Africa|www.onlinecasinosonline.co.za|0|0|7|0
+South Korea|fortunejack.com|0|0|1|1
+South Sudan|fortunejack.com|0|0|1|0
+Spain|$direct|2|1|7|2
+Spain|bitcoinchaser.com|1|1|1|1
+Spain|casinosland.org|1|1|0|0
+Spain|com.google.android.gm|0|0|2|0
+Spain|fortunejack.com|25|15|42|24
+Spain|instagram.com|2|0|11|0
+Spain|keitaro.fortunejack.com|0|0|2|0
+Spain|l.facebook.com|0|0|1|0
+Spain|m.facebook.com|0|0|5|0
+Spain|t.co|0|0|1|1
+Spain|www.google.com|5|5|6|4
+Spain|www.instagram.com|0|0|1|0
+Spain|www.vidibond.es|1|0|0|0
+Sri Lanka|fortunejack.com|0|0|2|2
+Sri Lanka|l.facebook.com|0|0|1|0
+Sri Lanka|m.facebook.com|1|0|0|0
+Sweden|$direct|6|2|15|12
+Sweden|beacons.ai|2|1|0|0
+Sweden|dappgambl.com|1|0|0|0
+Sweden|fortunejack.com|47|22|59|38
+Sweden|gonlinecasino.com|2|1|0|0
+Sweden|instagram.com|5|1|6|1
+Sweden|m.facebook.com|0|0|4|0
+Sweden|silentbet.com|1|0|0|0
+Sweden|www.google.com|2|1|3|3
+Switzerland|$direct|2|1|9|8
+Switzerland|fortunejack.com|5|4|15|12
+Switzerland|www.coincarp.com|0|0|1|1
+Taiwan|fortunejack.com|1|0|1|0
+Tajikistan|$direct|0|0|1|1
+Thailand|fortunejack.com|2|0|7|3
+Thailand|m.facebook.com|0|0|1|0
+The Netherlands|$direct|3|2|7|4
+The Netherlands|at.casinohex.at|1|1|0|0
+The Netherlands|casinobee.com|2|2|0|0
+The Netherlands|chatgpt.com|1|1|2|1
+The Netherlands|com.google.android.googlequicksearchbox|0|0|1|1
+The Netherlands|dappgambl.com|1|1|0|0
+The Netherlands|fortunejack.com|32|21|57|41
+The Netherlands|m.facebook.com|2|0|4|0
+The Netherlands|t.co|1|0|0|0
+The Netherlands|www.bing.com|0|0|1|0
+The Netherlands|www.google.com|6|6|4|3
+The Netherlands|znaki.fm|1|0|1|0
+Togo|m.facebook.com|0|0|1|0
+Trinidad and Tobago|fortunejack.com|0|0|2|1
+Tunisia|$direct|0|0|3|0
+Tunisia|fortunejack.com|3|0|5|4
+Tunisia|www.bing.com|0|0|1|1
+Türkiye|$direct|1|0|2|2
+Türkiye|25bahisno1.com|1|1|1|1
+Türkiye|casinobee.com|1|0|1|0
+Türkiye|fortunejack.com|4|0|17|16
+Türkiye|instagram.com|0|0|1|0
+Türkiye|m.facebook.com|0|0|1|0
+Türkiye|www.bookmakers.bet|1|0|0|0
+Uganda|fortunejack.com|0|0|1|0
+Ukraine|$direct|0|0|1|0
+Ukraine|fortunejack.com|2|0|10|6
+Ukraine|m.facebook.com|0|0|1|0
+Ukraine|mobile.bonusfinder.com.ua|0|0|1|0
+Ukraine|org.telegram.messenger|0|0|1|0
+Ukraine|sigma.world|0|0|1|0
+Ukraine|srt.bitcoin.com|0|0|1|1
+Ukraine|www.google.com|0|0|2|1
+United Arab Emirates|fortunejack.com|0|0|1|1
+United Kingdom|$direct|0|0|10|10
+United Kingdom|bitcoinchaser.com|1|0|0|0
+United Kingdom|fortunejack.com|38|6|12|8
+United Kingdom|lazybuguru.lt|1|0|1|1
+United Kingdom|scratchcardjoe.com|1|1|0|0
+United Kingdom|t.co|1|0|0|0
+United Kingdom|www.google.com|3|2|0|0
+United Kingdom|www.paygamble.com|0|0|1|1
+United States|$direct|10|0|52|29
+United States|bitcoincasinousa.com|0|0|1|0
+United States|bitcoinchaser.com|0|0|2|1
+United States|casinobee.com|0|0|1|0
+United States|casinolandia.com|0|0|3|0
+United States|chipy.com|0|0|4|2
+United States|coincodex.com|0|0|1|1
+United States|com.google.android.gm|0|0|1|1
+United States|com.google.android.googlequicksearchbox|0|0|1|0
+United States|cryptocasinos.com|1|0|1|0
+United States|dappgambl.com|0|0|3|3
+United States|duckduckgo.com|0|0|1|1
+United States|fortunejack.com|111|7|280|134
+United States|fullycrypto.com|0|0|2|0
+United States|instagram.com|1|0|4|0
+United States|keitaro.fortunejack.com|2|0|4|0
+United States|l.facebook.com|1|0|4|0
+United States|m.facebook.com|8|0|53|0
+United States|nodepositslots.org|1|0|0|0
+United States|roulette77.us|1|0|1|0
+United States|search.yahoo.com|1|0|1|1
+United States|silentbet.com|1|0|1|0
+United States|srt.bitcoin.com|1|0|1|1
+United States|t.co|0|0|5|3
+United States|tracker-pm2.fortunejackpartners.com|1|0|7|0
+United States|url8039.fortunejack.com|3|0|2|0
+United States|www.betbrain.com|1|0|0|0
+United States|www.betluck.tv|1|0|0|0
+United States|www.betonvalue.com|0|0|1|0
+United States|www.google.com|4|0|14|9
+United States|www.sbo.net|0|0|1|0
+Uruguay|$direct|0|0|5|5
+Uruguay|fortunejack.com|0|0|12|9
+Uruguay|instagram.com|1|0|0|0
+Uzbekistan|$direct|0|0|1|1
+Venezuela|$direct|0|0|2|1
+Venezuela|fortunejack.com|1|0|8|2
+Venezuela|instagram.com|0|0|3|0
+Venezuela|m.facebook.com|2|0|7|0
+Venezuela|tracker-pm2.fortunejackpartners.com|0|0|1|0
+Venezuela|www.google.com|1|0|1|0
+Vietnam|$direct|0|0|3|3
+Vietnam|fortunejack.com|0|0|13|12
+Vietnam|t.co|0|0|1|0
+Zambia|fortunejack.com|0|0|1|0
+Åland Islands|fortunejack.com|2|1|0|0

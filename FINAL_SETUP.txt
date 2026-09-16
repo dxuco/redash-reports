@@ -1,0 +1,136 @@
+═══════════════════════════════════════════════════════════════════════
+  ✅ GENERAL REPORT — ULTRA-SIMPLE SETUP COMPLETE
+═══════════════════════════════════════════════════════════════════════
+
+📁 STRUCTURE (Clean & Simple)
+
+  ✓ All scripts in root (.js, .py, .bat files)
+  ✓ All config in root (config.env, *.json)
+  ✓ Reports in output/reports/
+  ✓ Cache in output/cache/
+  ✓ Data in output/data/
+
+═══════════════════════════════════════════════════════════════════════
+
+📊 ROOT LEVEL FILES (50+ scripts ready to use)
+
+  BUILD SCRIPTS:
+    • build.js           — Bonus Cost (9-15 min, Redash query)
+    • build-ftd.js       — FTD Report (2-3 min)
+    • build-month.js     — Current Month (1 min)
+    • build_acquisition.py — Acquisition CPA (2 min)
+    • gen_2025.py        — 2025 Comparison (1 min)
+
+  UTILITIES:
+    • server.js          — Local dev server
+    • publish-worker.js  — Deploy to Cloudflare
+    • verify-public.js   — Check live site
+    • make-standalone.js — Bake data into HTML
+    • redash.js          — Redash API client
+    • app.js             — Interactive frontend
+    • [+ 10 more tools]
+
+  AUTOMATION:
+    • UPDATE-EVERYTHING.bat      ← MAIN SCRIPT (Full build)
+    • INSTALL-DAILY-UPDATE.bat   ← Schedule daily
+    • [+ 20 utility .bat files]
+
+  CONFIG:
+    • config.env         ← Settings & secrets (PROTECT!)
+    • bonus-groups.json  ← Bonus categorization
+    • data-exclusions.json ← Data filters
+    • [+ affili ate overrides]
+
+═══════════════════════════════════════════════════════════════════════
+
+📁 DIRECTORIES
+
+  output/
+    ├── reports/   ← Built HTML reports (view these!)
+    ├── cache/     ← Cached Redash data
+    └── data/      ← JSON datasets
+
+  overview/,  retention/, reactivation/  ← Report builders
+  redash-kit/    ← Reusable Redash library
+  worker/        ← Cloudflare Worker code
+  logs/          ← Build logs
+  docs/          ← Documentation
+
+═══════════════════════════════════════════════════════════════════════
+
+🚀 QUICK START (3 STEPS)
+
+  1. npm install
+  2. node build.js --probe
+  3. UPDATE-EVERYTHING.bat
+
+  Then check: output/reports/bonus-cost-report.html
+
+═══════════════════════════════════════════════════════════════════════
+
+📖 DOCUMENTATION
+
+  START_HERE.md      ← Read this first!
+  QUICKSTART.md      ← Common commands
+  ARCHITECTURE.md    ← How it works
+  README.md          ← Original docs
+
+═══════════════════════════════════════════════════════════════════════
+
+🔐 PROTECT THESE FILES
+
+  ✗ Never commit to Git:
+    • config.env
+    • bonus-groups.json
+    • output/data/data.json
+
+═══════════════════════════════════════════════════════════════════════
+
+⚙️ COMMON COMMANDS
+
+  npm install                    Install dependencies
+  node build.js --probe          Test Redash connection
+  node build.js                  Build Bonus Cost only
+  node build-ftd.js              Build FTD Report only
+  UPDATE-EVERYTHING.bat          Full build (all reports)
+  node server.js                 Local dev server
+  node publish-worker.js         Deploy to Cloudflare
+  INSTALL-DAILY-UPDATE.bat       Schedule daily builds
+
+═══════════════════════════════════════════════════════════════════════
+
+📊 WHAT GETS BUILT
+
+  ✓ Bonus Cost Report (20-25 MB)
+  ✓ FTD Report (3-4 MB)
+  ✓ Business Overview
+  ✓ FTD Share Dashboard
+  ✓ Retention Analysis
+  ✓ Reactivation Targeting
+  ✓ Acquisition & CPA
+
+  Total time: 10-20 minutes
+  Output location: output/reports/
+
+═══════════════════════════════════════════════════════════════════════
+
+🌐 LIVE SITE
+
+  Local:  http://localhost:8080 (run: node server.js)
+  Live:   https://reports.wayzen.workers.dev
+  Update: node publish-worker.js
+
+═══════════════════════════════════════════════════════════════════════
+
+⏰ DAILY AUTOMATION
+
+  Command: INSTALL-DAILY-UPDATE.bat (run as admin once)
+  Then: Builds run automatically at 07:05 AM every day
+
+═══════════════════════════════════════════════════════════════════════
+
+✅ READY TO GO!
+
+  Next: Read START_HERE.md and run UPDATE-EVERYTHING.bat
+
+═══════════════════════════════════════════════════════════════════════

@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Community Channels 2026</title>
+<style>
+:root{
+  --dark-green:#0B6E3A; --green-dk:#0A5A30; --sage:#4E9D5C; --light-green:#C0DD97;
+  --band:#E3F3E8; --row-alt:#F3F7F3; --navy:#0F2A43; --slate:#5B7285; --muted:#677181;
+  --axis:#C3CCD4; --border:#E5E5E5; --bar-bg:#EEF1F4; --surface:#FFFFFF; --plane:#F4F6F5;
+  --panel:#FAFBF9; --divider:#D8DEE0; --warning:#E67E22; --critical:#C0392B;
+  --grey-2:#8B93A1; --grey-5:#C6CED4; --grey:#B7C3CF;
+  --cat-live-casino:#2F7ED8; --cat-provably-fair:#16A0A0; --cat-crash:#8E44AD;
+  --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --cover-padding:1.6rem 20px 1.4rem; --cover-title:1.55rem; --cover-subtitle:.86rem;
+  --page-width:1800px; --cover-line-height:1.45; --cover-inner-min:60px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--navy);font-family:var(--font-body);
+     font-size:14px;line-height:1.45}
+/* Cover band: values written out literally, not as var() references —
+   check-theme.js compares them against theme.css textually. */
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);
+       color:#fff;padding:1.6rem 20px 1.4rem;line-height:1.45}
+.cover-inner{max-width:1800px;margin:0 auto;height:60px;line-height:1.45;display:flex;
+       align-items:center;justify-content:space-between;gap:24px;flex-wrap:nowrap}
+.cover h1{font-size:1.55rem;font-weight:700;margin:0 0 .25rem;letter-spacing:-.01em;
+       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cover p{color:var(--light-green);font-size:.86rem;margin:0;white-space:nowrap;
+       overflow:hidden;text-overflow:ellipsis}
+.ctl{display:flex;gap:18px;align-items:center;flex-shrink:0}
+.grp{display:flex;flex-direction:column;gap:4px}
+.grp .lbl{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;
+       color:var(--light-green);opacity:.85}
+.grp .btns{display:flex}
+button{font:inherit;font-size:.78rem;padding:.3rem .7rem;background:rgba(255,255,255,.1);
+       color:#fff;border:1px solid rgba(255,255,255,.35);cursor:pointer}
+button+button{border-left:none}
+button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:600}
+.wrap{max-width:1800px;margin:0 auto;padding:18px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--border);margin-bottom:18px}
+.card>h2{font-size:.95rem;margin:0;padding:.7rem 16px;border-bottom:1px solid var(--border);
+       background:var(--panel)}
+.card>.body{padding:14px 16px 18px}
+.cap{color:var(--muted);font-size:.76rem;margin:.5rem 0 0}
+.strip{display:flex;flex-wrap:wrap;gap:26px;padding:0 0 12px;margin-bottom:10px;
+       border-bottom:1px solid var(--border)}
+.fig .k{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--grey-2)}
+.fig .v{font-size:1.32rem;font-weight:700;letter-spacing:-.02em}
+.fig .s{font-size:.72rem;color:var(--muted)}
+.neg{color:var(--critical)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.li{display:flex;gap:6px;align-items:center;font-size:.78rem;cursor:pointer;
+    padding:2px 6px;border:1px solid transparent}
+.li.off{opacity:.35}
+.li .sw{width:11px;height:11px;border-radius:2px;display:inline-block}
+.chip{font-size:.72rem;border:1px solid var(--grey-5);background:var(--panel);
+      padding:.15rem .5rem;cursor:pointer;color:var(--slate)}
+.chip[hidden]{display:none}
+svg{display:block;width:100%;height:auto;overflow:visible}
+table{border-collapse:collapse;width:100%;font-size:.8rem}
+th,td{padding:.4rem .6rem;text-align:right;border-bottom:1px solid var(--border);
+      white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{background:var(--panel);font-size:.68rem;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--slate)}
+tbody tr:hover{background:var(--band)}
+tr.grp-hd td{background:var(--row-alt);font-weight:700}
+.sc{overflow-x:auto}
+.sw-i{width:9px;height:9px;display:inline-block;border-radius:2px;margin-right:6px}
+tbody tr[data-key],tbody tr[data-seg]{cursor:pointer}
+#tbl tbody tr.grp-hd[data-key]:hover{background:var(--band)}
+tbody tr[data-key] td:first-child::after,
+tbody tr[data-seg] td:first-child::after{content:"›";color:var(--grey-5);
+  margin-left:8px;font-weight:700}
+tbody tr[data-key]:hover td:first-child::after,
+tbody tr[data-seg]:hover td:first-child::after{color:var(--dark-green)}
+.modal{position:fixed;inset:0;background:rgba(15,42,67,.45);display:flex;
+  align-items:center;justify-content:center;padding:24px;z-index:50}
+.modal[hidden]{display:none}
+.modal-box{background:var(--surface);border:1px solid var(--border);max-width:1000px;
+  width:100%;max-height:86vh;overflow:auto;box-shadow:0 12px 40px rgba(15,42,67,.28)}
+.modal-hd{display:flex;align-items:center;gap:12px;padding:.7rem 16px;
+  background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0}
+.modal-hd h3{margin:0;font-size:.95rem}
+.modal-hd .x{margin-left:auto;border:1px solid var(--grey-5);background:var(--surface);
+  color:var(--slate);cursor:pointer;font-size:.8rem;padding:.2rem .6rem}
+.modal-body{padding:14px 16px 18px}
+.scope{font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--grey-2);border:1px solid var(--border);padding:.05rem .3rem;
+  margin-left:6px}
+</style>
+</head>
+<!-- An explicit opening body tag is required: publish-worker.js regex-matches
+     the FIRST one in the file and injects the site nav bar straight after it.
+     Never write that tag name in angle brackets above this line, comments
+     included — a regex cannot see comments, so the bar lands inside one:
+     invisible, no error, published page with no header. This comment used to
+     do exactly that. test_channels.js now checks for it. -->
+<body>
+
+<div class="cover"><div class="cover-inner">
+  <div style="min-width:0">
+    <h1>Community channels — Discord, Twitter, Telegram</h1>
+    <p id="sub">2026 by month · depositor penetration, share of total GGR, tickets</p>
+  </div>
+  <div class="ctl">
+    <div class="grp"><span class="lbl">Attribution</span><div class="btns">
+      <button id="b-month"  aria-pressed="true">Recipients that month</button>
+      <button id="b-cohort" aria-pressed="false">Cumulative cohort</button>
+    </div></div>
+    <div class="grp"><span class="lbl">Top depositor</span><div class="btns">
+      <button id="b-ex"  aria-pressed="true">Excluded</button>
+      <button id="b-inc" aria-pressed="false">Included</button>
+    </div></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+  <div class="card"><h2>Depositor penetration — all depositors vs <span id="focus"
+      >Community</span></h2><div class="body">
+    <svg id="c1" viewBox="0 0 1000 320" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l1"></div>
+    <p class="cap" id="cap1"></p>
+    <p class="cap">Grey bar is every depositor that month; coloured bar is depositors
+      who hold at least one ticket, with the penetration printed on it. Click a
+      channel in the legend to put that channel in the second bar instead of
+      Community.</p>
+  </div></div>
+
+  <div class="card"><h2>Adjusted GGR</h2><div class="body sc">
+    <div class="strip" id="s5"></div>
+    <table id="tbl-adj"></table>
+  </div></div>
+
+  <div class="card"><h2>Penetration by segment — 2026 to date</h2><div class="body sc">
+    <div class="strip" id="s6"></div>
+    <table id="tbl-seg"></table>
+  </div></div>
+
+  <div class="card"><h2>By bonus — 2026 to date</h2><div class="body sc">
+    <div class="strip" id="s7"></div>
+    <table id="tbl-bonus"></table>
+  </div></div>
+
+  <div class="card"><h2>By month</h2><div class="body sc">
+    <table id="tbl"></table>
+    <p class="cap" id="cap2conc"></p>
+    <p class="cap" id="cap4"></p>
+  </div></div>
+
+</div>
+
+<div class="modal" id="modal" hidden><div class="modal-box">
+  <div class="modal-hd"><h3 id="modal-title"></h3>
+    <button class="x" id="modal-x">Close</button></div>
+  <div class="modal-body sc"><table id="modal-tbl"></table>
+    <p class="cap" id="modal-cap"></p></div>
+</div></div>
+
+<script>
+var DATA = __DATA__;
+
+(function(){
+  var M = DATA.months, CH = DATA.channels, GR = DATA.groups;
+  var COL = {Community:"#0B6E3A", Discord:"#8E44AD", Twitter:"#2F7ED8",
+             Telegram:"#16A0A0", Any:"#0F2A43"};
+  // Opens on same-month reach so that "depositors reached" and "tickets created"
+  // sit on the same clock. Under the cohort view Telegram read 13 reached
+  // against 0 tickets created in January — both correct, but two columns
+  // answering different questions side by side with no cue. Cohort is one click
+  // away and answers the other question: what the programme has ever built up.
+  // The default lives here AND in the markup's aria-pressed — setting it in one
+  // place renders buttons that lie on load.
+  var state = { mode:"month", whale:"ex", hidden:{} };
+
+  function fmtMoney(v){
+    var s = v<0 ? "-" : "";                 // sign BEFORE the currency symbol
+    return s + "$" + Math.abs(v).toLocaleString("en-US",{maximumFractionDigits:0});
+  }
+  function fmtInt(v){ return v.toLocaleString("en-US"); }
+  function fmtPct1(v){ return (Math.round(v*10)/10).toFixed(1) + "%"; }
+  function mLabel(m){
+    return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+           [parseInt(m.slice(5),10)-1];
+  }
+  function cur(){ return DATA.series[state.mode+"|"+state.whale]; }
+  function visible(){ return GR.filter(function(g){ return !state.hidden[g]; }); }
+
+  // --- axis: ticks anchored to a step, and the zero is always labelled ------
+  function ticks(lo, hi){
+    if (lo>0) lo = 0;
+    if (hi<0) hi = 0;
+    if (hi===lo) hi = lo + 1;
+    var span = hi-lo, raw = span/4, mag = Math.pow(10, Math.floor(Math.log(raw)/Math.LN10));
+    var step = mag;
+    [1,2,2.5,5,10].some(function(k){ if (mag*k >= raw){ step = mag*k; return true; } });
+    var t = [], s = Math.floor(lo/step)*step;
+    for (var v=s; v<=hi+step*0.001; v+=step) t.push(Math.round(v*1e6)/1e6);
+    if (t.indexOf(0)<0 && lo<=0 && hi>=0) t.push(0);
+    return t.sort(function(a,b){return a-b;});
+  }
+
+  var PAD = {l:64, r:16, t:14, b:34};
+  function scaffold(svg, tk, fmt, H, rightTk, rightFmt){
+    var W=1000, pw=W-PAD.l-PAD.r-(rightTk?46:0), ph=H-PAD.t-PAD.b;
+    var lo=tk[0], hi=tk[tk.length-1];
+    var y = function(v){ return PAD.t + ph - (v-lo)/(hi-lo)*ph; };
+    var o = "";
+    tk.forEach(function(v){
+      var yy = y(v), zero = (v===0);
+      o += '<line x1="'+PAD.l+'" x2="'+(PAD.l+pw)+'" y1="'+yy+'" y2="'+yy+
+           '" stroke="'+(zero?"#5B7285":"#C3CCD4")+'" stroke-width="'+(zero?1.4:1)+'"/>'+
+           '<text x="'+(PAD.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" '+
+           'fill="#5B7285">'+fmt(v)+'</text>';
+    });
+    if (rightTk){
+      // The right axis is pinned to the LEFT axis's zero. Scaling it
+      // independently puts its zero on the floor while the bars' zero sits
+      // partway up the plot, and the line then gets drawn under the bars.
+      var rlo=rightTk[0], rhi=rightTk[rightTk.length-1];
+      var ry = function(v){ return PAD.t + ph - (v-rlo)/(rhi-rlo)*ph; };
+      rightTk.forEach(function(v){
+        o += '<text x="'+(PAD.l+pw+8)+'" y="'+(ry(v)+4)+'" font-size="11" '+
+             'fill="#5B7285">'+rightFmt(v)+'</text>';
+      });
+      svg._ry = ry;
+    }
+    M.forEach(function(m,i){
+      o += '<text x="'+(PAD.l + pw*(i+0.5)/M.length)+'" y="'+(H-12)+
+           '" text-anchor="middle" font-size="11" fill="#5B7285">'+mLabel(m)+'</text>';
+    });
+    svg._y = y; svg._pw = pw; svg._ph = ph;
+    return o;
+  }
+
+  // --- chart 1: depositor penetration ---------------------------------------
+  // TWO bars a month and nothing else: all depositors, and the focused group.
+  // The first version drew a backdrop plus four solid bars plus four dashed
+  // lines on a second axis; at 3% penetration the channel bars were 4px slivers
+  // and the chart was unreadable. Penetration is printed on the bar instead of
+  // being carried by a line, which removes the second axis entirely.
+  function focusGroup(){
+    var vis = visible();
+    return vis.length === 1 ? vis[0] : "Community";
+  }
+  function drawDepositors(){
+    var svg = document.getElementById("c1"), s = cur(), g = focusGroup();
+    var tot = DATA.totalDep[state.whale];
+    var tk = ticks(0, Math.max.apply(null, tot));
+    var o = scaffold(svg, tk, fmtInt, 320);
+    var pw = svg._pw, y = svg._y, slot = pw/M.length, y0 = y(0);
+    var bw = Math.min(46, slot*0.34);
+
+    M.forEach(function(m,i){
+      var x0 = PAD.l + slot*i + (slot - bw*2 - 6)/2;
+      var v = s[g].deps[i];
+      o += '<rect x="'+x0+'" y="'+y(tot[i])+'" width="'+bw+'" height="'+
+           (y0-y(tot[i]))+'" fill="#5B7285"><title>'+m+': '+fmtInt(tot[i])+
+           ' depositors</title></rect>'+
+           '<text x="'+(x0+bw/2)+'" y="'+(y(tot[i])-6)+'" text-anchor="middle" '+
+           'font-size="10.5" fill="#5B7285">'+fmtInt(tot[i])+'</text>'+
+           '<rect x="'+(x0+bw+6)+'" y="'+y(v)+'" width="'+bw+'" height="'+
+           Math.max(y0-y(v),v?1:0)+'" fill="'+COL[g]+'"><title>'+g+' '+m+': '+
+           fmtInt(v)+' of '+fmtInt(tot[i])+' ('+fmtPct1(s[g].pen[i])+')</title></rect>'+
+           '<text x="'+(x0+bw+6+bw/2)+'" y="'+(y(v)-6)+'" text-anchor="middle" '+
+           'font-size="10.5" font-weight="700" fill="'+COL[g]+'">'+
+           fmtPct1(s[g].pen[i])+'</text>'+
+           '<text x="'+(x0+bw+6+bw/2)+'" y="'+(y(v)-18)+'" text-anchor="middle" '+
+           'font-size="10" fill="'+COL[g]+'">'+fmtInt(v)+'</text>';
+    });
+    svg.innerHTML = o;
+  }
+
+  // --- legend ---------------------------------------------------------------
+  function legend(id){
+    var o = "";
+    GR.forEach(function(g){
+      o += '<span class="li'+(state.hidden[g]?" off":"")+'" data-c="'+g+'">'+
+           '<span class="sw" style="background:'+COL[g]+'"></span>'+g+'</span>';
+    });
+    var any = GR.some(function(g){ return state.hidden[g]; });
+    o += '<span class="chip" data-all="1"'+(any?"":" hidden")+'>Show all</span>';
+    document.getElementById(id).innerHTML = o;
+  }
+
+  // --- headline strips ------------------------------------------------------
+  function fig(k,v,s,neg){
+    return '<div class="fig"><div class="k">'+k+'</div><div class="v'+
+           (neg?" neg":"")+'">'+v+'</div><div class="s">'+(s||"")+'</div></div>';
+  }
+  function strips(){
+    var s = cur(), last = M.length-1, o = "";
+
+    // Chart 1 carries no headline strip — every figure it held is printed on
+    // the bars themselves.
+    document.getElementById("focus").textContent = focusGroup();
+
+    // Concentration warning. A channel whose line is mostly one account is not
+    // a channel result, and the chart alone cannot show that.
+    var hot = GR.filter(function(g){ return s[g].conc[last] >= 50; });
+    document.getElementById("cap2conc").innerHTML = hot.length
+      ? "<strong>Concentration:</strong> in " + mLabel(M[last]) + ", " +
+        hot.map(function(g){
+          return g + "'s line is " + Math.round(s[g].conc[last]) +
+                 "% one player"; }).join("; ") +
+        ". Read those shares as one account's result, not the channel's."
+      : "No group's latest month is more than half a single player.";
+
+    document.getElementById("cap1").innerHTML = state.mode==="cohort"
+      ? "Cumulative cohort: everyone who has ever had a ticket created, counted in "+
+        "every month from the month they first got one. A depositor is counted once "+
+        "per month however many times they deposited — never sum these bars across "+
+        "months, the same people recur in each."
+      : "Recipients that month: only players who had a ticket created in that same "+
+        "month, intersected with that month's depositors. Distinct within the month.";
+    document.getElementById("sub").textContent =
+      "2026 by month · " + (state.mode==="cohort" ? "cumulative cohort" :
+      "recipients that month") + " · top depositor " +
+      (state.whale==="ex" ? "excluded" : "included");
+  }
+
+  // --- table ----------------------------------------------------------------
+  function tag(t){
+    return '<span style="color:var(--muted);font-weight:400;font-size:.7rem;'+
+           'margin-left:6px">'+t+'</span>';
+  }
+  function table(){
+    var s = cur(), o = "<thead><tr><th>Month</th>";
+    ["Depositors reached","Penetration","Tickets created","Completed","Completion",
+     "GGR","Share of total","Top player"].forEach(function(h){ o += "<th>"+h+"</th>"; });
+    o += "</tr></thead><tbody>";
+    M.forEach(function(m,i){
+      // The month row is the WHOLE month, not a group: the figure under
+      // "Depositors reached" is every depositor, and the one under GGR is all
+      // GGR. Labelled inline — the label used to sit four columns away under
+      // "Completion", which read as though 1,504 were a reach figure.
+      // The month row IS Community — the programme total for that month, with
+      // the month's own totals carried alongside as muted context so the
+      // denominators stay visible. Only the three named channels sit inside.
+      var cr0 = DATA.tickets.Community.created[i];
+      var cp0 = DATA.tickets.Community.completed[i];
+      o += '<tr class="grp-hd" data-key="'+m+'|Community"><td>'+m+
+           tag("Community")+'</td>'+
+           '<td>'+fmtInt(s.Community.deps[i])+
+           tag("of "+fmtInt(DATA.totalDep[state.whale][i]))+'</td>'+
+           '<td>'+fmtPct1(s.Community.pen[i])+'</td>'+
+           '<td>'+(cr0?fmtInt(cr0):"—")+'</td><td>'+(cr0?fmtInt(cp0):"—")+'</td>'+
+           '<td>'+(cr0?Math.round(100*cp0/cr0)+"%":"—")+'</td>'+
+           '<td>'+fmtMoney(s.Community.ggr[i])+
+           tag("of "+fmtMoney(DATA.totalGgr[state.whale][i]))+'</td>'+
+           '<td'+(s.Community.share[i]<0?' class="neg"':'')+'>'+
+           fmtPct1(s.Community.share[i])+'</td>'+
+           '<td>'+(s.Community.conc[i]?Math.round(s.Community.conc[i])+"%":"—")+
+           '</td></tr>';
+      CH.forEach(function(g){
+        var cr = DATA.tickets[g].created[i], cp = DATA.tickets[g].completed[i];
+        o += '<tr data-key="'+m+'|'+g+'"><td style="padding-left:24px">'+
+             '<span class="sw-i" style="background:'+COL[g]+'"></span>'+g+'</td>'+
+             '<td>'+fmtInt(s[g].deps[i])+'</td>'+
+             '<td>'+fmtPct1(s[g].pen[i])+'</td>'+
+             '<td>'+(cr?fmtInt(cr):"—")+'</td><td>'+(cr?fmtInt(cp):"—")+'</td>'+
+             '<td>'+(cr?Math.round(100*cp/cr)+"%":"—")+'</td>'+
+             '<td>'+fmtMoney(s[g].ggr[i])+'</td>'+
+             '<td'+(s[g].share[i]<0?' class="neg"':'')+'>'+fmtPct1(s[g].share[i])+
+             '</td><td>'+(s[g].conc[i]?Math.round(s[g].conc[i])+"%":"—")+'</td></tr>';
+      });
+    });
+    o += "</tbody>";
+    document.getElementById("tbl").innerHTML = o;
+    document.getElementById("cap4").textContent =
+      "Community is the whole Acquisition - Community reward group — the three named "+
+      "channels plus everything with no channel in its name. The three channel rows "+
+      "therefore sit inside the Community row and do not add up to it, and they do "+
+      "not add up to each other either: " +
+      DATA.overlap[state.mode].reduce(function(a,b){return Math.max(a,b);},0) +
+      " players at peak hold tickets in more than one channel and are counted in "+
+      "each. " + DATA.meta.note;
+  }
+
+  // --- adjusted GGR table ---------------------------------------------------
+  function tableAdj(){
+    var s = cur(), o = "<thead><tr><th>Month</th>";
+    ["Total adjusted GGR","Community adj. GGR","Community share",
+     "Discord","Twitter","Telegram"]
+      .forEach(function(h){ o += "<th>"+h+"</th>"; });
+    o += "</tr></thead><tbody>";
+    M.forEach(function(m,i){
+      o += "<tr><td>"+m+"</td>"+
+           "<td>"+fmtMoney(DATA.totalAdj[state.whale][i])+"</td>"+
+           "<td>"+fmtMoney(s.Community.adj[i])+"</td>"+
+           '<td'+(s.Community.adjShare[i]<0?' class="neg"':'')+'><strong>'+
+           fmtPct1(s.Community.adjShare[i])+"</strong></td>";
+      CH.forEach(function(c){
+        o += '<td'+(s[c].adjShare[i]<0?' class="neg"':'')+'>'+
+             fmtPct1(s[c].adjShare[i])+"</td>";
+      });
+      o += "</tr>";
+    });
+    // Totals row: shares are recomputed from the summed dollars, never averaged
+    // across months — a mean of eight monthly percentages is not the period
+    // percentage, because the months are different sizes.
+    var sum = function(a){ return a.reduce(function(x,y){return x+y;},0); };
+    var tAdj = sum(DATA.totalAdj[state.whale]), cAdj = sum(s.Community.adj);
+    o += '<tr class="grp-hd"><td>2026 to date</td><td>'+fmtMoney(tAdj)+"</td><td>"+
+         fmtMoney(cAdj)+"</td><td>"+fmtPct1(100*cAdj/tAdj)+"</td>";
+    CH.forEach(function(c){
+      o += "<td>"+fmtPct1(100*sum(s[c].adj)/tAdj)+"</td>";
+    });
+    o += "</tr></tbody>";
+    document.getElementById("tbl-adj").innerHTML = o;
+
+    var o2 = fig("Total adjusted GGR", fmtMoney(tAdj), "2026 to date") +
+             fig("Community players", fmtMoney(cAdj),
+                 fmtPct1(100*cAdj/tAdj) + " of it");
+    document.getElementById("s5").innerHTML = o2;
+  }
+
+  // --- segment table --------------------------------------------------------
+  function tableSeg(){
+    var rows = DATA.segments[state.mode+"|"+state.whale];
+    var o = "<thead><tr><th>Segment</th>";
+    ["Depositors","Community reached","Penetration","Discord","Twitter","Telegram",
+     "Segment adj. GGR","Community adj. GGR","Share"]
+      .forEach(function(h){ o += "<th>"+h+"</th>"; });
+    o += "</tr></thead><tbody>";
+    // A share is only meaningful over a positive denominator. Two segments run
+    // negative adjusted GGR (their players are collectively ahead), and a
+    // percentage of a negative number flips sign and reads as the opposite of
+    // what happened — Community's +$22k inside a -$126k segment would print as
+    // -17.5%. Print the dollars and n/a instead.
+    function shareCell(part, whole){
+      if (whole > 0) return '<td'+(part<0?' class="neg"':'')+'>'+
+                             fmtPct1(100*part/whole)+"</td>";
+      return '<td style="color:var(--grey-2)">n/a</td>';
+    }
+    var tDep=0, tCom=0, tAdj=0, tComAdj=0;
+    rows.forEach(function(r){
+      tDep += r.dep; tCom += r.Community; tAdj += r.adj; tComAdj += r.CommunityAdj;
+      o += '<tr data-seg="'+r.segment+'"><td>'+r.segment+"</td>"+
+           "<td>"+fmtInt(r.dep)+"</td>"+
+           "<td>"+fmtInt(r.Community)+"</td>"+
+           "<td><strong>"+fmtPct1(r.CommunityPen)+"</strong></td>"+
+           "<td>"+fmtPct1(r.DiscordPen)+"</td>"+
+           "<td>"+fmtPct1(r.TwitterPen)+"</td>"+
+           "<td>"+fmtPct1(r.TelegramPen)+"</td>"+
+           '<td'+(r.adj<0?' class="neg"':'')+">"+fmtMoney(r.adj)+"</td>"+
+           '<td'+(r.CommunityAdj<0?' class="neg"':'')+">"+fmtMoney(r.CommunityAdj)+
+           "</td>" + shareCell(r.CommunityAdj, r.adj) + "</tr>";
+    });
+    // Totals are recomputed from the underlying counts, never averaged down the
+    // percentage column — the segments are wildly different sizes.
+    o += '<tr class="grp-hd"><td>All segments</td><td>'+fmtInt(tDep)+"</td><td>"+
+         fmtInt(tCom)+"</td><td>"+fmtPct1(100*tCom/tDep)+"</td>"+
+         '<td colspan="3"></td><td>'+fmtMoney(tAdj)+"</td><td>"+fmtMoney(tComAdj)+
+         "</td>" + shareCell(tComAdj, tAdj) + "</tr></tbody>";
+    document.getElementById("tbl-seg").innerHTML = o;
+
+    // The interesting figures are the extremes, so name them rather than making
+    // the reader scan nine rows for them.
+    var big = rows.filter(function(r){ return r.dep >= 50; });
+    var top = big.slice().sort(function(a,b){ return b.CommunityPen-a.CommunityPen; })[0];
+    var bot = big.slice().sort(function(a,b){ return a.CommunityPen-b.CommunityPen; })[0];
+    document.getElementById("s6").innerHTML =
+      fig("Depositors 2026", fmtInt(tDep), "distinct over the period") +
+      fig("Reached", fmtInt(tCom), fmtPct1(100*tCom/tDep)+" overall") +
+      fig("Deepest", fmtPct1(top.CommunityPen), top.segment+", "+fmtInt(top.dep)+
+          " depositors") +
+      fig("Shallowest", fmtPct1(bot.CommunityPen), bot.segment+", "+fmtInt(bot.dep)+
+          " depositors");
+
+  }
+
+  // --- one row per bonus, whole year ----------------------------------------
+  // Fixed to 2026 and unaffected by both switches: a ticket was either sent or
+  // it was not, and neither attribution nor the top depositor changes that.
+  function tableBonus(){
+    var B = DATA.bonuses;
+    var o = "<thead><tr><th>Bonus</th><th>Channel</th>";
+    ["Tickets sent","Completed","Players","Players who used it","Use rate",
+     "Free spins sent","Used","Freebet sent","Used","Realised cost"]
+      .forEach(function(h){ o += "<th>"+h+"</th>"; });
+    o += "</tr></thead><tbody>";
+    var t = {created:0, completed:0, fs:0, fsUsed:0, fb:0, fbUsed:0, cost:0};
+    B.forEach(function(b){
+      Object.keys(t).forEach(function(k){ t[k] += b[k]; });
+      var use = b.players ? 100*b.playersPaid/b.players : 0;
+      o += "<tr><td>"+b.name+"</td>"+
+           '<td style="text-align:left">'+
+           (b.chan==="Other" ? '<span style="color:var(--grey-2)">no channel</span>'
+             : '<span class="sw-i" style="background:'+COL[b.chan]+'"></span>'+b.chan)+
+           "</td>"+
+           "<td>"+fmtInt(b.created)+"</td>"+
+           "<td>"+fmtInt(b.completed)+"</td>"+
+           "<td>"+fmtInt(b.players)+"</td>"+
+           "<td>"+fmtInt(b.playersPaid)+"</td>"+
+           '<td'+(use<50?' style="color:var(--critical)"':'')+">"+
+           (b.players?fmtPct1(use):"—")+"</td>"+
+           "<td>"+(b.fs?fmtInt(b.fs):"—")+"</td>"+
+           "<td>"+(b.fs?fmtInt(b.fsUsed):"—")+"</td>"+
+           "<td>"+(b.fb?fmtMoney(b.fb):"—")+"</td>"+
+           "<td>"+(b.fb?fmtMoney(b.fbUsed):"—")+"</td>"+
+           "<td>"+fmtMoney(b.cost)+"</td></tr>";
+    });
+    // The players total is the DISTINCT count over all bonuses, not the column
+    // sum: the same person holds several, so adding the column gives 2,241
+    // against a true 755. The sum is shown beside it, greyed, so the overlap is
+    // visible rather than looking like an arithmetic error.
+    var D = DATA.bonusDistinct;
+    var naive = B.reduce(function(a,b){ return a+b.players; }, 0);
+    var naivePaid = B.reduce(function(a,b){ return a+b.playersPaid; }, 0);
+    o += '<tr class="grp-hd"><td>'+B.length+" bonuses</td><td></td>"+
+         "<td>"+fmtInt(t.created)+"</td><td>"+fmtInt(t.completed)+"</td>"+
+         "<td>"+fmtInt(D.players)+tag("of "+fmtInt(naive)+" rows")+"</td>"+
+         "<td>"+fmtInt(D.playersPaid)+tag("of "+fmtInt(naivePaid)+" rows")+"</td>"+
+         "<td>"+fmtPct1(D.players?100*D.playersPaid/D.players:0)+"</td>"+
+         "<td>"+fmtInt(t.fs)+"</td><td>"+fmtInt(t.fsUsed)+"</td>"+
+         "<td>"+fmtMoney(t.fb)+"</td><td>"+fmtMoney(t.fbUsed)+"</td>"+
+         "<td>"+fmtMoney(t.cost)+"</td></tr></tbody>";
+    document.getElementById("tbl-bonus").innerHTML = o;
+
+    var dead = B.filter(function(b){ return b.players && b.playersPaid/b.players < 0.5; });
+    var deadTickets = dead.reduce(function(a,b){ return a+b.created; }, 0);
+    document.getElementById("s7").innerHTML =
+      fig("Tickets sent", fmtInt(t.created), B.length+" different bonuses") +
+      fig("Free spins sent", fmtInt(t.fs),
+          fmtPct1(t.fs?100*t.fsUsed/t.fs:0)+" of them used") +
+      fig("Realised cost", fmtMoney(t.cost), "what converted to real balance") +
+      fig("Under half take it up", fmtInt(dead.length)+" bonuses",
+          fmtInt(deadTickets)+" tickets, "+
+          fmtPct1(t.created?100*deadTickets/t.created:0)+" of the year");
+  }
+
+  function render(){
+    drawDepositors();
+    ["l1"].forEach(legend);
+    strips();
+    tableAdj();
+    tableSeg();
+    tableBonus();
+    table();
+  }
+
+  // --- bonus detail popup ---------------------------------------------------
+  // Clicking a channel row in the by-month table opens the individual bonuses
+  // behind that cell. The rows come from the same export as the ticket counts,
+  // so the popup always adds up to the row that opened it.
+  function openDetail(key){
+    var parts = key.split("|"), m = parts[0], g = parts[1];
+    var rows = DATA.detail[key] || [];
+    document.getElementById("modal-title").innerHTML =
+      '<span class="sw-i" style="background:'+COL[g]+'"></span>'+g+" — "+
+      mLabel(m)+" "+m.slice(0,4);
+    var o = "<thead><tr><th>Bonus</th>";
+    ["Tickets","Completed","Players","Free spins issued","Used","Freebet issued",
+     "Realised cost"].forEach(function(h){ o += "<th>"+h+"</th>"; });
+    o += "</tr></thead><tbody>";
+    var tc=0, tp=0, tf=0, tfu=0, tb=0, tcost=0;
+    rows.forEach(function(r){
+      tc+=r.created; tp+=r.completed; tf+=r.fs; tfu+=r.fsUsed; tb+=r.fb;
+      tcost+=r.cost;
+      o += "<tr><td>"+r.name.trim()+
+           (r.scope ? '<span class="scope">'+r.scope+"</span>" : "")+"</td>"+
+           "<td>"+fmtInt(r.created)+"</td><td>"+fmtInt(r.completed)+"</td>"+
+           "<td>"+fmtInt(r.players)+"</td>"+
+           "<td>"+(r.fs?fmtInt(r.fs):"—")+"</td>"+
+           "<td>"+(r.fs?fmtInt(r.fsUsed):"—")+"</td>"+
+           "<td>"+(r.fb?fmtMoney(r.fb):"—")+"</td>"+
+           "<td>"+fmtMoney(r.cost)+"</td></tr>";
+    });
+    o += '<tr class="grp-hd"><td>'+rows.length+" bonus"+(rows.length===1?"":"es")+
+         "</td><td>"+fmtInt(tc)+"</td><td>"+fmtInt(tp)+"</td><td>—</td><td>"+
+         (tf?fmtInt(tf):"—")+"</td><td>"+(tf?fmtInt(tfu):"—")+"</td><td>"+
+         (tb?fmtMoney(tb):"—")+"</td><td>"+fmtMoney(tcost)+"</td></tr></tbody>";
+    document.getElementById("modal-tbl").innerHTML = o;
+    // Players is left out of the total on purpose: one person can hold three
+    // different bonuses in a month, so the column does not add up.
+    document.getElementById("modal-cap").textContent =
+      "Players is distinct per bonus and does not add up — one person can hold "+
+      "several. Free spins have no monetary issued value anywhere in the data, "+
+      "only a count; realised cost is what converted to real balance.";
+    document.getElementById("modal").hidden = false;
+  }
+  // Clicking a segment row lists the players behind its "Community reached"
+  // cell. 397 players across the whole table, so the whole list is inlined.
+  function openSegment(name){
+    var row = DATA.segments[state.mode+"|"+state.whale].filter(function(r){
+      return r.segment === name; })[0];
+    if (!row) return;
+    var ps = row.players || [];
+    document.getElementById("modal-title").textContent =
+      name + " — " + fmtInt(ps.length) + " of " + fmtInt(row.dep) +
+      " depositors reached (" + fmtPct1(row.CommunityPen) + ")";
+    var o = "<thead><tr><th>Player</th>";
+    ["Channel","First ticket","Tickets 2026","Deposits 2026","Adjusted GGR"]
+      .forEach(function(h){ o += "<th>"+h+"</th>"; });
+    o += "</tr></thead><tbody>";
+    var td=0, ta=0;
+    ps.forEach(function(p){
+      td += p["dep$"]; ta += p.adj;
+      o += "<tr><td>"+(p.name || "—")+
+           '<span class="scope">'+p.id+"</span></td>"+
+           "<td>"+p.chan+"</td><td>"+p.since+"</td>"+
+           "<td>"+(p.tickets?fmtInt(p.tickets):"—")+"</td>"+
+           "<td>"+fmtMoney(p["dep$"])+"</td>"+
+           '<td'+(p.adj<0?' class="neg"':'')+">"+fmtMoney(p.adj)+"</td></tr>";
+    });
+    o += '<tr class="grp-hd"><td>'+fmtInt(ps.length)+" players</td>"+
+         '<td colspan="3"></td><td>'+fmtMoney(td)+"</td>"+
+         '<td'+(ta<0?' class="neg"':'')+">"+fmtMoney(ta)+"</td></tr></tbody>";
+    document.getElementById("modal-tbl").innerHTML = o;
+    document.getElementById("modal-cap").textContent =
+      "Sorted by adjusted GGR. Tickets 2026 is zero for anyone whose only ticket "+
+      "came in 2025 — they are still reached, which is what the cumulative view "+
+      "counts. Channel is blank where the bonus name carried no channel (blog "+
+      "posts and generic promos). Username is the latest one on file; a player "+
+      "id can change name mid-year.";
+    document.getElementById("modal").hidden = false;
+  }
+  function closeDetail(){ document.getElementById("modal").hidden = true; }
+  document.getElementById("modal-x").addEventListener("click", closeDetail);
+  document.getElementById("modal").addEventListener("click", function(e){
+    if (e.target.id === "modal") closeDetail();
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape") closeDetail();
+  });
+
+  // --- interaction ----------------------------------------------------------
+  // Clicking a series ISOLATES it. People click a thing because they want to
+  // look at it; hiding-on-click is the intuitive-seeming default and is wrong.
+  document.addEventListener("click", function(e){
+    var row = e.target.closest ? e.target.closest("#tbl tr[data-key]") : null;
+    if (row){ openDetail(row.getAttribute("data-key")); return; }
+    var seg = e.target.closest ? e.target.closest("#tbl-seg tr[data-seg]") : null;
+    if (seg){ openSegment(seg.getAttribute("data-seg")); return; }
+    var all = e.target.closest ? e.target.closest("[data-all]") : null;
+    if (all){ state.hidden = {}; render(); return; }
+    var li = e.target.closest ? e.target.closest(".li") : null;
+    if (li){
+      var g = li.getAttribute("data-c");
+      if (e.altKey){ state.hidden[g] = !state.hidden[g]; }
+      else {
+        var only = GR.filter(function(x){ return !state.hidden[x]; });
+        if (only.length===1 && only[0]===g) state.hidden = {};
+        else { state.hidden = {}; GR.forEach(function(x){
+          if (x!==g) state.hidden[x] = true; }); }
+      }
+      render(); return;
+    }
+  });
+  function bind(id, key, val, siblings){
+    document.getElementById(id).addEventListener("click", function(){
+      state[key] = val;
+      siblings.forEach(function(sid){
+        document.getElementById(sid).setAttribute("aria-pressed", String(sid===id)); });
+      render();
+    });
+  }
+  bind("b-month","mode","month",["b-month","b-cohort"]);
+  bind("b-cohort","mode","cohort",["b-month","b-cohort"]);
+  bind("b-ex","whale","ex",["b-ex","b-inc"]);
+  bind("b-inc","whale","inc",["b-ex","b-inc"]);
+
+  render();
+  // const is script-scoped and never reaches window; hand over an explicit
+  // handle so the jsdom test (and the console) can read the state back.
+  window.CC = { DATA:DATA, state:state, render:render, cur:cur,
+                fmtMoney:fmtMoney, fmtPct1:fmtPct1, ticks:ticks };
+})();
+</script>
+</body>
+</html>

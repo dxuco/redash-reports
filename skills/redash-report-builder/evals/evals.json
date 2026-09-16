@@ -1,0 +1,26 @@
+{
+  "skill_name": "redash-report-builder",
+  "evals": [
+    {
+      "id": 1,
+      "name": "add-withdrawals-chart",
+      "prompt": "add withdrawals by day to the business overview page, same format as the deposit chart",
+      "expected_output": "Reads the ftd-report/cache month files rather than calling Redash; checks that `withdraw` shares a row with `blockchain` before splitting it by rail; carves out karolik777 by default; follows the house chart conventions (zero labelled, sign before currency symbol); tests the built page in jsdom.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "new-bonus-cost-page",
+      "prompt": "make me a new standalone html page showing bonus cost by day broken down by bonus group, for august",
+      "expected_output": "Uses the three-file build pattern (builder .py -> data .json -> template + maker -> standalone html at the folder root); discovers that bonus_group and game_product almost never share a row; excludes the whale by default; produces a page that actually renders.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "diagnose-suspect-figure",
+      "prompt": "our june GGR looks way off compared to may, can you check what's going on",
+      "expected_output": "Investigates from the cache rows; identifies karolik777 as the driver (his GGR swings +$7.27M in May to -$3.43M in June); distinguishes raw GGR from adjusted GGR; reports the ex-whale figures alongside the headline ones rather than just restating the anomaly.",
+      "files": []
+    }
+  ]
+}

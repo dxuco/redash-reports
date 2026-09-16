@@ -1,0 +1,194 @@
+/* ============================================================================
+   veis reports — house palette
+   ----------------------------------------------------------------------------
+   One palette for every report on the site. Taken from the Acquisition / CPA
+   report, which was the first one built in this style.
+
+   The reports are standalone single-file HTML — they have to open by
+   double-clicking, with no server and no network — so this file is NOT linked
+   by them. It is the reference copy, and check-theme.js enforces that no report
+   uses a colour that is not listed here.
+
+   Changing a colour: edit it here, change it in the reports, then run
+   8-check-theme.bat to confirm nothing was missed.
+   ========================================================================== */
+
+:root {
+  /* --- greens: the house colour ------------------------------------------ */
+  --dark-green:  #0B6E3A;   /* headers, primary series, buttons              */
+  --green-hi:    #0D7F43;   /* hover state on a dark-green surface           */
+  --green-dk:    #0A5A30;   /* far end of the cover gradient                 */
+  --sage:        #4E9D5C;   /* secondary series, selection outlines          */
+  --light-green: #C0DD97;   /* cover subtitle, selected cells                */
+  --band:        #E3F3E8;   /* row hover                                     */
+  --row-alt:     #F3F7F3;   /* group rows, zebra striping                    */
+
+  /* --- neutrals ---------------------------------------------------------- */
+  --navy:        #0F2A43;   /* body text, card header strips, tertiary series */
+  --slate:       #5B7285;   /* secondary text, quaternary series             */
+  --muted:       #677181;   /* em-dashes for zero, de-emphasised labels      */
+  --grey:        #B7C3CF;
+  --axis:        #C3CCD4;   /* chart axes, rules                             */
+  --zero-rule:   #9AA7B2;   /* the darkened zero line an axis stacks from    */
+  --border:      #E5E5E5;   /* table row separators                          */
+  --bar-bg:      #EEF1F4;   /* empty half of an inline bar                   */
+  --surface:     #FFFFFF;   /* cards, table body                             */
+  --plane:       #F4F6F5;   /* page background                               */
+  --panel:       #FAFBF9;   /* meta strips                                   */
+  --divider:     #D8DEE0;
+
+  /* --- status ------------------------------------------------------------ */
+  --warning:     #E67E22;   /* also the "money" series                       */
+  --warn-bg:     #FDF6EC;
+  --critical:    #C0392B;   /* negative figures, stale dates, churn series   */
+
+  /* --- extra greys, as used by the Acquisition and FTD reports ------------ */
+  --grey-2:      #8B93A1;   /* big muted stat headings                       */
+  --grey-3:      #B8C0C8;   /* "n/a" cells                                   */
+  --grey-4:      #A8B4BE;   /* scrollbar thumb, hover                        */
+  --grey-5:      #C6CED4;   /* thin cell outlines                            */
+
+  /* --- light green tints -------------------------------------------------- */
+  --tint-1:      #E7F1E9;   /* top-depositor row hover                       */
+  --tint-2:      #EDF1EE;   /* its row separator                             */
+  --tint-3:      #EAF3EC;   /* sub-label on a green fill                     */
+
+  /* --- diverging ramp, used by the August FTD win/loss table -------------- */
+  /* navy end = players lost, orange end = players gained                     */
+  --ramp-navy-3: #081E33;
+  --ramp-navy-2: #4A6480;
+  --ramp-navy-1: #A8BAC9;
+  --ramp-warm-1: #F2C48E;
+  --ramp-warm-2: #ECA255;
+  --ramp-warm-3: #A85410;
+
+  /* --- sequential green ramp, FTD country heatmap ------------------------- */
+  /* 0-9 players at the pale end through 1000+ at the dark end               */
+  --heat-1:      #E1EBE3;
+  --heat-2:      #C2D8C7;
+  --heat-3:      #A3C5AB;
+  --heat-4:      #84B28F;
+  --heat-5:      #659F73;
+  --heat-6:      #468C57;
+  --heat-7:      #27793B;
+  --heat-8:      #0B5C2C;
+  --heat-ink:    #243B4A;   /* text on the darker heat steps                 */
+
+  /* --- alert fills, FTD churn/negative cells ------------------------------ */
+  --alert-bg:    #FDECEA;   /* faint red cell background                     */
+  --alert-fill:  #F1948A;   /* strong red cell background                    */
+  --alert-ink:   #641E16;   /* text on that strong fill                      */
+
+  /* --- game category / payment rail series -------------------------------
+     Nominal colours, one per category — a green ramp is unreadable once the
+     stacked segments get thin. These were already in use by the overview,
+     depositor-mix and FTD-share pages; they were only added here on
+     2026-08-25, when those pages were put on the theme check for the first
+     time and turned out never to have been covered by it.
+
+     Reused deliberately, because the two never appear in the same chart:
+       --cat-live-casino and --cat-crypto are both #2F7ED8
+       --cat-sports      and --cat-fiat    are both #E67E22            */
+  --cat-casino:        #0B6E3A;
+  --cat-live-casino:   #2F7ED8;
+  --cat-sports:        #E67E22;
+  --cat-provably-fair: #16A0A0;
+  --cat-crash:         #8E44AD;
+  --cat-dice:          #D64550;
+  --cat-tradesmarter:  #C9A227;
+  --cat-micro-betting: #7F8C8D;
+  --cat-unknown:       #B7C3CF;
+
+  /* --- FTD cohort bands, added 2026-08-30 --------------------------------
+     FTD Share stacks five cohorts by the year a player first deposited. The
+     newest two keep the colours the Business Overview gives them — blue for
+     this year (--cat-live-casino) and green for last (--cat-casino) — so the
+     two pages read the same.
+
+     The older three are a deliberate exception to the nominal-colour rule
+     above. They are one band split three ways, not three unrelated series:
+     "pre-2025" used to be a single purple, and giving its parts unrelated
+     hues would break the family the reader recognises from the coarse page.
+     So they are a purple ramp, spaced far enough apart to stay separable at
+     the thin end, oldest darkest.
+
+     --cohort-back2 is light enough that a white numeral on it is a smudge, so
+     the band carries --cohort-back2-ink and the chart drawer uses it. Any new
+     light band must do the same.                                          */
+  --cohort-older:      #4A235A;   /* pre-2023: deepest, at the base         */
+  --cohort-back3:      #7D3C98;   /* FTD 2023                               */
+  --cohort-back2:      #BB8FCE;   /* FTD 2024: lightest of the three        */
+  --cohort-back2-ink:  #0F2A43;   /* navy numerals on that light fill       */
+
+  /* --- typography -------------------------------------------------------- */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               Helvetica, Arial, sans-serif;
+
+  /* --- the cover band, agreed 2026-08-25 ---------------------------------- */
+  /* Every report opens with the same green band. Before this was pinned the
+     pages had drifted into three sizes: most used 1.6/1.4rem, reactivation
+     had 1.5/1.3rem, and the two acquisition reports plus deposit-frequency
+     rendered 2rem/1.7rem — not by choice, but because those files carry two
+     stacked stylesheets and the second `.cover` rule quietly won. Copying
+     "whatever the last report did" is how that spread, so the numbers live
+     here now and 9-check-theme.bat enforces them.
+
+     Content width is part of the standard: .cover-inner must match the page
+     container (.wrap or section) or the title stops lining up with the
+     tables underneath it. */
+  --cover-padding:    1.6rem 20px 1.4rem;
+  --cover-title:      1.55rem;   /* .cover h1 — or a bare h1 on older pages  */
+  --cover-subtitle:   0.86rem;   /* .cover p  — or .sub on older pages       */
+  --page-width:       1800px;    /* .cover-inner AND .wrap / section         */
+
+  /* Padding and type sizes alone do NOT make the bands equal, which is why
+     the first attempt at this left them visibly different. Three more things
+     move the height:
+       - line-height, inherited from body — business-overview uses 1.45,
+         other pages 1.5, and the cover text inherits whatever it finds;
+       - the h1 margin, .25rem on some pages and .3rem on others;
+       - what the band CONTAINS. business-overview holds the Days/Months
+         buttons inside its cover; most pages hold only a title and subtitle.
+     So the height is pinned directly instead of being left to emerge.
+
+     BENCHMARK: business-overview.html. Its content block measures
+     1.55rem x 1.45 + .25rem + .86rem x 1.45 = 60px, and its button group is
+     shorter than that, so 60px is the floor everywhere and every band comes
+     out at 60 + 1.6rem + 1.4rem. */
+  --cover-line-height: 1.45;
+  --cover-inner-min:   60px;   /* applied as a FIXED height, not a floor */
+
+  /* A floor was not enough — the bands still rendered at different heights,
+     because a flex band grows in two ways that no amount of matching padding
+     can prevent:
+       - the controls wrap to a second row when the window is narrow. Several
+         covers carry six buttons and a select;
+       - a long subtitle wraps to a second line. kw-radar's ran to 291
+         characters.
+     So .cover-inner is given height (not min-height) 60px, flex-wrap:nowrap,
+     and the title and subtitle truncate with an ellipsis. The title shrinks
+     before the controls do: losing sight of the buttons is worse than a
+     clipped word. Keep cover subtitles under about 140 characters and they
+     will never truncate at a normal width. */
+}
+
+/* ----------------------------------------------------------------------------
+   Reference implementation. The reports are standalone single-file HTML, so
+   they each carry their own copy — this is what that copy should say.
+
+   .cover       { background: linear-gradient(135deg, var(--dark-green) 0%,
+                                              var(--green-dk) 100%);
+                  color: #fff; padding: 1.6rem 20px 1.4rem; }
+   .cover-inner { max-width: 1800px; margin: 0 auto; }
+   .cover h1    { font-size: 1.55rem; font-weight: 700; margin: 0 0 .25rem;
+                  letter-spacing: -0.01em; }
+   .cover p     { color: var(--light-green); font-size: .86rem; margin: 0; }
+   -------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------------
+   Series colours, in the order they should be assigned so that no two series
+   in the same chart share a hue:
+
+     1  --dark-green   2  --navy      3  --sage
+     4  --slate        5  --warning   6  --critical
+   -------------------------------------------------------------------------- */

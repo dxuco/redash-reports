@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiat payments by affiliate</title>
+<style>
+:root{--dark-green:#0B6E3A;--green-hi:#0D7F43;--sage:#4E9D5C;--light-green:#C0DD97;
+--band:#E3F3E8;--row-alt:#F3F7F3;--navy:#0F2A43;--slate:#5B7285;--muted:#677181;
+--grey:#B7C3CF;--axis:#C3CCD4;--zero-rule:#9AA7B2;--border:#E5E5E5;--surface:#FFFFFF;
+--plane:#F4F6F5;--panel:#FAFBF9;--divider:#D8DEE0;--warning:#E67E22;--warn-bg:#FDF6EC;
+--critical:#C0392B;--grey-2:#8B93A1;--grey-3:#B8C0C8;--grey-5:#C6CED4;--tint-1:#E7F1E9;
+--bar-bg:#EEF1F4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--navy);
+font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px 72px}
+header{background:var(--dark-green);color:#fff;padding:26px 0 22px;margin-bottom:26px}
+header .wrap{padding-bottom:0}
+.hrow{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+ border-radius:20px;padding:2px}
+.seg button{appearance:none;border:0;background:transparent;color:#fff;font:inherit;font-weight:600;
+ font-size:12px;padding:5px 13px;border-radius:18px;cursor:pointer;white-space:nowrap}
+.seg button:hover{background:rgba(255,255,255,.16)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:700}
+select.iconbtn{appearance:none;border:1.5px solid rgba(255,255,255,.6);
+ background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:12px;font-weight:600;
+ padding:6px 10px;border-radius:20px;cursor:pointer;max-width:230px}
+select.iconbtn:hover{background:#fff;color:var(--dark-green)}
+select.iconbtn option{color:var(--navy);background:#fff}
+.dlbl{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--light-green);
+ margin-right:2px}
+h1{margin:0 0 6px;font-size:27px;font-weight:600;letter-spacing:-.2px}
+header p{margin:0;color:var(--light-green);font-size:14px}
+h2{font-size:18px;font-weight:600;margin:34px 0 4px;padding-top:20px;
+ border-top:2px solid var(--dark-green)}
+h2 .n{color:var(--grey-2);font-weight:400;margin-right:8px}
+.sub{color:var(--slate);font-size:13.5px;margin:0 0 14px;max-width:86ch}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+ padding:14px 16px;margin:14px 0}
+.scroll{overflow-x:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin:18px 0 6px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.kpi .l{color:var(--grey-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;
+ font-weight:600}
+.kpi .v{font-size:23px;font-weight:600;margin-top:3px;font-variant-numeric:tabular-nums;
+ letter-spacing:-.4px}
+.kpi .d{color:var(--slate);font-size:11.5px;margin-top:1px}
+.kpi.hi .v{color:var(--dark-green)}
+.kpi.bad .v{color:var(--critical)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{text-align:right;padding:6px 7px;border-bottom:2px solid var(--divider);color:var(--slate);
+ font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th.s{cursor:pointer;user-select:none}
+th.s:hover{color:var(--dark-green)}
+th.s .ar{color:var(--dark-green);font-size:9px}
+td{text-align:right;padding:5px 7px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr:hover{background:var(--band)}
+tbody tr.pick{cursor:pointer}
+tr.tot td{font-weight:600;background:var(--row-alt);border-top:2px solid var(--divider)}
+tr.sel td{background:var(--tint-1)}
+tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--dark-green)}
+th.sep,td.sep{border-left:1px solid var(--divider)}
+td.nm{max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:1px 6px;border-radius:9px;
+ border:1px solid var(--grey-5);color:var(--slate);background:var(--panel)}
+.tag.aff{border-color:var(--sage);color:var(--dark-green);background:var(--tint-1)}
+.tag.str{border-color:#e2c48d;color:#7a4f10;background:var(--warn-bg)}
+.mini{display:inline-block;width:52px;height:7px;background:var(--bar-bg);border-radius:4px;
+ vertical-align:middle;margin-right:6px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--dark-green)}
+.mini i.w{background:var(--warning)}
+.mini i.c{background:var(--critical)}
+.z{color:var(--muted)}
+.code{font-weight:600;margin-right:7px;color:var(--navy)}
+.brk{margin:14px 0 0;padding:9px 12px;border-radius:7px;font-size:12.5px;line-height:1.5;
+ border:1px solid #d7dee6;background:#f4f7fa;color:#41505f}
+.brk b{color:#1d2b3a}
+.brk .bt{display:inline-block;font-weight:600;margin-right:6px}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0 0;font-size:12.5px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--tint-1);
+ border:1px solid var(--sage);color:var(--dark-green);border-radius:14px;padding:2px 6px 2px 11px;
+ font-weight:600}
+.chip button{appearance:none;border:0;background:transparent;color:var(--dark-green);
+ font:inherit;font-size:14px;line-height:1;cursor:pointer;padding:0 4px}
+.chip button:hover{color:var(--critical)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--slate);margin:2px 0 10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+.chartbox{overflow-x:auto}
+.pbtn{font:inherit;font-size:12.5px;padding:4px 11px;border:1px solid var(--grey-5);
+ background:var(--surface);color:var(--slate);border-radius:6px;cursor:pointer}
+.pbtn:hover{border-color:var(--dark-green);color:var(--dark-green)}
+.pbtn[aria-pressed="true"]{background:var(--dark-green);border-color:var(--dark-green);color:#fff}
+.bar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px;align-items:center}
+.bar .plbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--grey-2)}
+#drill{display:none}
+.close{float:right;font-size:12px;color:var(--slate);cursor:pointer;font-weight:600}
+.close:hover{color:var(--critical)}
+</style></head><body>
+
+<header><div class="wrap"><div class="hrow">
+<div>
+<h1>Fiat payments by affiliate</h1>
+<p>Attempted vs created &middot; <span id="hspan"></span> &middot; Redash query 1787 &middot; built __BUILT__</p>
+</div>
+<div class="controls">
+  <div class="seg" id="kind">
+    <button data-k="0" aria-pressed="true">Deposits</button>
+    <button data-k="1" aria-pressed="false">Withdrawals</button>
+    <button data-k="2" aria-pressed="false">Both</button>
+  </div>
+  <span class="dlbl">from</span><select class="iconbtn" id="from"></select>
+  <span class="dlbl">to</span><select class="iconbtn" id="to"></select>
+  <div class="seg" id="preset">
+    <button data-p="all" aria-pressed="true">All</button>
+    <button data-p="ytd" aria-pressed="false">YTD</button>
+    <button data-p="90" aria-pressed="false">90d</button>
+    <button data-p="30" aria-pressed="false">30d</button>
+  </div>
+  <select class="iconbtn" id="country" aria-label="Payment country"></select>
+  <select class="iconbtn" id="method" aria-label="Payment method"></select>
+</div>
+</div></div></header>
+
+<div class="wrap">
+
+<div class="kpis" id="kpis"></div>
+<div class="chips" id="chips"></div>
+<div class="brk" id="brk"></div>
+
+<h2><span class="n">01</span>Attempted vs created over time</h2>
+<p class="sub" id="csub"></p>
+<div class="panel">
+  <div class="legend">
+    <span><i style="background:#0B6E3A"></i>Created</span>
+    <span><i style="background:#C0392B"></i>Failed / declined</span>
+    <span><i style="background:#0F2A43;height:3px;width:16px;border-radius:2px"></i>Success rate (right axis)</span>
+  </div>
+  <div class="chartbox"><svg id="chart" role="img" aria-label="Monthly attempted versus created fiat transactions"></svg></div>
+</div>
+
+<h2><span class="n">02</span>By payment country</h2>
+<p class="sub" id="ctrysub"></p>
+<div class="panel scroll"><table id="tctry"></table></div>
+
+<h2><span class="n">03</span>By payment method</h2>
+<p class="sub" id="mthsub"></p>
+<div class="panel scroll"><table id="tmth"></table></div>
+
+<h2><span class="n">04</span>By affiliate</h2>
+<p class="sub" id="tsub"></p>
+<div class="bar">
+  <span class="plbl">Show</span>
+  <button class="pbtn" data-f="all" aria-pressed="true">Everyone</button>
+  <button class="pbtn" data-f="Affiliate" aria-pressed="false">Affiliates</button>
+  <button class="pbtn" data-f="Streamer" aria-pressed="false">Streamers</button>
+  <button class="pbtn" data-f="Direct" aria-pressed="false">Direct</button>
+  <span class="plbl" style="margin-left:10px">Min attempts</span>
+  <button class="pbtn" data-m="0" aria-pressed="true">any</button>
+  <button class="pbtn" data-m="10" aria-pressed="false">10+</button>
+  <button class="pbtn" data-m="50" aria-pressed="false">50+</button>
+</div>
+<div class="panel scroll"><table id="tmain"></table></div>
+
+<div id="drill">
+<h2><span class="n">05</span><span id="dname"></span><span class="close" id="dclose">close &times;</span></h2>
+<p class="sub" id="dsub"></p>
+<div class="panel scroll"><table id="tmon"></table></div>
+<p class="sub" style="margin-top:18px">Why the rest were not created</p>
+<div class="panel scroll"><table id="treason"></table></div>
+</div>
+
+</div>
+
+<script>window.DATA = __DATA__;</script>
+<script>
+(function(){
+var D = window.DATA;
+var DAYS = D.days, AFFS = D.affs, CELLS = D.cells, CTRY = D.countries, MTHD = D.methods;
+
+/* Cell layout, emitted by build_fiat_affiliate.py:
+   0 day  1 kind  2 country  3 method  4 attempted  5 created
+   6 attempted EUR  7 created EUR  8 players attempted  9 players created
+   10 [[reasonIdx,count]]  11 [[reasonByIdx,count]]                        */
+var C_DAY=0, C_KIND=1, C_CTRY=2, C_MTHD=3, C_ATT=4, C_SUC=5,
+    C_AAMT=6, C_SAMT=7, C_PA=8, C_PS=9, C_R=10, C_B=11;
+
+/* ISO-3166 names for the codes this dataset actually contains, so the
+   dropdown reads as places rather than as a list of two-letter codes. */
+var CNAME = {DE:'Germany',NO:'Norway',ES:'Spain',NL:'Netherlands',FR:'France',
+ PT:'Portugal',LV:'Latvia',EE:'Estonia',IT:'Italy',PL:'Poland',FI:'Finland',
+ DK:'Denmark',BG:'Bulgaria',HU:'Hungary',BR:'Brazil',SE:'Sweden',CH:'Switzerland',
+ BE:'Belgium',AT:'Austria',CZ:'Czechia',RO:'Romania',LT:'Lithuania',CA:'Canada',
+ CY:'Cyprus',AU:'Australia',HR:'Croatia',SK:'Slovakia',IE:'Ireland',SI:'Slovenia',
+ MT:'Malta',LU:'Luxembourg',GR:'Greece',AR:'Argentina',NZ:'New Zealand',MX:'Mexico'};
+function cname(code){ return CNAME[code] || code; }
+
+/* ---- helpers ---------------------------------------------------------- */
+function n(v){ return v.toLocaleString('en-US'); }
+function eur(v){
+  var s = v < 0 ? '-' : '';
+  return s + '€' + Math.round(Math.abs(v)).toLocaleString('en-US');
+}
+/* One helper for every percentage on the page: whole numbers, but a real
+   small value reads "<1%" rather than rounding to a flat 0% and looking dead. */
+function pct(a, b){
+  if(!b) return '—';
+  var p = 100 * a / b;
+  if(p > 0 && p < 1) return '<1%';
+  if(p < 100 && p > 99) return '>99%';
+  return Math.round(p) + '%';
+}
+function monthOf(d){ return d.slice(0,7); }
+var MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function prettyDay(d){
+  return parseInt(d.slice(8,10),10) + ' ' + MN[+d.slice(5,7)-1] + ' ' + d.slice(0,4);
+}
+function prettyMon(m){ return MN[+m.slice(5,7)-1] + ' ' + m.slice(2,4); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+/* ---- state ------------------------------------------------------------ */
+/* country / method are indices into D.countries / D.methods; -1 means all. */
+var state = { kind: 0, from: 0, to: DAYS.length - 1, country: -1, method: -1,
+              type: 'all', min: 0, sort: 'a', desc: true, pick: -1,
+              csort: 'a', cdesc: true, msort: 'a', mdesc: true };
+
+/* ---- the one walker every figure on the page comes from ---------------- */
+/* `skip` lets a breakdown ignore its own filter: the country table stays a
+   list of every country even while one country is selected, so you can see
+   the slice in context instead of a single row. */
+function walk(fn, skip){
+  var lo = state.from, hi = state.to, kk = state.kind;
+  var ci = (skip === 'country') ? -1 : state.country;
+  var mi = (skip === 'method')  ? -1 : state.method;
+  for(var i=0;i<CELLS.length;i++){
+    var cs = CELLS[i];
+    for(var j=0;j<cs.length;j++){
+      var c = cs[j];
+      if(c[C_DAY] < lo || c[C_DAY] > hi) continue;
+      if(kk !== 2 && c[C_KIND] !== kk) continue;
+      if(ci >= 0 && c[C_CTRY] !== ci) continue;
+      if(mi >= 0 && c[C_MTHD] !== mi) continue;
+      fn(i, c);
+    }
+  }
+}
+/* Distinct players are unioned over whatever the filters select, never summed
+   from per-cell or per-month counts -- a player who tried on five days, or in
+   two countries, is one player. Player ids are global indices precisely so a
+   country or a method (which cut across affiliates) can be counted this way. */
+function bucket(){ return { a:0, s:0, aa:0, sa:0, pa:{}, ps:{}, npa:0, nps:0 }; }
+function add(b, c){
+  b.a += c[C_ATT]; b.s += c[C_SUC]; b.aa += c[C_AAMT]; b.sa += c[C_SAMT];
+  var x, L = c[C_PA];
+  for(x=0;x<L.length;x++){ if(b.pa[L[x]] !== 1){ b.pa[L[x]] = 1; b.npa++; } }
+  L = c[C_PS];
+  for(x=0;x<L.length;x++){ if(b.ps[L[x]] !== 1){ b.ps[L[x]] = 1; b.nps++; } }
+}
+
+function byAffiliate(){
+  var m = {}, tot = bucket();
+  walk(function(i, c){
+    if(!m[i]){ m[i] = bucket(); m[i].i = i; }
+    add(m[i], c); add(tot, c);
+  });
+  var out = [];
+  for(var k in m){
+    var r = m[k], A = AFFS[r.i];
+    r.n = A.n; r.t = A.t; r.src = A.src;
+    out.push(r);
+  }
+  return { rows: out, tot: tot };
+}
+function byDim(dimIdx, skip){
+  var m = {};
+  walk(function(i, c){
+    var k = c[dimIdx];
+    if(!m[k]){ m[k] = bucket(); m[k].k = k; }
+    add(m[k], c);
+  }, skip);
+  var out = [];
+  for(var k in m) out.push(m[k]);
+  return out;
+}
+function monthly(){
+  var m = {}, order = [];
+  walk(function(i, c){
+    var key = monthOf(DAYS[c[C_DAY]]);
+    if(!m[key]){ m[key] = { k:key, a:0, s:0 }; order.push(key); }
+    m[key].a += c[C_ATT]; m[key].s += c[C_SUC];
+  });
+  order.sort();
+  return order.map(function(k){ return m[k]; });
+}
+
+/* ---- chart ------------------------------------------------------------ */
+/* Stacked bars for the counts (created at the base, failures above it, so the
+   created band shares a baseline across months and stays comparable) and the
+   success rate as a line on a right axis PINNED TO THE SAME ZERO, so the two
+   zeros sit on one rule instead of the line floating under the bars. */
+function drawChart(series){
+  var W = Math.max(760, series.length * 62 + 110), H = 300;
+  var L = 62, R = 48, TOP = 14, B = 34;
+  var pw = W - L - R, ph = H - TOP - B;
+  var max = 0;
+  series.forEach(function(d){ if(d.a > max) max = d.a; });
+  var step = Math.pow(10, Math.floor(Math.log(Math.max(max,1)) / Math.LN10));
+  while(max / step > 5) step *= 2;
+  var top = Math.ceil(max / step) * step || 1;
+  var sc = function(v){ return ph - (v / top) * ph; };
+  var s = ['<svg xmlns="http://www.w3.org/2000/svg" id="chart" width="' + W + '" height="' + H +
+           '" viewBox="0 0 ' + W + ' ' + H + '" role="img">'];
+  s.push('<g transform="translate(' + L + ',' + TOP + ')">');
+  for(var v = 0; v <= top + 1e-9; v += step){
+    var y = sc(v);
+    s.push('<line x1="0" y1="' + y.toFixed(1) + '" x2="' + pw + '" y2="' + y.toFixed(1) +
+      '" stroke="' + (v === 0 ? '#9AA7B2' : '#E5E5E5') + '" stroke-width="1"/>');
+    s.push('<text x="-9" y="' + (y + 4).toFixed(1) + '" text-anchor="end" font-size="10.5" fill="#5B7285">' +
+      n(v) + '</text>');
+  }
+  for(var p = 0; p <= 100; p += 25){
+    var yy = ph - (p / 100) * ph;
+    s.push('<text x="' + (pw + 9) + '" y="' + (yy + 4).toFixed(1) +
+      '" font-size="10.5" fill="#0F2A43">' + p + '%</text>');
+  }
+  var bw = Math.min(38, pw / Math.max(series.length, 1) * 0.62);
+  var pts = [];
+  series.forEach(function(d, i){
+    var cx = (i + 0.5) * (pw / series.length);
+    var x = cx - bw / 2;
+    var ys = sc(d.s), ya = sc(d.a);
+    s.push('<rect class="bs" x="' + x.toFixed(1) + '" y="' + ys.toFixed(1) + '" width="' + bw.toFixed(1) +
+      '" height="' + Math.max(0, ph - ys).toFixed(1) + '" fill="#0B6E3A"><title>' +
+      prettyMon(d.k) + ' — created ' + n(d.s) + '</title></rect>');
+    s.push('<rect class="bf" x="' + x.toFixed(1) + '" y="' + ya.toFixed(1) + '" width="' + bw.toFixed(1) +
+      '" height="' + Math.max(0, ys - ya).toFixed(1) + '" fill="#C0392B"><title>' +
+      prettyMon(d.k) + ' — failed ' + n(d.a - d.s) + '</title></rect>');
+    pts.push([cx, ph - (d.a ? d.s / d.a : 0) * ph]);
+    s.push('<text x="' + cx.toFixed(1) + '" y="' + (ph + 15) +
+      '" text-anchor="middle" font-size="10.5" fill="#5B7285">' + prettyMon(d.k) + '</text>');
+  });
+  if(pts.length){
+    var path = pts.map(function(p, i){
+      return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    s.push('<path d="' + path + '" fill="none" stroke="#fff" stroke-width="4.5" stroke-linejoin="round"/>');
+    s.push('<path class="rate" d="' + path +
+      '" fill="none" stroke="#0F2A43" stroke-width="2.2" stroke-linejoin="round"/>');
+    pts.forEach(function(p, i){
+      s.push('<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) +
+        '" r="3.1" fill="#0F2A43" stroke="#fff" stroke-width="1.4"><title>' +
+        prettyMon(series[i].k) + ' — ' + pct(series[i].s, series[i].a) + ' created</title></circle>');
+    });
+  }
+  s.push('</g></svg>');
+  document.querySelector('.chartbox').innerHTML = s.join('');
+}
+
+/* ---- a shared row shape for the three tables -------------------------- */
+function rateCell(r){
+  var sr = r.a ? r.s / r.a : 0;
+  var cls = sr >= 0.7 ? '' : (sr >= 0.5 ? 'w' : 'c');
+  return '<td><span class="mini"><i class="' + cls + '" style="width:' + (sr * 100).toFixed(0) +
+    '%"></i></span>' + pct(r.s, r.a) + '</td>';
+}
+function figures(r){
+  return '<td class="sep">' + n(r.a) + '</td><td>' + n(r.s) + '</td><td>' + n(r.a - r.s) + '</td>' +
+    rateCell(r) + '<td class="sep">' + n(r.npa) + '</td><td>' + n(r.nps) + '</td>' +
+    '<td>' + pct(r.nps, r.npa) + '</td><td class="sep">' + eur(r.sa) + '</td>';
+}
+function totalRow(label, rows, span){
+  var T = { a:0, s:0, npa:0, nps:0, sa:0 };
+  rows.forEach(function(r){ T.a += r.a; T.s += r.s; T.npa += r.npa; T.nps += r.nps; T.sa += r.sa; });
+  var blanks = '';
+  for(var i=1;i<span;i++) blanks += '<td></td>';
+  return '<tr class="tot"><td>' + label + '</td>' + blanks +
+    '<td class="sep">' + n(T.a) + '</td><td>' + n(T.s) + '</td><td>' + n(T.a - T.s) + '</td>' +
+    '<td>' + pct(T.s, T.a) + '</td><td class="sep">' + n(T.npa) + '</td><td>' + n(T.nps) + '</td>' +
+    '<td>' + pct(T.nps, T.npa) + '</td><td class="sep">' + eur(T.sa) + '</td></tr>';
+}
+var FIGCOLS = [['a','Attempted'],['s','Created'],['f','Failed'],['sr','Success rate'],
+               ['pa','Players tried'],['ps','Players created'],['pr','Player rate'],['sa','Created €']];
+function val(r, k){
+  if(k === 'f')  return r.a - r.s;
+  if(k === 'sr') return r.a ? r.s / r.a : 0;
+  if(k === 'pr') return r.npa ? r.nps / r.npa : 0;
+  if(k === 'pa') return r.npa;
+  if(k === 'ps') return r.nps;
+  if(k === 'av') return r.s ? r.sa / r.s : 0;
+  return r[k];
+}
+function sortRows(rows, key, desc){
+  rows.sort(function(x, y){
+    var a = val(x, key), b = val(y, key);
+    if(typeof a === 'string' || typeof b === 'string')
+      return desc ? String(b).localeCompare(String(a)) : String(a).localeCompare(String(b));
+    return desc ? b - a : a - b;
+  });
+  return rows;
+}
+function figHead(sortKey, desc, lead){
+  var h = '<thead><tr>' + lead;
+  FIGCOLS.forEach(function(c, i){
+    h += '<th class="s' + (i === 0 || i === 4 || i === 7 ? ' sep' : '') + '" data-c="' + c[0] + '">' +
+      c[1] + (sortKey === c[0] ? ' <span class="ar">' + (desc ? '▼' : '▲') + '</span>' : '') + '</th>';
+  });
+  return h + '</tr></thead><tbody>';
+}
+
+/* ---- breakdown tables ------------------------------------------------- */
+function renderDim(tableId, rows, names, sortKey, desc, selIdx, label){
+  sortRows(rows, sortKey, desc);
+  var h = figHead(sortKey, desc, '<th class="s" data-c="n">' + label + '</th>');
+  rows.forEach(function(r){
+    r.n = names[r.k];
+    h += '<tr class="pick' + (selIdx === r.k ? ' sel' : '') + '" data-k="' + r.k + '"><td class="nm">' +
+      (names === CTRY ? '<span class="code">' + esc(r.n) + '</span><span class="z">' + esc(cname(r.n)) + '</span>'
+                      : esc(r.n)) + '</td>' + figures(r) + '</tr>';
+  });
+  h += totalRow(rows.length + ' shown', rows, 1) + '</tbody>';
+  document.getElementById(tableId).innerHTML = h;
+}
+
+/* ---- affiliate table -------------------------------------------------- */
+function renderTable(W){
+  var rows = W.rows.filter(function(r){
+    return (state.type === 'all' || r.t === state.type) && r.a >= state.min;
+  });
+  sortRows(rows, state.sort, state.desc);
+  var h = figHead(state.sort, state.desc,
+    '<th class="s" data-c="n">Affiliate</th><th class="s" data-c="t">Type</th><th class="s" data-c="src">Source</th>');
+  rows.forEach(function(r){
+    h += '<tr class="pick' + (state.pick === r.i ? ' sel' : '') + '" data-i="' + r.i + '">' +
+      '<td class="nm" title="' + esc(r.n) + '">' + esc(r.n) + '</td>' +
+      '<td style="text-align:left"><span class="tag ' +
+        (r.t === 'Affiliate' ? 'aff' : r.t === 'Streamer' ? 'str' : '') + '">' + esc(r.t) + '</span></td>' +
+      '<td style="text-align:left" class="z">' + (esc(r.src) || '—') + '</td>' +
+      figures(r) + '</tr>';
+  });
+  h += totalRow(n(rows.length) + ' shown', rows, 3) + '</tbody>';
+  document.getElementById('tmain').innerHTML = h;
+}
+
+/* ---- drill ------------------------------------------------------------ */
+function renderDrill(){
+  var box = document.getElementById('drill');
+  if(state.pick < 0){ box.style.display = 'none'; return; }
+  /* #drill{display:none} lives in the stylesheet, so clearing the inline
+     style is not enough -- it has to be set explicitly. */
+  box.style.display = 'block';
+  var A = AFFS[state.pick];
+  document.getElementById('dname').textContent = A.n;
+  var m = {}, order = [], reasons = [], by = [], z;
+  for(z=0;z<D.reasons.length;z++) reasons.push(0);
+  for(z=0;z<D.reasonBy.length;z++) by.push(0);
+  walk(function(i, c){
+    if(i !== state.pick) return;
+    var key = monthOf(DAYS[c[C_DAY]]);
+    if(!m[key]){ m[key] = bucket(); m[key].k = key; order.push(key); }
+    add(m[key], c);
+    for(z=0;z<c[C_R].length;z++) reasons[c[C_R][z][0]] += c[C_R][z][1];
+    for(z=0;z<c[C_B].length;z++) by[c[C_B][z][0]] += c[C_B][z][1];
+  });
+  order.sort();
+  var h = '<thead><tr><th>Month</th><th class="sep">Attempted</th><th>Created</th><th>Failed</th>' +
+    '<th>Success rate</th><th class="sep">Players tried</th><th>Players created</th>' +
+    '<th>Player rate</th><th class="sep">Created €</th></tr></thead><tbody>';
+  var mrows = order.map(function(k){ return m[k]; });
+  mrows.forEach(function(o){
+    h += '<tr><td>' + prettyMon(o.k) + '</td>' + figures(o) + '</tr>';
+  });
+  h += totalRow('Window', mrows, 1) + '</tbody>';
+  document.getElementById('tmon').innerHTML = h;
+
+  var tot = 0;
+  for(z=0;z<reasons.length;z++) tot += reasons[z];
+  var idx = [];
+  for(z=0;z<reasons.length;z++){ if(reasons[z]) idx.push([z, reasons[z]]); }
+  idx.sort(function(a, b){ return b[1] - a[1]; });
+  var r = '<thead><tr><th>Reason the payment was not created</th><th>Count</th><th>Share</th></tr></thead><tbody>';
+  if(!idx.length){
+    r += '<tr><td colspan="3" class="z">Nothing failed in this window.</td></tr>';
+  } else {
+    idx.forEach(function(p){
+      r += '<tr><td class="nm" title="' + esc(D.reasons[p[0]]) + '">' + esc(D.reasons[p[0]]) +
+        '</td><td>' + n(p[1]) + '</td><td>' + pct(p[1], tot) + '</td></tr>';
+    });
+    var bl = [];
+    for(z=0;z<by.length;z++){ if(by[z]) bl.push(D.reasonBy[z] + ' ' + n(by[z])); }
+    r += '<tr class="tot"><td>Blamed on</td><td colspan="2" style="text-align:left">' +
+      bl.join(' · ') + '</td></tr>';
+  }
+  r += '</tbody>';
+  document.getElementById('treason').innerHTML = r;
+  document.getElementById('dsub').textContent =
+    A.t + (A.src ? ' · ' + A.src : '') + ' · ' + A.np +
+    ' players have ever made a fiat transaction under this name.';
+}
+
+/* ---- KPIs, chips and notes -------------------------------------------- */
+function renderTop(W){
+  var T = W.tot, kk = state.kind;
+  var label = kk === 0 ? 'deposit' : kk === 1 ? 'withdrawal' : 'fiat';
+  var K = [
+    ['Attempted', n(T.a), label + ' transactions', ''],
+    ['Created', n(T.s), 'went through', 'hi'],
+    ['Success rate', pct(T.s, T.a), n(T.a - T.s) + ' did not', (T.a && T.s / T.a < 0.6) ? 'bad' : ''],
+    ['Players tried', n(T.npa), 'distinct, over the window', ''],
+    ['Players created', n(T.nps), pct(T.nps, T.npa) + ' of those who tried', 'hi'],
+    ['Created value', eur(T.sa), 'EUR transactions only', ''],
+    ['Affiliate names', n(W.rows.length), 'with at least one attempt', '']
+  ];
+  document.getElementById('kpis').innerHTML = K.map(function(k){
+    return '<div class="kpi ' + k[3] + '"><div class="l">' + k[0] + '</div><div class="v">' +
+      k[1] + '</div><div class="d">' + k[2] + '</div></div>';
+  }).join('');
+
+  var chips = [];
+  if(state.country >= 0) chips.push('<span class="chip">' + esc(CTRY[state.country]) + ' · ' +
+    esc(cname(CTRY[state.country])) + '<button data-clear="country" title="Clear country">×</button></span>');
+  if(state.method >= 0) chips.push('<span class="chip">' + esc(MTHD[state.method]) +
+    '<button data-clear="method" title="Clear payment method">×</button></span>');
+  var chipBox = document.getElementById('chips');
+  chipBox.innerHTML = chips.length
+    ? '<span class="plbl" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:#8B93A1">Filtered to</span>' +
+      chips.join('') + '<button class="pbtn" data-clear="all">Clear both</button>'
+    : '';
+
+  document.getElementById('hspan').textContent =
+    prettyDay(DAYS[state.from]) + ' – ' + prettyDay(DAYS[state.to]);
+  document.getElementById('csub').textContent =
+    'Bars are transaction counts — created at the base, failed and declined stacked above, so the ' +
+    'full height is every attempt. The line is the share created, on the right axis, which shares the ' +
+    'bars’ zero.';
+  document.getElementById('ctrysub').textContent =
+    'Where the card or bank sits, not where the player registered. Click a row to filter the whole ' +
+    'page to that country. This table always lists every country, so a selected one can be read ' +
+    'against the rest.';
+  document.getElementById('mthsub').textContent =
+    'Card brand or wallet type. Click a row to filter the whole page to that method. ' +
+    '"(not recorded)" is a transaction that carried neither — mostly bank rails. This table ignores ' +
+    'the method filter for the same reason the country one does.';
+  document.getElementById('tsub').textContent =
+    'Click a row to open that affiliate’s monthly detail and decline reasons. "Players tried" is ' +
+    'distinct players over the whole selected window, not the sum of the monthly figures — a player ' +
+    'who tried in five months is one player.';
+  document.getElementById('brk').innerHTML =
+    '<span class="bt">Read this first</span>Created means the money moved: <b>SUCCESS</b> for a deposit, ' +
+    '<b>PROCESSED</b> for a withdrawal. Everything else query 1785 returns is a real attempt that failed — ' +
+    'deposits fail as FAILED or DECLINED, withdrawals as FAILED or REJECTED. Amounts cover the <b>' +
+    pct(D.totalTx - D.nonEurTx, D.totalTx) + '</b> of transactions denominated in EUR; the other <b>' +
+    n(D.nonEurTx) + '</b> (BRL, CAD, ARS, PLN, MXN) are counted but not converted, so the counts and the ' +
+    'euros do not describe exactly the same set. Player counts are unions over whatever is selected, so ' +
+    'country and method rows will not add up to the total — one player can pay from two countries with ' +
+    'three methods.';
+}
+
+/* ---- render ----------------------------------------------------------- */
+function render(){
+  var W = byAffiliate();
+  renderTop(W);
+  drawChart(monthly());
+  renderDim('tctry', byDim(C_CTRY, 'country'), CTRY, state.csort, state.cdesc, state.country, 'Country');
+  renderDim('tmth',  byDim(C_MTHD, 'method'),  MTHD, state.msort, state.mdesc, state.method,  'Method');
+  renderTable(W);
+  renderDrill();
+  window.OV.last = W;
+}
+
+/* ---- wiring ----------------------------------------------------------- */
+function fillMonths(){
+  var f = document.getElementById('from'), t = document.getElementById('to');
+  var seen = {}, opts = [], lastOf = {};
+  DAYS.forEach(function(d, i){
+    var mm = monthOf(d);
+    if(!(mm in seen)){ seen[mm] = i; opts.push([mm, i]); }
+    lastOf[mm] = i;
+  });
+  f.innerHTML = opts.map(function(o){
+    return '<option value="' + o[1] + '">' + prettyMon(o[0]) + '</option>'; }).join('');
+  t.innerHTML = opts.map(function(o){
+    return '<option value="' + lastOf[o[0]] + '">' + prettyMon(o[0]) + '</option>'; }).join('');
+  f.value = 0; t.value = DAYS.length - 1;
+}
+function fillDims(){
+  document.getElementById('country').innerHTML =
+    '<option value="-1">All countries</option>' + CTRY.map(function(c, i){
+      return '<option value="' + i + '">' + esc(c) + ' · ' + esc(cname(c)) + '</option>'; }).join('');
+  document.getElementById('method').innerHTML =
+    '<option value="-1">All payment methods</option>' + MTHD.map(function(m, i){
+      return '<option value="' + i + '">' + esc(m) + '</option>'; }).join('');
+}
+function syncDims(){
+  document.getElementById('country').value = String(state.country);
+  document.getElementById('method').value = String(state.method);
+}
+function setPreset(p){
+  if(p === 'all'){ state.from = 0; state.to = DAYS.length - 1; }
+  else if(p === 'ytd'){
+    var y = DAYS[DAYS.length - 1].slice(0, 4), ix = -1;
+    for(var i=0;i<DAYS.length;i++){ if(DAYS[i].slice(0,4) === y){ ix = i; break; } }
+    state.from = ix < 0 ? 0 : ix; state.to = DAYS.length - 1;
+  } else {
+    state.from = Math.max(0, DAYS.length - parseInt(p, 10)); state.to = DAYS.length - 1;
+  }
+  document.getElementById('from').value = state.from;
+  document.getElementById('to').value = state.to;
+}
+function press(container, attr, valStr){
+  Array.prototype.forEach.call(container.querySelectorAll('button'), function(b){
+    b.setAttribute('aria-pressed', b.getAttribute(attr) === valStr ? 'true' : 'false');
+  });
+}
+fillMonths(); fillDims(); syncDims();
+
+document.getElementById('kind').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  state.kind = +b.getAttribute('data-k');
+  press(this, 'data-k', b.getAttribute('data-k'));
+  render();
+});
+document.getElementById('preset').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  setPreset(b.getAttribute('data-p'));
+  press(this, 'data-p', b.getAttribute('data-p'));
+  render();
+});
+document.getElementById('from').addEventListener('change', function(){
+  state.from = +this.value;
+  if(state.from > state.to){ state.to = state.from; document.getElementById('to').value = state.to; }
+  press(document.getElementById('preset'), 'data-p', '');
+  render();
+});
+document.getElementById('to').addEventListener('change', function(){
+  state.to = +this.value;
+  if(state.to < state.from){ state.from = state.to; document.getElementById('from').value = state.from; }
+  press(document.getElementById('preset'), 'data-p', '');
+  render();
+});
+document.getElementById('country').addEventListener('change', function(){
+  state.country = +this.value; render();
+});
+document.getElementById('method').addEventListener('change', function(){
+  state.method = +this.value; render();
+});
+document.getElementById('chips').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  var what = b.getAttribute('data-clear');
+  if(what === 'country' || what === 'all') state.country = -1;
+  if(what === 'method'  || what === 'all') state.method  = -1;
+  syncDims(); render();
+});
+document.querySelector('.bar').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  var self = this;
+  if(b.hasAttribute('data-f')){
+    state.type = b.getAttribute('data-f');
+    Array.prototype.forEach.call(self.querySelectorAll('button[data-f]'), function(x){
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+  } else {
+    state.min = +b.getAttribute('data-m');
+    Array.prototype.forEach.call(self.querySelectorAll('button[data-m]'), function(x){
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+  }
+  render();
+});
+
+/* Clicking a breakdown row is the same act as picking from the dropdown --
+   people click the thing they want to look at. Clicking the selected row
+   again clears it. */
+function dimClick(tableId, sortKeyName, descName, stateKey){
+  document.getElementById(tableId).addEventListener('click', function(e){
+    var th = e.target.closest('th');
+    if(th && th.hasAttribute('data-c')){
+      var c = th.getAttribute('data-c');
+      if(state[sortKeyName] === c) state[descName] = !state[descName];
+      else { state[sortKeyName] = c; state[descName] = true; }
+      render(); return;
+    }
+    var tr = e.target.closest('tr[data-k]'); if(!tr) return;
+    var k = +tr.getAttribute('data-k');
+    state[stateKey] = (state[stateKey] === k) ? -1 : k;
+    syncDims(); render();
+  });
+}
+dimClick('tctry', 'csort', 'cdesc', 'country');
+dimClick('tmth',  'msort', 'mdesc', 'method');
+
+document.getElementById('tmain').addEventListener('click', function(e){
+  var th = e.target.closest('th');
+  if(th && th.hasAttribute('data-c')){
+    var c = th.getAttribute('data-c');
+    if(state.sort === c){ state.desc = !state.desc; } else { state.sort = c; state.desc = true; }
+    render(); return;
+  }
+  var tr = e.target.closest('tr[data-i]'); if(!tr) return;
+  var i = +tr.getAttribute('data-i');
+  state.pick = (state.pick === i) ? -1 : i;
+  render();
+  if(state.pick >= 0 && document.getElementById('drill').scrollIntoView){
+    document.getElementById('drill').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+});
+document.getElementById('dclose').addEventListener('click', function(){ state.pick = -1; render(); });
+
+/* const is script-scoped and never reaches window; hand the test and the
+   console an explicit handle on everything worth poking at. */
+window.OV = { state: state, byAffiliate: byAffiliate, byDim: byDim, monthly: monthly,
+              walk: walk, render: render, D: D, val: val, setPreset: setPreset,
+              syncDims: syncDims, C: { DAY:C_DAY, KIND:C_KIND, CTRY:C_CTRY, MTHD:C_MTHD,
+              ATT:C_ATT, SUC:C_SUC } };
+render();
+})();
+</script>
+</body></html>

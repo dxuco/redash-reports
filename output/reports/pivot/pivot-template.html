@@ -1,0 +1,1791 @@
+<title>Marketing Report</title>
+<style>
+*{box-sizing:border-box}
+/* House palette — same names and values as theme.css, so this page sits beside
+   the Business Overview, Bonus Cost and FTD reports without clashing. The page
+   commits to the light palette on purpose, like every other report in the
+   folder, and paints every surface explicitly so it holds on any host ground. */
+:root{
+ --dark-green:#0B6E3A;--green-hi:#0d7f43;--green-dk:#0a5a30;--sage:#4E9D5C;
+ --navy:#0F2A43;--slate:#5B7285;--light-green:#C0DD97;
+ --surface-1:#FFFFFF;--plane:#F4F6F5;--row-alt:#F3F7F3;--band:#E3F3E8;
+ --panel:#FAFBF9;--divider:#D8DEE0;
+ --text-primary:#0F2A43;--text-secondary:#5B7285;--muted:#677181;
+ --border:#E5E5E5;--axis:#C3CCD4;--grey:#B7C3CF;--grey-3:#B8C0C8;--grey-4:#A8B4BE;
+ --warning:#E67E22;--critical:#C0392B;--accent:#0B6E3A;
+ --heat-1:#E1EBE3;--heat-2:#C2D8C7;--heat-3:#A3C5AB;--heat-4:#84B28F;
+ --heat-5:#659F73;--heat-6:#468C57;--heat-7:#27793B;--heat-8:#0B5C2C;
+ --heat-ink:#243B4A;
+ --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color-scheme:light}
+
+body{margin:0;background:var(--plane);color:var(--text-primary);
+ font-family:var(--font-body);font-size:13px;line-height:1.45}
+
+/* ---------------------------------------------------------------- cover */
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);
+ color:#fff;padding:.7rem 20px;line-height:1.45}
+.cover-inner{max-width:1800px;margin:0 auto;height:34px;display:flex;flex-wrap:nowrap;
+ gap:14px;align-items:center;justify-content:space-between}
+.cover h1{font-size:1.15rem;font-weight:700;margin:0 0 .15rem;letter-spacing:-0.01em;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cover .sub{color:var(--light-green);font-size:.78rem;margin:0;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}
+.cover .controls{display:flex;gap:8px;align-items:center;flex:none}
+.iconbtn{appearance:none;border:1.5px solid rgba(255,255,255,.6);background:rgba(255,255,255,.1);
+ color:#fff;font:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:20px;
+ cursor:pointer;white-space:nowrap}
+.iconbtn:hover{background:#fff;color:var(--dark-green)}
+.iconbtn[aria-pressed="true"]{background:#fff;color:var(--dark-green)}
+.seg{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+ border-radius:20px;padding:2px;flex:none}
+.seg button{appearance:none;border:0;background:transparent;color:#fff;font:inherit;font-weight:600;
+ font-size:12px;padding:5px 13px;border-radius:18px;cursor:pointer;white-space:nowrap}
+.seg button:hover{background:rgba(255,255,255,.16)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:700}
+
+.wrap{max-width:1800px;margin:0 auto;padding:16px 20px 48px;
+ display:grid;grid-template-columns:236px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1000px){.wrap{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------------------------------------------------------------- panels */
+.card{background:var(--surface-1);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card>h2{font-size:.8rem;font-weight:700;margin:0;letter-spacing:.04em;text-transform:uppercase;
+ color:var(--slate);padding:.65rem .85rem .55rem;border-bottom:1px solid var(--border)}
+.side{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+.chead{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.chead:hover{color:var(--dark-green)}
+.chead .tog{appearance:none;width:19px;height:19px;flex:none;border:1px solid var(--axis);
+ border-radius:4px;background:var(--surface-1);color:var(--slate);font:inherit;font-size:13px;
+ line-height:1;font-weight:700;cursor:pointer;display:flex;align-items:center;
+ justify-content:center;padding:0}
+.chead:hover .tog{border-color:var(--dark-green);color:var(--dark-green)}
+.card.closed .cbody{display:none}
+.card.closed h2{border-bottom:0}
+.fieldlist{padding:.55rem .6rem .7rem;display:flex;flex-direction:column;gap:3px;
+ max-height:min(46vh,460px);overflow:auto}
+.grouplabel{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+ color:var(--grey-4);padding:.5rem .25rem .15rem}
+
+/* a field chip: same object in the list and in a zone */
+.chip{display:flex;align-items:center;gap:6px;background:var(--panel);
+ border:1px solid var(--divider);border-radius:5px;padding:4px 7px;font-size:12px;
+ font-weight:600;color:var(--navy);cursor:grab;text-align:left;width:100%;
+ font-family:inherit}
+.chip:hover{border-color:var(--sage);background:var(--band)}
+.chip .grip{color:var(--grey-3);font-size:11px;letter-spacing:-1px;flex:none}
+.chip .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.m{background:#fff;border-left:3px solid var(--warning)}
+.chip.d{background:#fff;border-left:3px solid var(--dark-green)}
+.chip.used{opacity:.42;cursor:default}
+.chip.dragging{opacity:.4}
+.chip .mv{appearance:none;border:0;background:transparent;color:var(--grey-4);
+ cursor:pointer;font-size:10px;line-height:1;padding:2px 3px;border-radius:3px;flex:none}
+.chip .mv:hover{color:var(--dark-green);background:var(--band)}
+.chip .mv:disabled{opacity:.25;cursor:default}
+.chip .mv:disabled:hover{color:var(--grey-4);background:transparent}
+.chip .x,.chip .fn{appearance:none;border:0;background:transparent;color:var(--grey-4);
+ font:inherit;font-size:12px;line-height:1;cursor:pointer;padding:1px 2px;border-radius:3px;flex:none}
+.chip .x:hover,.chip .fn:hover{color:var(--critical);background:var(--band)}
+.chip .fn:hover{color:var(--dark-green)}
+.chip .fn.on{color:var(--dark-green)}
+.chip:focus-visible,.iconbtn:focus-visible,button:focus-visible{outline:2px solid var(--sage);
+ outline-offset:1px}
+.chip.save{border-style:dashed;border-color:var(--dark-green);background:var(--panel);
+ color:var(--dark-green);justify-content:center;cursor:pointer}
+.chip.save:hover{background:var(--band)}
+.chip.save:disabled{opacity:.5;cursor:not-allowed}
+.chip.save:disabled:hover{background:var(--panel)}
+
+/* ---------------------------------------------------------------- zones */
+.zones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:.7rem .85rem .85rem}
+@media (max-width:1180px){.zones{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.zone{border:1px dashed var(--axis);border-radius:6px;background:var(--panel);padding:.45rem;
+ min-height:76px;display:flex;flex-direction:column;gap:4px}
+.zone.over{border-color:var(--dark-green);background:var(--band)}
+.zone>.zh{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+ color:var(--slate);display:flex;justify-content:space-between;gap:6px;padding:0 2px 2px}
+.zone .hint{color:var(--grey-4);font-weight:500;letter-spacing:0;text-transform:none;font-size:11px}
+
+/* ---------------------------------------------------------------- table */
+.tablewrap{overflow:auto;max-height:calc(100vh - 120px);border-radius:0 0 8px 8px}
+table{border-collapse:separate;border-spacing:0;font-size:12px;width:100%}
+th,td{padding:4px 9px;white-space:nowrap;border-bottom:1px solid var(--border)}
+thead th{position:sticky;top:0;z-index:3;background:var(--surface-1);color:var(--navy);
+ font-weight:700;text-align:right;border-bottom:1px solid var(--axis);font-size:11px}
+thead tr:first-child th{top:0}
+thead th.lvl{background:var(--row-alt);text-align:center;letter-spacing:.02em}
+thead th.rh{text-align:left;z-index:4;left:0;background:var(--surface-1)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--dark-green)}
+th .arrow{color:var(--dark-green);font-size:9px;margin-left:3px}
+tbody th{text-align:left;font-weight:600;color:var(--navy);position:sticky;left:0;z-index:2;
+ background:var(--surface-1)}
+tbody tr:nth-child(even) th,tbody tr:nth-child(even) td{background:var(--row-alt)}
+tbody tr:hover th,tbody tr:hover td{background:var(--band)}
+td{text-align:right;font-variant-numeric:tabular-nums}
+td.neg{color:var(--critical)}
+td.nil{color:var(--grey-3)}
+tr.sub th,tr.sub td{font-weight:700;background:var(--row-alt);color:var(--navy)}
+tr.grand th,tr.grand td{font-weight:700;background:var(--band);color:var(--navy);
+ border-top:2px solid var(--dark-green);border-bottom:0;position:sticky;bottom:0;z-index:2}
+th.ind1{padding-left:22px}th.ind2{padding-left:38px}th.ind3{padding-left:54px}
+td.sep,th.sep{border-left:1px solid var(--divider)}
+
+.meta{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+ padding:.55rem .85rem;border-top:1px solid var(--border);color:var(--muted);font-size:11px}
+.meta b{color:var(--navy)}
+
+/* ---------------------------------------------------------------- filter popover */
+.pop{position:absolute;z-index:40;background:var(--surface-1);border:1px solid var(--axis);
+ border-radius:8px;box-shadow:0 8px 24px rgba(15,42,67,.18);width:250px;padding:.6rem;
+ display:flex;flex-direction:column;gap:6px}
+.pop h3{margin:0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+ color:var(--slate)}
+.pop input[type=search]{font:inherit;font-size:12px;padding:4px 7px;border:1px solid var(--divider);
+ border-radius:5px;width:100%;color:var(--navy);background:var(--surface-1)}
+.pop .opts{max-height:210px;overflow:auto;display:flex;flex-direction:column;gap:1px;
+ border:1px solid var(--border);border-radius:5px;padding:3px}
+.pop label{display:flex;gap:6px;align-items:center;font-size:12px;padding:2px 4px;border-radius:4px;
+ cursor:pointer;color:var(--navy)}
+.pop label:hover{background:var(--band)}
+.pop label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pop .row{display:flex;gap:6px;justify-content:space-between}
+.tinybtn{appearance:none;font:inherit;font-size:11px;font-weight:600;border:1px solid var(--divider);
+ background:var(--surface-1);color:var(--navy);border-radius:5px;padding:3px 9px;cursor:pointer}
+.tinybtn:hover{border-color:var(--dark-green);color:var(--dark-green);background:var(--band)}
+.tinybtn.primary{background:var(--dark-green);border-color:var(--dark-green);color:#fff}
+.tinybtn.primary:hover{background:var(--green-hi);color:#fff}
+
+/* ---------------------------------------------------------------- chart */
+.seg2{display:inline-flex;background:var(--panel);border:1px solid var(--divider);
+ border-radius:16px;padding:2px}
+.seg2 button{appearance:none;border:0;background:transparent;color:var(--slate);font:inherit;
+ font-weight:600;font-size:11.5px;padding:3px 12px;border-radius:14px;cursor:pointer}
+.seg2 button:hover{color:var(--dark-green)}
+.seg2 button[aria-pressed="true"]{background:var(--dark-green);color:#fff}
+select.tinysel{font:inherit;font-size:11.5px;font-weight:600;color:var(--navy);
+ background:var(--surface-1);border:1px solid var(--divider);border-radius:5px;padding:3px 6px}
+
+.chartbox{padding:.4rem .85rem 1rem}
+.headline{display:flex;flex-wrap:wrap;gap:22px;padding:.5rem .1rem .7rem}
+.headline div{display:flex;flex-direction:column;gap:1px}
+.headline .k{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--grey-4)}
+.headline .v{font-size:1.15rem;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.headline .v.neg{color:var(--critical)}
+.headline .s{font-size:11px;color:var(--muted)}
+.plot{overflow-x:auto;overflow-y:hidden}
+.plot svg{display:block}
+/* The legend sits above the plot: it carries each series' window total, so it
+   reads as the figures strip the chart is drawn under. */
+.legend{display:flex;flex-wrap:wrap;gap:6px;padding:.15rem .1rem .7rem;align-items:center}
+.lg{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--divider);
+ background:var(--surface-1);border-radius:14px;padding:3px 10px 3px 7px;font-size:11.5px;
+ font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit}
+.lg:hover{border-color:var(--dark-green);background:var(--band)}
+.lg .sw{width:10px;height:10px;border-radius:2px;flex:none}
+.lg .lv{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.lg.off{opacity:.42}
+.lg.off .lv{text-decoration:line-through}
+.lg.all{border-style:dashed;border-color:var(--dark-green);color:var(--dark-green)}
+.charttip{position:fixed;z-index:50;background:var(--navy);color:#fff;border-radius:6px;
+ padding:7px 10px;font-size:11.5px;line-height:1.5;pointer-events:none;display:none;
+ box-shadow:0 6px 18px rgba(15,42,67,.28);max-width:280px}
+.charttip b{color:#fff}
+.charttip .r{display:flex;justify-content:space-between;gap:14px}
+.charttip .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.charttip .tot{border-top:1px solid rgba(255,255,255,.3);margin-top:4px;padding-top:4px;font-weight:700}
+.emptychart{padding:22px 14px;color:var(--muted);max-width:640px;line-height:1.6}
+
+.note{padding:.6rem .85rem;font-size:11.5px;color:var(--muted);border-top:1px solid var(--border);
+ line-height:1.5}
+.note b{color:var(--navy)}
+.overlapnote{margin:0 0 8px;padding:.5rem .75rem;font-size:11.5px;line-height:1.5;
+ color:#8a5a1f;background:var(--warn-bg);border:1px solid #F1DDB8;border-radius:6px}
+.overlapnote:before{content:"⚠ ";}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);
+ color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:60;
+ box-shadow:0 6px 20px rgba(15,42,67,.3)}
+@media (prefers-reduced-motion:no-preference){.toast{animation:pop .18s ease-out}}
+@keyframes pop{from{opacity:0;transform:translate(-50%,6px)}to{opacity:1;transform:translate(-50%,0)}}
+</style>
+
+<div class="cover">
+  <div class="cover-inner">
+    <div style="min-width:0">
+      <h1>Marketing Report</h1>
+      <p class="sub" id="sub">21 months of query 1732, pre-aggregated — drag a field into Rows, Columns or Values</p>
+    </div>
+    <div class="controls">
+      <span class="seg">
+        <button id="perFull" aria-pressed="false">Full months</button>
+        <button id="perMtd" aria-pressed="true">MTD</button>
+      </span>
+      <button class="iconbtn" id="whaleBtn" aria-pressed="false">karolik777: excluded</button>
+      <button class="iconbtn" id="resetBtn">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="side">
+    <div class="card" id="cardFields">
+      <h2 class="chead"><button class="tog" type="button" aria-expanded="true"
+        aria-controls="fieldlist" title="Collapse">−</button>Fields</h2>
+      <div class="cbody"><div class="fieldlist" id="fieldlist"></div></div>
+    </div>
+    <div class="card" id="cardPresets">
+      <h2 class="chead"><button class="tog" type="button" aria-expanded="true"
+        aria-controls="presets" title="Collapse">−</button>Saved layouts</h2>
+      <div class="cbody"><div class="fieldlist" id="presets" style="max-height:none"></div></div>
+    </div>
+  </div>
+
+  <div style="min-width:0;display:flex;flex-direction:column;gap:16px">
+    <div class="card">
+      <h2>Layout</h2>
+      <div class="zones" id="zones">
+        <div class="zone" data-zone="filters"><div class="zh"><span>Filters</span></div></div>
+        <div class="zone" data-zone="cols"><div class="zh"><span>Columns</span></div></div>
+        <div class="zone" data-zone="rows"><div class="zh"><span>Rows</span></div></div>
+        <div class="zone" data-zone="vals"><div class="zh"><span>Values</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <span id="tableTitle">Pivot</span>
+        <span style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0">
+          <select class="tinysel" id="chartMeas" hidden></select>
+          <button class="tinybtn" id="subBtn" aria-pressed="true">Subtotals</button>
+          <span class="seg2">
+            <button id="tabTable" aria-pressed="true">Table</button>
+            <button id="tabChart" aria-pressed="false">Chart</button>
+          </span>
+        </span>
+      </h2>
+      <div class="chartbox" id="chartHost" hidden>
+        <p class="overlapnote" id="chartOverlap" hidden></p>
+        <div class="legend" id="legend"></div>
+        <div class="plot" id="plot"></div>
+      </div>
+      <p class="overlapnote" id="tableOverlap" hidden></p>
+      <div class="tablewrap"><table id="pivot"><thead></thead><tbody></tbody></table></div>
+      <div class="charttip" id="charttip"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const RAW = __DATA__;
+
+/* ------------------------------------------------------------------ decode
+   Dimensions ship as one byte (or two, for country) per cell. Each measure
+   ships as a presence bitmap over the cell list plus int values for the set
+   bits — a bit per cell costs 14 KB across the whole cube where an index
+   array would cost 32 bits per present cell. Both are expanded once, here. */
+function bytesOf(b64){
+  const bin = atob(b64), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+const N = RAW.meta.cells;
+
+const CODES = {};                                   // field key -> code array
+RAW.cols.forEach(c => {
+  const b = bytesOf(c.b64);
+  CODES[c.key] = c.width === "H"
+    ? new Uint16Array(b.buffer, b.byteOffset, N)
+    : b;
+});
+
+/* Two variants of every measure: the full month, and the month trimmed to the
+   current month's day count. MTD cannot be derived from the full figures -- the
+   day is gone by the time the cube is built -- so the builder emits both and
+   the page switches between them. */
+function expand(list){
+  const out = {};
+  list.forEach(m => {
+    const bits = bytesOf(m.bits);
+    const vals = new Int32Array(bytesOf(m.val).buffer.slice(0));
+    const dense = new Float64Array(N);
+    let k = 0;
+    for (let i = 0; i < N; i++) {
+      if (bits[i >> 3] & (1 << (i & 7))) dense[i] = vals[k++] / m.scale;
+    }
+    out[m.key] = dense;
+  });
+  return out;
+}
+const SUMS = {full: expand(RAW.measures), mtd: expand(RAW.measures_mtd)};
+const SUM = SUMS.full;
+
+/* Active depositors: WHO deposited in each cube cell, not how many rows did --
+   a sparse array over cube cells of small player-code lists, one per variant.
+   Everything downstream (aggregate/rollup/combo) unions these lists rather
+   than summing sizes, which is what makes a subtotal or a "by rail" total
+   come out exactly right instead of double-counting a multi-rail depositor. */
+function decodeActiveDep(obj){
+  const idx = new Uint32Array(bytesOf(obj.idx).buffer);
+  const counts = bytesOf(obj.counts);
+  const codes = new Uint16Array(bytesOf(obj.codes).buffer);
+  const perCell = new Array(N);
+  let p = 0;
+  for (let j = 0; j < obj.n; j++){
+    const ci = idx[j], c = counts[j];
+    perCell[ci] = codes.subarray(p, p + c);
+    p += c;
+  }
+  return perCell;
+}
+const ACTIVE_DEP = {
+  full: decodeActiveDep(RAW.active_dep.full),
+  mtd:  decodeActiveDep(RAW.active_dep.mtd),
+};
+
+/* FTD cohort reads newest-first: alphabetical order (the default for every
+   other stored dimension) puts "(never deposited)" before FTD 2023-2026 and
+   "pre-2023" after all of them, because '(' and lowercase 'p' sort where they
+   sort, not where the calendar puts them. */
+const FTDYEAR_RANK = label => {
+  const m = /^FTD (\d{4})$/.exec(label);
+  if (m) return 3000 - Number(m[1]);      // 2026 ranks below 2025 ranks below ...
+  if (label === "pre-2023") return 2000;  // older than every numbered cohort
+  return 9999;                            // "(never deposited)" -- not a cohort, goes last
+};
+
+/* Fields: the ten stored dimensions plus the derived ones, which are a
+   relabelling of a stored dimension's codes and so cost no extra cells. */
+const FIELDS = [];
+RAW.dims.forEach(d => {
+  const f = {key:d.key, label:d.label, levels:d.levels, codes:CODES[d.key]};
+  if (d.key === "ftdyear"){
+    f.sortOrder = f.levels.map((_,i) => i)
+      .sort((a,b) => FTDYEAR_RANK(f.levels[a]) - FTDYEAR_RANK(f.levels[b]));
+  }
+  FIELDS.push(f);
+});
+RAW.derived.forEach(d => {
+  const parentLevels = [...new Set(d.map)];
+  const lookup = new Map(parentLevels.map((v,i) => [v,i]));
+  const parentCodes = CODES[d.from];
+  const codes = parentLevels.length < 256 ? new Uint8Array(N) : new Uint16Array(N);
+  for (let i = 0; i < N; i++) codes[i] = lookup.get(d.map[parentCodes[i]]);
+  const order = parentLevels.map((v,i) => i).sort((a,b) => parentLevels[a] < parentLevels[b] ? -1 : 1);
+  FIELDS.push({key:d.key, label:d.label, levels:parentLevels, codes:codes, sortOrder:order});
+});
+const F = Object.fromEntries(FIELDS.map(f => [f.key, f]));
+
+/* Measures. Stored ones are plain sums. Derived ones are ratios computed from
+   those sums AFTER aggregation, so a subtotal is a weighted ratio and never
+   the mean of the rows above it. */
+const BASE = RAW.measures.map(m => ({key:m.key, label:m.label, kind:m.kind}));
+const DERIVED = [
+  {key:"net_dep",   label:"Net deposits", kind:"money", of:s => s.deposit - s.withdraw},
+  {key:"house_edge",label:"House edge",   kind:"pct",   of:s => s.bet ? s.ggr / s.bet : null},
+  {key:"ngr_margin",label:"NGR margin",   kind:"pct",   of:s => s.bet ? s.ngr / s.bet : null},
+  {key:"bonus_rate",label:"Bonus % of GGR",kind:"pct",  of:s => s.ggr ? s.bonus_cost / s.ggr : null},
+  {key:"avg_dep",   label:"Avg deposit",  kind:"money", of:s => s.dep_count ? s.deposit / s.dep_count : null},
+  {key:"avg_ftd",   label:"Avg first deposit", kind:"money", of:s => s.ftd_players ? s.ftd_value / s.ftd_players : null},
+];
+/* "distinct" measures are never read from the numeric SUM arrays -- they come
+   from ACTIVE_DEP's per-cell player lists, unioned by aggregate()/rollup(), so
+   a subtotal or grand total is a genuine headcount and not a sum that
+   double-counts someone who deposited under two of the combined rows or
+   columns. */
+const DISTINCT = [
+  {key:"active_dep", label:"Active depositors", kind:"distinct"},
+];
+const MEAS = [...BASE, ...DERIVED, ...DISTINCT];
+const M = Object.fromEntries(MEAS.map(m => [m.key, m]));
+const BASEKEYS = BASE.map(m => m.key);
+
+/* ------------------------------------------------------------------ state */
+/* The page opens on the question it exists to answer: how the months compare
+   like-for-like, split by what the player was playing. Defaults live here and
+   in the markup's aria-pressed attributes -- a default set in only one place
+   renders buttons that lie on load. */
+const DEFAULTS = () => ({
+  rows: ["month"],
+  cols: ["afftype"],
+  vals: ["ftd_players"],
+  filters: {whale: new Set([F.whale.levels.findIndex(l => l.indexOf("Everyone") === 0)])},
+  subtotals: true,
+  heat: false,
+  sort: null,          // {col:index, meas:key, dir:-1}
+  period: "mtd",       // or "full" -- MTD trims every month to the same day count
+  view: "chart",       // or "table"
+  chartMeas: "ftd_players",   // which of the Values the chart draws
+});
+let S = DEFAULTS();
+
+/* `id` is a stable identifier for a built-in preset, independent of its
+   display name -- dismissing one is saved by id, so renaming a preset later
+   doesn't un-dismiss it or dismiss the wrong one. */
+const PRESETS = [
+  {id:"p-monthly-pl",  name:"Monthly P&L",        rows:["month"], cols:[], vals:["deposit","bet","ggr","bonus_cost","ngr","house_edge"]},
+  {id:"p-country-cat", name:"Country × category", rows:["country"], cols:["game"], vals:["ngr"]},
+  {id:"p-rails-q",     name:"Rails by quarter",   rows:["rail"], cols:["quarter"], vals:["deposit"]},
+  {id:"p-acquisition", name:"Acquisition",        rows:["month"], cols:["channel"], vals:["ftd_players","ftd_value","avg_ftd"]},
+  {id:"p-game-mix",    name:"Game mix",           rows:["game"], cols:["year"], vals:["bet","ggr","house_edge"]},
+  {id:"p-cohort-rev",  name:"Revenue by cohort",  rows:["month"], cols:["ftdyear"], vals:["ngr"]},
+  {id:"p-top-aff",     name:"Top affiliates",     rows:["affname"], cols:[], vals:["ftd_players","deposit","ngr"]},
+  {id:"p-whale-vs",    name:"Whale vs everyone",  rows:["whale"], cols:["year"], vals:["deposit","ngr"], all:true},
+];
+
+/* ------------------------------------------------------------ saved layouts
+   Custom layouts live server-side now -- Cloudflare KV, behind the Worker's
+   /api/pivot-layouts route (see worker/worker.js) -- not this browser's
+   localStorage. A layout saved on one machine shows up for anyone who opens
+   this page from any other machine, signed in as anyone with access to this
+   site: that is the whole point, this used to be the thing that kept
+   quietly losing people's saved layouts. The panel starts with nothing
+   saved showing while the first GET is in flight -- the same way it would
+   look if the network were simply slow -- and repaints once the real list
+   comes back. */
+let CAN_SAVE = false;
+let CUSTOM = [];
+async function persistCustomLayouts(){
+  if (!CAN_SAVE) return;
+  try {
+    const res = await fetch("/api/pivot-layouts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: CUSTOM }),
+    });
+    if (!res.ok) throw new Error("bad status " + res.status);
+  } catch (e) { toast("Could not save -- the change is only on this screen for now"); }
+}
+(function loadCustomLayouts(){
+  /* No fetch at all (very old browser, or a sandboxed test harness) -- leave
+     CAN_SAVE/CUSTOM at their safe defaults and skip straight to the first
+     paint() call further down, which already renders correctly from those. */
+  if (typeof fetch !== "function") return;
+  fetch("/api/pivot-layouts")
+    .then(res => { if (!res.ok) throw new Error("bad status " + res.status); return res.json(); })
+    .then(doc => {
+      CUSTOM = Array.isArray(doc.items) ? doc.items : [];
+      CAN_SAVE = true;
+      paintPresets();
+    })
+    .catch(() => {});  // CAN_SAVE stays false -- save button explains why
+})();
+
+/* Dismissing one of the built-in presets doesn't delete it from PRESETS --
+   that array is the same for everyone who opens this page -- it just adds the
+   preset's id to a personal "don't show me this one" list. This stays a
+   per-viewer, per-browser convenience on purpose (unlike the saved layouts
+   above, which are now shared across the whole site): it's cosmetic and
+   low-stakes, and "everyone's dismiss list is shared" would mean one person
+   hiding a built-in removes it for the whole team. LS_OK is localStorage's
+   own availability, independent of CAN_SAVE (the server) -- the two storage
+   layers can each work or fail on their own. */
+const LS_DISMISSED_KEY = "pivot1732:dismissed:v1";
+function lsAvailable(){
+  try {
+    const k = "__probe__" + Math.random();
+    localStorage.setItem(k, "1");
+    localStorage.removeItem(k);
+    return true;
+  } catch (e) { return false; }
+}
+const LS_OK = lsAvailable();
+function loadDismissed(){
+  if (!LS_OK) return new Set();
+  try {
+    const arr = JSON.parse(localStorage.getItem(LS_DISMISSED_KEY) || "[]");
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch (e) { return new Set(); }
+}
+function persistDismissed(){
+  if (!LS_OK) return;
+  try { localStorage.setItem(LS_DISMISSED_KEY, JSON.stringify([...DISMISSED])); } catch (e) {}
+}
+let DISMISSED = loadDismissed();
+
+/* Filters are saved by LEVEL LABEL, not by the numeric code S.filters actually
+   holds -- a code is this build's array index for a value, and while a
+   from-scratch rebuild of the cube keeps existing codes stable (new values are
+   only ever appended), a label survives even a rebuild that didn't. */
+function serializeFilters(){
+  const out = {};
+  Object.keys(S.filters).forEach(k => {
+    const sel = S.filters[k], f = F[k];
+    if (sel && sel.size && f) out[k] = [...sel].map(i => f.levels[i]);
+  });
+  return out;
+}
+function deserializeFilters(saved){
+  const out = {};
+  Object.keys(saved || {}).forEach(k => {
+    const f = F[k];
+    if (!f) return;                          // a field this build no longer has
+    const set = new Set();
+    (saved[k] || []).forEach(label => {
+      const i = f.levels.indexOf(label);
+      if (i > -1) set.add(i);
+    });
+    if (set.size) out[k] = set;
+  });
+  return out;
+}
+function currentLayout(name){
+  return {
+    id: "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name,
+    rows: [...S.rows], cols: [...S.cols], vals: [...S.vals],
+    filters: serializeFilters(),
+    subtotals: S.subtotals, heat: S.heat,
+    period: S.period, view: S.view, chartMeas: S.chartMeas,
+  };
+}
+/* Applies either a built-in PRESET (rows/cols/vals only, `all` opts out of the
+   default whale exclusion) or a saved CUSTOM layout (which carries everything,
+   including filters, view and period, so it reproduces exactly what was
+   saved). */
+function applyLayout(p){
+  S.rows = [...(p.rows || [])];
+  S.cols = [...(p.cols || [])];
+  S.vals = [...(p.vals || [])];
+  S.sort = null;
+  if (p.filters) S.filters = deserializeFilters(p.filters);
+  else if (p.all) S.filters = {};
+  else S.filters = DEFAULTS().filters;
+  if (typeof p.subtotals === "boolean") S.subtotals = p.subtotals;
+  if (typeof p.heat === "boolean") S.heat = p.heat;
+  if (p.period) S.period = p.period;
+  if (p.view) S.view = p.view;
+  if (p.chartMeas) S.chartMeas = p.chartMeas;
+  paint();
+}
+function suggestedLayoutName(){
+  const parts = [];
+  if (S.rows.length) parts.push(S.rows.map(k => F[k].label).join(" × "));
+  if (S.cols.length) parts.push("by " + S.cols.map(k => F[k].label).join(" × "));
+  return parts.join(" ") || "My layout";
+}
+
+/* ------------------------------------------------------------------ format */
+const nf = new Intl.NumberFormat("en-US");
+function fmt(kind, v){
+  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  if (kind === "money"){
+    const s = v < 0 ? "-" : "";
+    const a = Math.abs(v);
+    return s + "$" + nf.format(Math.round(a));
+  }
+  if (kind === "pct"){
+    const p = v * 100;
+    if (p !== 0 && Math.abs(p) < 0.1) return (p < 0 ? "-" : "") + "<0.1%";
+    return (Math.round(p * 10) / 10).toFixed(1) + "%";
+  }
+  return nf.format(Math.round(v * 100) / 100);
+}
+
+/* ------------------------------------------------------------ aggregation */
+function activeCells(){
+  const keys = Object.keys(S.filters).filter(k => S.filters[k] && S.filters[k].size);
+  const out = [];
+  for (let i = 0; i < N; i++){
+    let ok = true;
+    for (let j = 0; j < keys.length; j++){
+      if (!S.filters[keys[j]].has(F[keys[j]].codes[i])) { ok = false; break; }
+    }
+    if (ok) out.push(i);
+  }
+  return out;
+}
+
+/* A tree of the distinct value paths down one axis. Leaves carry an id used to
+   index the aggregate map; internal nodes exist only when subtotals are on. */
+function buildTree(cells, fieldKeys){
+  const root = {label:null, children:new Map(), leaf:fieldKeys.length === 0, id:-1, path:[]};
+  if (!fieldKeys.length){ root.id = 0; return {root, leaves:1, ids:new Int32Array(cells.length)}; }
+  const ids = new Int32Array(cells.length);
+  let nextId = 0;
+  const fs = fieldKeys.map(k => F[k]);
+  for (let c = 0; c < cells.length; c++){
+    const i = cells[c];
+    let node = root;
+    for (let d = 0; d < fs.length; d++){
+      const code = fs[d].codes[i];
+      let kid = node.children.get(code);
+      if (!kid){
+        kid = {label:fs[d].levels[code], code, children:new Map(),
+               leaf:d === fs.length - 1, id:-1, path:node.path.concat(code), depth:d};
+        if (kid.leaf) kid.id = nextId++;
+        node.children.set(code, kid);
+      }
+      node = kid;
+    }
+    ids[c] = node.id;
+  }
+  return {root, leaves:nextId, ids};
+}
+
+/* Flatten a tree into display order, sorting siblings and inserting a subtotal
+   marker for internal nodes when subtotals are on. */
+function flatten(root, sortFn){
+  const out = [];
+  (function walk(node, depth){
+    const kids = [...node.children.values()];
+    kids.sort(sortFn ? sortFn : (a,b) => (a.label > b.label ? 1 : a.label < b.label ? -1 : 0));
+    for (const k of kids){
+      out.push({node:k, depth});
+      if (!k.leaf) walk(k, depth + 1);
+    }
+  })(root, 0);
+  return out;
+}
+
+function aggregate(){
+  const cells = activeCells();
+  const rt = buildTree(cells, S.rows);
+  const ct = buildTree(cells, S.cols);
+  const nc = Math.max(ct.leaves, 1);
+  const store = new Map();                       // rowLeaf*nc+colLeaf -> sums
+  const distinctStore = new Map();                // same key -> Set of player codes
+  const nb = BASEKEYS.length;
+  const src = SUMS[S.period] || SUMS.full;
+  const dep = ACTIVE_DEP[S.period] || ACTIVE_DEP.full;
+  for (let c = 0; c < cells.length; c++){
+    const i = cells[c];
+    const key = rt.ids[c] * nc + ct.ids[c];
+    let arr = store.get(key);
+    if (!arr){ arr = new Float64Array(nb); store.set(key, arr); }
+    for (let m = 0; m < nb; m++){
+      const v = src[BASEKEYS[m]][i];
+      if (v) arr[m] += v;
+    }
+    /* Active depositors is a genuine per-cube-cell list of WHO, not a count --
+       so it unions correctly into any rollup a moment ago at rollup(), instead
+       of being summed here the way every other measure is. Summing per-cell
+       sizes would double-count a player who deposited via two rails, in two
+       countries, on two days of the same month, and so on: exactly the trap
+       the page's own honesty note warns about for any distinct headcount. */
+    const codes = dep[i];
+    if (codes && codes.length){
+      let set = distinctStore.get(key);
+      if (!set){ set = new Set(); distinctStore.set(key, set); }
+      for (let k = 0; k < codes.length; k++) set.add(codes[k]);
+    }
+  }
+  return {cells, rt, ct, nc, store, distinctStore, nb};
+}
+
+/* Roll leaf sums up to every ancestor pair that the layout will show. The
+   distinct-player sets are rolled up the same way, via Set union rather than
+   addition -- which is what keeps a subtotal or the grand total exactly
+   correct no matter which rows/columns/filters produced it. */
+function rollup(agg, rowNodes, colNodes){
+  const {store, distinctStore, nc, nb} = agg;
+  const rowAnc = new Map();   // leaf id -> [display indices it contributes to]
+  const colAnc = new Map();
+  function collect(list, target){
+    list.forEach((entry, idx) => {
+      (function leaves(node){
+        if (node.leaf){ (target.get(node.id) || target.set(node.id, []).get(node.id)).push(idx); return; }
+        for (const k of node.children.values()) leaves(k);
+      })(entry.node);
+    });
+  }
+  collect(rowNodes, rowAnc);
+  collect(colNodes, colAnc);
+  const R = rowNodes.length, C = colNodes.length;
+  const mat = new Float64Array((R + 1) * (C + 1) * nb);   // last row/col = grand
+  const distinctMat = new Array((R + 1) * (C + 1));       // lazy Sets, same shape
+  const put = (r, c, arr) => {
+    const off = (r * (C + 1) + c) * nb;
+    for (let m = 0; m < nb; m++) mat[off + m] += arr[m];
+  };
+  const putDistinct = (r, c, set) => {
+    const off = r * (C + 1) + c;
+    let dst = distinctMat[off];
+    if (!dst){ dst = new Set(); distinctMat[off] = dst; }
+    set.forEach(x => dst.add(x));
+  };
+  store.forEach((arr, key) => {
+    const rl = Math.floor(key / nc), cl = key % nc;
+    const rs = rowAnc.get(rl) || [], cs = colAnc.get(cl) || [];
+    for (const r of rs){ for (const c of cs) put(r, c, arr); put(r, C, arr); }
+    for (const c of cs) put(R, c, arr);
+    put(R, C, arr);
+  });
+  distinctStore.forEach((set, key) => {
+    const rl = Math.floor(key / nc), cl = key % nc;
+    const rs = rowAnc.get(rl) || [], cs = colAnc.get(cl) || [];
+    for (const r of rs){ for (const c of cs) putDistinct(r, c, set); putDistinct(r, C, set); }
+    for (const c of cs) putDistinct(R, c, set);
+    putDistinct(R, C, set);
+  });
+  return {mat, R, C, nb, distinctMat};
+}
+
+/* `v` is any object carrying {mat, R, C, nb, distinctMat} -- a rollup() result,
+   or the render-wide `view` object, which embeds one. Kept as one bundle
+   rather than five loose parameters so a call site can't forget to pass
+   distinctMat through and silently get "Active depositors" from the wrong
+   (or a missing) matrix. */
+function cellValue(v, r, c, mkey){
+  const m = M[mkey];
+  if (m.kind === "distinct"){
+    const s = v.distinctMat && v.distinctMat[r * (v.C + 1) + c];
+    return s ? s.size : 0;
+  }
+  const off = (r * (v.C + 1) + c) * v.nb;
+  if (m.of){
+    const s = {};
+    BASEKEYS.forEach((k, i) => s[k] = v.mat[off + i]);
+    return m.of(s);
+  }
+  return v.mat[off + BASEKEYS.indexOf(mkey)];
+}
+
+/* ------------------------------------------------------------------ render */
+let LAST = null;
+
+/* render() rebuilds large chunks of the DOM (the whole table body, or the
+   whole chart+legend) on every state change, including a click on a legend
+   chip or a table row. Removing the clicked element's node from the DOM mid-
+   click drops browser focus back to <body> — and in this page's layout the
+   plot and the sidebar both sit below the fold on a typical window, so the
+   browser's default focus-follow scrolls the page back to the very top the
+   moment that happens. The fix is mechanical, not about what causes a redraw:
+   wrap the real work and put the scroll position back afterward, including
+   one extra frame later for the reflow the new SVG width triggers. */
+function render(){
+  const sx = window.scrollX, sy = window.scrollY;
+  renderNow();
+  if (sx || sy){
+    window.scrollTo(sx, sy);
+    requestAnimationFrame(() => window.scrollTo(sx, sy));
+  }
+}
+
+function renderNow(){
+  const agg = aggregate();
+  let rowNodes = flatten(agg.rt.root, null);
+  let colNodes = flatten(agg.ct.root, null);
+  if (S.cols.length){
+    const cf = F[S.cols[0]];
+    if (cf.sortOrder) colNodes = flatten(agg.ct.root, (a,b) => cf.sortOrder.indexOf(a.code) - cf.sortOrder.indexOf(b.code));
+  }
+
+  /* The rolled-up matrix is (rows+1) x (cols+1) x measures. A layout like
+     country x rail x month against a wide column axis can ask for tens of
+     millions of doubles, which is a hung tab rather than a slow one, so it is
+     refused with an explanation instead of attempted. Checked before the sort
+     probe, which allocates the same matrix. */
+  if ((rowNodes.length + 1) * (colNodes.length + 1) * BASEKEYS.length > 4e6){
+    document.querySelector("#pivot thead").innerHTML = "";
+    document.querySelector("#pivot tbody").innerHTML =
+      '<tr><td style="text-align:left;padding:18px 14px;white-space:normal;max-width:640px">' +
+      "That layout expands to " + nf.format((rowNodes.length + 1) * (colNodes.length + 1)) +
+      " cells, which is more than the browser can hold. Filter one of the fields — or move " +
+      "the widest one out of Rows — and the table comes straight back.</td></tr>";
+    document.getElementById("stat").textContent = "Layout too wide to compute";
+    document.getElementById("tableTitle").textContent = "Too many combinations";
+    return;
+  }
+
+  /* Sorting by a clicked column reorders leaves inside their own parent, so a
+     nested layout keeps its grouping. */
+  if (S.sort){
+    const probe = rollup(agg, rowNodes, colNodes);
+    const score = new Map();
+    rowNodes.forEach((e, i) => score.set(e.node, cellValue(probe, i, S.sort.col, S.sort.meas)));
+    rowNodes = flatten(agg.rt.root, (a,b) => {
+      const av = score.get(a) ?? 0, bv = score.get(b) ?? 0;
+      return av === bv ? 0 : (av < bv ? 1 : -1) * S.sort.dir;
+    });
+  } else if (S.rows.length){
+    const f = F[S.rows[0]];
+    if (f.sortOrder) rowNodes = flatten(agg.rt.root, (a,b) => f.sortOrder.indexOf(a.code) - f.sortOrder.indexOf(b.code));
+  }
+
+  const shown = S.subtotals ? rowNodes : rowNodes.filter(e => e.node.leaf);
+  const {mat, R, C, nb, distinctMat} = rollup(agg, rowNodes, colNodes);
+  const rowIndex = new Map(rowNodes.map((e,i) => [e.node, i]));
+  const colLeaves = colNodes.filter(e => e.node.leaf);
+  const colCols = S.cols.length
+    ? colLeaves.map(e => ({idx:colNodes.indexOf(e), label:e.node.label, node:e.node}))
+    : [{idx:C, label:null, node:null}];
+  const vals = S.vals.length ? S.vals : ["ngr"];
+  const headerCols = S.cols.length ? colCols.concat([{idx:C, label:"Total", node:null}]) : colCols;
+
+  const view = {agg, rowNodes, colNodes, shown, mat, R, C, nb, distinctMat, rowIndex, colCols, headerCols, vals};
+  LAST = view;
+  document.getElementById("tableTitle").textContent =
+    (S.rows.map(k => F[k].label).join(" › ") || "All data") +
+    (S.cols.length ? " by " + S.cols.map(k => F[k].label).join(" › ") : "");
+  document.getElementById("chartHost").hidden = S.view !== "chart";
+  document.querySelector(".tablewrap").hidden = S.view === "chart";
+  document.getElementById("subBtn").hidden = S.view === "chart";
+  document.getElementById("tabTable").setAttribute("aria-pressed", S.view === "table");
+  document.getElementById("tabChart").setAttribute("aria-pressed", S.view === "chart");
+  if (S.view === "chart") paintChart(view);
+  else { document.getElementById("chartMeas").hidden = true; paintTable(view); }
+}
+
+function paintTable(view){
+  const {R, C, rowIndex, colCols, headerCols, vals, shown} = view;
+
+  const tableOverlapEl = document.getElementById("tableOverlap");
+  const distinctVals = vals.filter(v => M[v].kind === "distinct");
+  if (distinctVals.length && S.cols.length && colCols.length > 1){
+    tableOverlapEl.hidden = false;
+    tableOverlapEl.textContent = distinctVals.map(v => M[v].label).join(" and ") +
+      " can overlap across " + S.cols.map(k => F[k].label.toLowerCase()).join("/") +
+      ": someone counted under more than one column is counted in each, so those columns " +
+      "(and the Total column) don't sum the way the other measures do.";
+  } else {
+    tableOverlapEl.hidden = true;
+  }
+  /* ---- head */
+  const thead = document.querySelector("#pivot thead");
+  thead.innerHTML = "";
+  const rowSpan = S.cols.length ? 2 : 1;
+  const tr1 = document.createElement("tr");
+  const rh = document.createElement("th");
+  rh.className = "rh"; rh.rowSpan = rowSpan;
+  rh.textContent = S.rows.length ? S.rows.map(k => F[k].label).join(" › ") : "All";
+  tr1.appendChild(rh);
+  if (S.cols.length){
+    colCols.forEach((c, ci) => {
+      const th = document.createElement("th");
+      th.className = "lvl" + (ci ? " sep" : "");
+      th.colSpan = vals.length;
+      th.textContent = c.label;
+      tr1.appendChild(th);
+    });
+    const tot = document.createElement("th");
+    tot.className = "lvl sep"; tot.colSpan = vals.length; tot.textContent = "Total";
+    tr1.appendChild(tot);
+  }
+  thead.appendChild(tr1);
+
+  const tr2 = S.cols.length ? document.createElement("tr") : tr1;
+  headerCols.forEach((c, ci) => {
+    vals.forEach((v, vi) => {
+      const th = document.createElement("th");
+      th.className = "sortable" + (vi === 0 && (ci || !S.cols.length) ? " sep" : "");
+      th.textContent = M[v].label;
+      if (S.sort && S.sort.col === c.idx && S.sort.meas === v){
+        const a = document.createElement("span");
+        a.className = "arrow"; a.textContent = S.sort.dir === -1 ? "▼" : "▲";
+        th.appendChild(a);
+      }
+      th.onclick = () => {
+        S.sort = (S.sort && S.sort.col === c.idx && S.sort.meas === v && S.sort.dir === -1)
+          ? {col:c.idx, meas:v, dir:1}
+          : (S.sort && S.sort.col === c.idx && S.sort.meas === v && S.sort.dir === 1) ? null
+          : {col:c.idx, meas:v, dir:-1};
+        render();
+      };
+      tr2.appendChild(th);
+    });
+  });
+  if (S.cols.length) thead.appendChild(tr2);
+
+  /* ---- heat scale, per displayed column, over leaf rows only */
+  const heat = {};
+  if (S.heat){
+    headerCols.forEach(c => vals.forEach(v => {
+      let mx = 0;
+      shown.forEach(e => {
+        if (!e.node.leaf) return;
+        const val = cellValue(view, rowIndex.get(e.node), c.idx, v);
+        if (val !== null && Math.abs(val) > mx) mx = Math.abs(val);
+      });
+      heat[c.idx + "|" + v] = mx;
+    }));
+  }
+  const RAMP = ["--heat-1","--heat-2","--heat-3","--heat-4","--heat-5","--heat-6","--heat-7","--heat-8"];
+
+  /* ---- body */
+  const tbody = document.querySelector("#pivot tbody");
+  tbody.innerHTML = "";
+  const CAP = 2000;
+  const clipped = shown.length > CAP;
+  const list = clipped ? shown.slice(0, CAP) : shown;
+
+  const frag = document.createDocumentFragment();
+  const addRow = (label, depth, rIdx, cls) => {
+    const tr = document.createElement("tr");
+    if (cls) tr.className = cls;
+    const th = document.createElement("th");
+    th.textContent = label;
+    if (depth) th.className = "ind" + Math.min(depth, 3);
+    tr.appendChild(th);
+    headerCols.forEach((c, ci) => {
+      vals.forEach((v, vi) => {
+        const val = cellValue(view, rIdx, c.idx, v);
+        const td = document.createElement("td");
+        if (vi === 0 && (ci || !S.cols.length)) td.className = "sep";
+        if (val === null || val === undefined) { td.textContent = "—"; td.className += " nil"; }
+        else {
+          td.textContent = fmt(M[v].kind, val);
+          if (val < 0) td.className += " neg";
+          else if (val === 0) td.className += " nil";
+          if (S.heat && cls !== "grand"){
+            const mx = heat[c.idx + "|" + v] || 0;
+            if (mx > 0 && val > 0){
+              const step = Math.min(7, Math.floor((val / mx) * 8));
+              td.style.background = "var(" + RAMP[step] + ")";
+              if (step >= 6) td.style.color = "#fff";
+            }
+          }
+        }
+        tr.appendChild(td);
+      });
+    });
+    frag.appendChild(tr);
+  };
+
+  if (!S.rows.length){
+    addRow("All data", 0, R, null);
+  } else {
+    list.forEach(e => {
+      addRow(e.node.leaf ? e.node.label : e.node.label + " — total",
+             e.depth, rowIndex.get(e.node), e.node.leaf ? null : "sub");
+    });
+  }
+  tbody.appendChild(frag);
+  if (S.rows.length){
+    /* The grand total is built by hand rather than through addRow: it never
+       takes a heat tint, because a total is not a member of the scale the
+       tint encodes. */
+    const g = document.createDocumentFragment();
+    (function(){
+      const tr = document.createElement("tr");
+      tr.className = "grand";
+      const th = document.createElement("th");
+      th.textContent = "Grand total";
+      tr.appendChild(th);
+      headerCols.forEach((c, ci) => vals.forEach((v, vi) => {
+        const val = cellValue(view, R, c.idx, v);
+        const td = document.createElement("td");
+        if (vi === 0 && (ci || !S.cols.length)) td.className = "sep";
+        td.textContent = val === null ? "—" : fmt(M[v].kind, val);
+        if (val < 0) td.className += " neg";
+        tr.appendChild(td);
+      }));
+      g.appendChild(tr);
+    })();
+    tbody.appendChild(g);
+  }
+}
+
+/* ------------------------------------------------------------------ charts
+   Hand-written SVG, no library — the standalone build has no network. Two
+   drawers: stacked bars for additive quantities, lines for ratios. A ratio
+   cannot be stacked, and its total is weighted, never the mean of the series. */
+const NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, text){
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined && text !== null) e.textContent = text;
+  return e;
+}
+
+/* Nominal colours, not a green ramp — six stacked greens are indistinguishable
+   once the segments get thin. Game categories and rail types keep the exact
+   colours the other reports give them so the pages read the same. */
+const NOMINAL = ["#0B6E3A","#E67E22","#0F2A43","#B7C3CF","#2F7ED8","#16A0A0",
+                 "#8E44AD","#D64550","#C9A227","#4E9D5C","#7D3C98","#7F8C8D"];
+const FIXED_COLOUR = {
+  "Casino":"#0B6E3A", "Live casino":"#2F7ED8", "Sports":"#E67E22",
+  "Provably fair":"#16A0A0", "Crash":"#8E44AD", "Dice":"#D64550",
+  "(no category)":"#B7C3CF", "Crypto":"#2F7ED8", "Fiat":"#E67E22",
+  "(no rail)":"#B7C3CF", "Other":"#B7C3CF",
+};
+const colourFor = (label, i) => FIXED_COLOUR[label] || NOMINAL[i % NOMINAL.length];
+
+/* Ticks anchored to multiples of a step, so every axis labels its own zero. */
+function niceStep(range, ticks){
+  const raw = range / Math.max(1, ticks);
+  const mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  const n = raw / mag;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * mag;
+}
+function moneyShort(v){
+  const s = v < 0 ? "-" : "", a = Math.abs(v);
+  if (a >= 1e9) return s + "$" + (a / 1e9).toFixed(a >= 1e10 ? 0 : 1) + "b";
+  if (a >= 1e6) return s + "$" + (a / 1e6).toFixed(a >= 1e7 ? 0 : 1) + "m";
+  if (a >= 1e3) return s + "$" + Math.round(a / 1e3) + "k";
+  return s + "$" + Math.round(a);
+}
+function countShort(v){
+  const a = Math.abs(v), s = v < 0 ? "-" : "";
+  if (a >= 1e6) return s + (a / 1e6).toFixed(1) + "m";
+  if (a >= 1e4) return s + Math.round(a / 1e3) + "k";
+  return s + nf.format(Math.round(a * 100) / 100);
+}
+const shortFmt = kind => kind === "money" ? moneyShort
+                       : kind === "pct" ? (v => (Math.round(v * 1000) / 10) + "%")
+                       : countShort;
+
+/* One sum of the base measures across a set of column indices, so a grouped
+   "Other" series and a ratio both come out right: the ratio is recomputed from
+   the combined numerator and denominator, never averaged. A distinct measure
+   takes the same idea but unions the player sets instead of summing sizes --
+   summing would double-count anyone who deposited under two of the combined
+   columns, which for "Other (N categories)" or a grand total is the rule
+   rather than the exception. */
+function combo(v, r, idxs, mkey){
+  const m = M[mkey];
+  if (m.kind === "distinct"){
+    if (!v.distinctMat) return 0;
+    const set = new Set();
+    for (const c of idxs){
+      const s = v.distinctMat[r * (v.C + 1) + c];
+      if (s) s.forEach(x => set.add(x));
+    }
+    return set.size;
+  }
+  const s = new Float64Array(v.nb);
+  for (const c of idxs){
+    const off = (r * (v.C + 1) + c) * v.nb;
+    for (let m2 = 0; m2 < v.nb; m2++) s[m2] += v.mat[off + m2];
+  }
+  if (m.of){
+    const o = {}; BASEKEYS.forEach((k, i) => o[k] = s[i]);
+    return m.of(o);
+  }
+  return s[BASEKEYS.indexOf(mkey)];
+}
+
+let CHART = {sig:"", off:new Set()};
+
+function paintChart(v){
+  const plot = document.getElementById("plot");
+  const legend = document.getElementById("legend");
+  const overlapEl = document.getElementById("chartOverlap");
+  plot.innerHTML = ""; legend.innerHTML = ""; overlapEl.hidden = true;
+
+  const meas = v.vals.indexOf(S.chartMeas) > -1 ? S.chartMeas : v.vals[0];
+  const sel = document.getElementById("chartMeas");
+  sel.hidden = false;
+  sel.innerHTML = "";
+  v.vals.forEach(k => {
+    const o = document.createElement("option");
+    o.value = k; o.textContent = M[k].label; o.selected = k === meas;
+    sel.appendChild(o);
+  });
+
+  if (!S.rows.length){
+    plot.innerHTML = '<p class="emptychart">A chart needs something along the bottom. ' +
+      'Drag a field into <b>Rows</b> — Month is the usual one — and it becomes the x axis. ' +
+      'Whatever sits in <b>Columns</b> becomes the stacked segments.</p>';
+    return;
+  }
+
+  /* x axis: the leaf rows, in the order the table shows them. */
+  let pts = v.shown.filter(e => e.node.leaf);
+  const XCAP = 80;
+  let xClipped = 0;
+  if (pts.length > XCAP){
+    const size = new Map(pts.map(e => [e.node, Math.abs(combo(v, v.rowIndex.get(e.node), [v.C], meas) || 0)]));
+    const keep = new Set([...pts].sort((a,b) => size.get(b.node) - size.get(a.node)).slice(0, XCAP).map(e => e.node));
+    xClipped = pts.length - XCAP;
+    pts = pts.filter(e => keep.has(e.node));
+  }
+  if (!pts.length){ plot.innerHTML = '<p class="emptychart">Nothing left after the filters.</p>'; return; }
+
+  /* series: the leaf columns, or a single series when Columns is empty. */
+  let series = S.cols.length
+    ? v.colCols.map(c => ({key:c.label, label:c.label, idxs:[c.idx]}))
+    : [{key:"__all", label:M[meas].label, idxs:[v.C]}];
+
+  const seriesTotal = s => combo(v, v.R, s.idxs, meas) || 0;
+  const SCAP = 21;   // 20 named series + one "Other" bucket for the rest
+  if (series.length > SCAP){
+    const ranked = series.slice().sort((a,b) => Math.abs(seriesTotal(b)) - Math.abs(seriesTotal(a)));
+    const keep = ranked.slice(0, SCAP - 1);
+    const rest = ranked.slice(SCAP - 1);
+    const keepSet = new Set(keep.map(s => s.key));
+    series = series.filter(s => keepSet.has(s.key));
+    series.push({key:"__other", label:"Other (" + rest.length + " " +
+      S.cols.map(k => F[k].label.toLowerCase()).join("/") + ")",
+      idxs:rest.reduce((a,s) => a.concat(s.idxs), [])});
+  }
+  series.forEach((s, i) => s.color = colourFor(s.label.indexOf("Other (") === 0 ? "Other" : s.label, i));
+
+  if (M[meas].kind === "distinct" && S.cols.length && series.length > 1){
+    overlapEl.hidden = false;
+    overlapEl.textContent = M[meas].label + " can overlap: someone counted under more than one " +
+      S.cols.map(k => F[k].label.toLowerCase()).join("/") +
+      " is counted in each segment, so the segments shown here add up to more than the true total for each bar.";
+  }
+
+  const sig = S.cols.join("|") + "::" + series.length;
+  if (CHART.sig !== sig){ CHART = {sig, off:new Set()}; }
+  const shown = series.filter(s => !CHART.off.has(s.key));
+  const use = shown.length ? shown : series;
+
+  const kind = M[meas].kind;
+  const vals = use.map(s => pts.map(e => combo(v, v.rowIndex.get(e.node), s.idxs, meas)));
+  const allIdxs = use.reduce((a,s) => a.concat(s.idxs), []);
+  const totals = pts.map(e => combo(v, v.rowIndex.get(e.node), allIdxs, meas));
+
+  /* The window figures that used to sit in a strip above the legend were taken
+     off on request. The legend still carries each series' total for the window,
+     which is where those numbers now live. */
+  const ctx = {pts, series, use, vals, totals, meas, kind, plot};
+  if (kind === "pct") drawLines(ctx); else drawBars(ctx);
+
+  /* legend: clicking isolates, alt-click hides just that one. */
+  series.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "lg" + (CHART.off.has(s.key) ? " off" : "");
+    b.type = "button";
+    const sw = document.createElement("span"); sw.className = "sw"; sw.style.background = s.color;
+    const nm = document.createElement("span"); nm.textContent = s.label;
+    const lv = document.createElement("span"); lv.className = "lv";
+    lv.textContent = fmt(kind, seriesTotal(s));
+    b.append(sw, nm, lv);
+    b.onclick = ev => { pick(series.map(x => x.key), s.key, ev.altKey || ev.metaKey || ev.ctrlKey); render(); };
+    legend.appendChild(b);
+  });
+  if (CHART.off.size){
+    const b = document.createElement("button");
+    b.className = "lg all"; b.type = "button"; b.textContent = "Show all";
+    b.onclick = () => { CHART.off.clear(); render(); };
+    legend.appendChild(b);
+  }
+  if (xClipped){
+    const n = document.createElement("span");
+    n.style.cssText = "font-size:11px;color:var(--muted);margin-left:6px";
+    n.textContent = "Drawing the " + XCAP + " largest of " + (XCAP + xClipped) + " — the table has them all.";
+    legend.appendChild(n);
+  }
+}
+
+/* Clicking a series shows only that one; clicking it again restores everything.
+   Hiding on click is the intuitive-seeming default and the wrong one — people
+   click a thing because they want to look at it. */
+function pick(allKeys, key, hideOnly){
+  const off = CHART.off;
+  if (hideOnly){ off.has(key) ? off.delete(key) : off.add(key); return; }
+  const isolated = !off.has(key) && allKeys.every(k => k === key || off.has(k));
+  off.clear();
+  if (!isolated) allKeys.forEach(k => { if (k !== key) off.add(k); });
+}
+
+const PAD = {t:30, r:16, b:82, l:72};
+/* The chart sizes itself to the space it has, so two years of months sit side
+   by side on a desktop without a horizontal scroll. Only when the slot would
+   fall below what a readable tick needs does the plot get wider than its box
+   and start scrolling — which is the case for eighty countries, not for
+   twenty-one months. */
+function frame(ctx){
+  const n = ctx.pts.length;
+  const avail = Math.max(640, (ctx.plot.clientWidth || 1180) - 2);
+  const floor = n <= 26 ? 34 : n <= 48 ? 27 : 21;
+  const fit = (avail - PAD.l - PAD.r) / n;
+  const slot = Math.max(floor, Math.min(140, fit));
+  const W = Math.max(640, Math.round(PAD.l + PAD.r + n * slot));
+  const H = 470, ih = H - PAD.t - PAD.b;
+  const svg = el("svg", {viewBox:"0 0 " + W + " " + H, width:W, height:H,
+                         style:"font-family:var(--font-body)"});
+  return {svg, W, H, ih, slot, n};
+}
+
+/* Axis, gridlines and x labels — shared by both drawers. Every axis labels its
+   zero, and the zero rule is drawn darker than the other gridlines. */
+function axes(g, ctx, bot, top, yOf, stepSize){
+  const {svg, W, ih} = g;
+  const f = shortFmt(ctx.kind);
+  for (let t = bot; t <= top + 1e-9; t += stepSize){
+    const y = yOf(t), zero = Math.abs(t) < 1e-9;
+    svg.appendChild(el("line", {x1:PAD.l - 6, x2:W - PAD.r, y1:y, y2:y,
+      stroke: zero ? "#5B7285" : "#E5E5E5", "stroke-width": zero ? 1.3 : 1}));
+    svg.appendChild(el("text", {x:PAD.l - 11, y:y + 3.5, "text-anchor":"end",
+      "font-size":10.5, fill:"#5B7285"}, f(t)));
+  }
+  /* x labels, slanted so a long country name still fits its slot */
+  ctx.pts.forEach((e, i) => {
+    const cx = PAD.l + i * g.slot + g.slot / 2;
+    const label = e.node.label.length > 22 ? e.node.label.slice(0, 21) + "…" : e.node.label;
+    const t = el("text", {x:cx, y:PAD.t + ih + 15, "text-anchor":"end", "font-size":10.5,
+      fill:"#5B7285", transform:"rotate(-35 " + cx + " " + (PAD.t + ih + 15) + ")"}, label);
+    svg.appendChild(t);
+  });
+  /* a dashed divider wherever the leading year changes, as the monthly pages do */
+  if (S.rows.length === 1 && /^\d{4}([-\s]|$)/.test(ctx.pts[0].node.label)){
+    ctx.pts.forEach((e, i) => {
+      if (!i) return;
+      const y0 = ctx.pts[i - 1].node.label.slice(0, 4), y1 = e.node.label.slice(0, 4);
+      if (y0 === y1) return;
+      const x = PAD.l + i * g.slot;
+      g.svg.appendChild(el("line", {x1:x, x2:x, y1:PAD.t - 16, y2:PAD.t + ih,
+        stroke:"#C3CCD4", "stroke-width":1, "stroke-dasharray":"4 4"}));
+      g.svg.appendChild(el("text", {x:x + 6, y:PAD.t - 8, "font-size":11, fill:"#8B93A1",
+        "font-weight":600}, y1));
+    });
+  }
+}
+
+function drawBars(ctx){
+  const g = frame(ctx);
+  const {svg, ih, slot} = g;
+  const posTot = ctx.pts.map((_, i) => ctx.vals.reduce((s, row) => s + Math.max(0, row[i] || 0), 0));
+  const negTot = ctx.pts.map((_, i) => ctx.vals.reduce((s, row) => s + Math.min(0, row[i] || 0), 0));
+  const maxBar = Math.max(0, ...posTot) || 1;
+  const minBar = Math.min(0, ...negTot);
+  const step = niceStep(Math.max(maxBar - minBar, 1e-9), 5);
+  const top = Math.ceil(maxBar / step) * step || step;
+  const bot = Math.floor(minBar / step) * step;
+  const yOf = val => PAD.t + ih - ((val - bot) / (top - bot)) * ih;
+  axes(g, ctx, bot, top, yOf, step);
+
+  const barW = Math.min(56, Math.max(9, slot * 0.72));
+  const segs = [];
+  ctx.pts.forEach((e, i) => {
+    const x = PAD.l + i * slot + (slot - barW) / 2;
+    let accPos = 0, accNeg = 0;
+    /* Stack bottom-to-top in the REVERSE of legend/series order, so the first
+       series listed -- the newest FTD cohort, once sorted newest-first --
+       ends up drawn last and sits on top of the bar, not buried at the foot
+       of it. */
+    for (let si = ctx.use.length - 1; si >= 0; si--){
+      const s = ctx.use[si];
+      const val = ctx.vals[si][i];
+      if (!val) continue;
+      const base = val > 0 ? accPos : accNeg;
+      const y0 = yOf(base), y1 = yOf(base + val);
+      const yTop = Math.min(y0, y1), h = Math.abs(y1 - y0);
+      svg.appendChild(el("rect", {x, y:yTop, width:barW, height:h, fill:s.color}));
+      segs.push({i, key:s.key, top:yTop, bot:yTop + h});
+      /* a label that spills across two colours is worse than no label */
+      if (h >= 15 && barW >= 34){
+        svg.appendChild(el("text", {x:x + barW / 2, y:yTop + h / 2 + 3.5, "text-anchor":"middle",
+          "font-size":10.5, fill:"#fff", "fill-opacity":.92}, shortFmt(ctx.kind)(val)));
+      }
+      if (val > 0) accPos += val; else accNeg += val;
+    }
+    const tot = ctx.totals[i];
+    if (slot >= 30 && tot){
+      const under = accPos === 0 && accNeg < 0;
+      svg.appendChild(el("text", {x:x + barW / 2, y: under ? yOf(accNeg) + 14 : yOf(accPos) - 7,
+        "text-anchor":"middle", "font-size":11, "font-weight":700,
+        fill: tot < 0 ? "#C0392B" : "#0F2A43"}, shortFmt(ctx.kind)(tot)));
+    }
+  });
+
+  hoverBands(g, ctx, segs);
+  ctx.plot.appendChild(svg);
+}
+
+function drawLines(ctx){
+  const g = frame(ctx);
+  const {svg, ih, slot} = g;
+  let lo = 0, hi = 0;
+  ctx.vals.concat([ctx.totals]).forEach(row => row.forEach(val => {
+    if (val === null || val === undefined) return;
+    if (val < lo) lo = val; if (val > hi) hi = val;
+  }));
+  const step = niceStep(Math.max(hi - lo, 1e-9), 5);
+  const top = Math.ceil(hi / step) * step || step;
+  const bot = Math.floor(lo / step) * step;
+  const yOf = val => PAD.t + ih - ((val - bot) / (top - bot || 1)) * ih;
+  axes(g, ctx, bot, top, yOf, step);
+
+  const xOf = i => PAD.l + i * slot + slot / 2;
+  /* null means no data for that point: break the line rather than drop it to
+     zero, which would read as "players broke even". */
+  const path = (row, color, width, opacity) => {
+    let run = [];
+    const flush = () => {
+      if (run.length > 1){
+        svg.appendChild(el("polyline", {points:run.map(p => p[0] + "," + p[1]).join(" "),
+          fill:"none", stroke:color, "stroke-width":width, "stroke-opacity":opacity,
+          "stroke-linejoin":"round", "stroke-linecap":"round"}));
+      } else if (run.length === 1){
+        svg.appendChild(el("circle", {cx:run[0][0], cy:run[0][1], r:2.6, fill:color,
+          "fill-opacity":opacity}));
+      }
+      run = [];
+    };
+    row.forEach((val, i) => {
+      if (val === null || val === undefined) flush();
+      else run.push([xOf(i), yOf(val)]);
+    });
+    flush();
+  };
+  ctx.use.forEach((s, si) => path(ctx.vals[si], s.color, 1.8, .9));
+  if (ctx.use.length > 1) path(ctx.totals, "#0F2A43", 3, 1);
+
+  /* label only the emphasised line — seven labelled lines is a wall of text */
+  const labelRow = ctx.use.length > 1 ? ctx.totals : ctx.vals[0];
+  if (slot >= 34){
+    labelRow.forEach((val, i) => {
+      if (val === null || val === undefined) return;
+      const x = xOf(i), y = yOf(val) - 12, txt = shortFmt(ctx.kind)(val);
+      svg.appendChild(el("rect", {x:x - txt.length * 3.2 - 3, y:y - 9, width:txt.length * 6.4 + 6,
+        height:14, rx:3, fill:"#fff", "fill-opacity":.88}));
+      svg.appendChild(el("text", {x, y:y + 2, "text-anchor":"middle", "font-size":10.5,
+        "font-weight":600, fill:"#0F2A43"}, txt));
+    });
+  }
+  hoverBands(g, ctx, []);
+  ctx.plot.appendChild(svg);
+}
+
+/* One invisible band per point, sitting above the marks so the tooltip covers
+   the whole column. A click on a band resolves to the segment under the
+   pointer, which is why each segment's box is recorded while drawing. */
+function hoverBands(g, ctx, segs){
+  const tip = document.getElementById("charttip");
+  ctx.pts.forEach((e, i) => {
+    const band = el("rect", {x:PAD.l + i * g.slot, y:PAD.t, width:g.slot, height:g.ih,
+      fill:"transparent", style:"cursor:pointer"});
+    band.addEventListener("mousemove", ev => {
+      const rows = ctx.use.map((s, si) => {
+        const val = ctx.vals[si][i];
+        return (val === null || val === undefined || val === 0) ? "" :
+          '<div class="r"><span><span class="sw" style="background:' + s.color + '"></span>' +
+          s.label + "</span><span>" + fmt(ctx.kind, val) + "</span></div>";
+      }).join("");
+      tip.innerHTML = "<b>" + e.node.label + "</b>" + rows +
+        '<div class="r tot"><span>' + (ctx.kind === "pct" ? "Weighted" : "Total") +
+        "</span><span>" + fmt(ctx.kind, ctx.totals[i]) + "</span></div>";
+      tip.style.display = "block";
+      const w = tip.offsetWidth || 200;
+      tip.style.left = Math.min(ev.clientX + 14, window.innerWidth - w - 12) + "px";
+      tip.style.top = Math.max(8, ev.clientY - 30) + "px";
+    });
+    band.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+    band.addEventListener("click", ev => {
+      const box = g.svg.getBoundingClientRect();
+      if (!box.height) return;                       // jsdom reports zero; bail
+      const yUser = (ev.clientY - box.top) * (g.H / box.height);
+      const seg = segs.find(s => s.i === i && yUser >= s.top - 1 && yUser <= s.bot + 1);
+      if (!seg) return;
+      pick(ctx.series.map(s => s.key), seg.key, ev.altKey || ev.metaKey || ev.ctrlKey);
+      tip.style.display = "none";
+      render();
+    });
+    g.svg.appendChild(band);
+  });
+}
+
+/* ------------------------------------------------------------------ chips */
+function chipEl(key, zone){
+  const isMeas = !!M[key] && zone === "vals";
+  const el = document.createElement("div");
+  el.className = "chip " + (isMeas ? "m" : "d");
+  el.draggable = true;
+  el.dataset.key = key; el.dataset.from = zone;
+  const grip = document.createElement("span");
+  grip.className = "grip"; grip.textContent = "⣿";
+  const nm = document.createElement("span");
+  nm.className = "nm"; nm.textContent = (isMeas ? M[key] : F[key]).label;
+  el.append(grip, nm);
+  if (!isMeas && F[key]){
+    const fn = document.createElement("button");
+    fn.className = "fn" + (S.filters[key] && S.filters[key].size ? " on" : "");
+    fn.textContent = "▾"; fn.title = "Filter this field";
+    fn.onclick = ev => { ev.stopPropagation(); openFilter(key, el); };
+    el.appendChild(fn);
+  }
+  const x = document.createElement("button");
+  x.className = "x"; x.textContent = "×"; x.title = "Remove";
+  x.onclick = ev => { ev.stopPropagation(); removeFrom(zone, key); };
+  el.appendChild(x);
+  el.addEventListener("dragstart", ev => {
+    ev.dataTransfer.setData("text/plain", JSON.stringify({key, from:zone}));
+    ev.dataTransfer.effectAllowed = "move";
+    el.classList.add("dragging");
+  });
+  el.addEventListener("dragend", () => el.classList.remove("dragging"));
+  return el;
+}
+
+function removeFrom(zone, key){
+  /* Taking a field out of Rows does not throw away the filter set on it — the
+     chip moves to Filters, where the filter is still visible and editable.
+     Dropping it silently is how a page ends up quietly filtered. */
+  if (zone === "filters") delete S.filters[key];
+  else S[zone] = S[zone].filter(k => k !== key);
+  S.sort = null; paint();
+}
+const inLayout = key => S.rows.includes(key) || S.cols.includes(key) || S.vals.includes(key);
+
+function addTo(zone, key, before){
+  ["rows","cols","vals"].forEach(z => { if (z !== zone) S[z] = S[z].filter(k => k !== key); });
+  if (zone === "filters"){
+    if (!S.filters[key]) S.filters[key] = new Set();
+    S.sort = null; paint(); openFilterByKey(key); return;
+  }
+  if (zone === "vals" && !M[key]) return;
+  if (zone !== "vals" && !F[key]) return;
+  const arr = S[zone].filter(k => k !== key);
+  const at = before === null || before === undefined ? arr.length : Math.max(0, arr.indexOf(before));
+  arr.splice(before === null || before === undefined ? arr.length : at, 0, key);
+  S[zone] = arr;
+  S.sort = null; paint();
+}
+
+function paintZones(){
+  document.querySelectorAll(".zone").forEach(z => {
+    const zone = z.dataset.zone;
+    z.querySelectorAll(".chip,.hint").forEach(n => n.remove());
+    /* The whale filter is owned by its own header button, so it does not also
+       take a chip here — two controls for one filter is how they drift apart. */
+    const keys = zone === "filters"
+      ? Object.keys(S.filters).filter(k => !inLayout(k) && k !== "whale")
+      : S[zone];
+    keys.forEach(k => z.appendChild(chipEl(k, zone)));
+    if (!keys.length){
+      const h = document.createElement("span");
+      h.className = "hint";
+      h.textContent = zone === "vals" ? "drop a measure here" : "drop a field here";
+      z.appendChild(h);
+    }
+  });
+}
+
+function paintFields(){
+  const list = document.getElementById("fieldlist");
+  list.innerHTML = "";
+  const mk = (title, items, isMeas) => {
+    const h = document.createElement("div");
+    h.className = "grouplabel"; h.textContent = title;
+    list.appendChild(h);
+    items.forEach(f => {
+      const b = document.createElement("button");
+      b.className = "chip " + (isMeas ? "m" : "d") + (inLayout(f.key) ? " used" : "");
+      b.draggable = true; b.dataset.key = f.key; b.dataset.from = "list";
+      b.type = "button";
+      const g = document.createElement("span"); g.className = "grip"; g.textContent = "⣿";
+      const n = document.createElement("span"); n.className = "nm"; n.textContent = f.label;
+      b.append(g, n);
+      b.onclick = () => addTo(isMeas ? "vals" : "rows", f.key, null);
+      b.addEventListener("dragstart", ev => {
+        ev.dataTransfer.setData("text/plain", JSON.stringify({key:f.key, from:"list"}));
+        b.classList.add("dragging");
+      });
+      b.addEventListener("dragend", () => b.classList.remove("dragging"));
+      list.appendChild(b);
+    });
+  };
+  mk("Dimensions", FIELDS, false);
+  mk("Measures", MEAS, true);
+}
+
+function paintPresets(){
+  const box = document.getElementById("presets");
+  box.innerHTML = "";
+
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button"; saveBtn.className = "chip save"; saveBtn.textContent = "+ Save current layout";
+  if (!CAN_SAVE){
+    saveBtn.disabled = true;
+    saveBtn.title = "Couldn't reach the server to load saved layouts, so saving is off for now -- " +
+      "reload the page, and if it keeps happening the site itself may be down.";
+  } else {
+    saveBtn.onclick = ev => { ev.stopPropagation(); openSaveDialog(saveBtn); };
+  }
+  box.appendChild(saveBtn);
+
+  /* Every layout gets a delete control -- a built-in one included, since
+     "delete a saved layout" reasonably means anything sitting in this list,
+     not only the ones the user typed a name for themselves. Deleting a
+     built-in hides it (onDelete only ever removes from PRESETS' rendering,
+     never the array itself), so "Restore" below can always bring it back. */
+  const mkChip = (p, onDelete, title, move) => {
+    const b = document.createElement("button");
+    b.className = "chip d"; b.type = "button";
+    if (title) b.title = title;
+    if (move){
+      const up = document.createElement("button");
+      up.className = "mv"; up.type = "button"; up.textContent = "▲"; up.title = "Move up";
+      up.disabled = !move.canUp;
+      up.onclick = ev => { ev.stopPropagation(); move.onUp(); };
+      const dn = document.createElement("button");
+      dn.className = "mv"; dn.type = "button"; dn.textContent = "▼"; dn.title = "Move down";
+      dn.disabled = !move.canDown;
+      dn.onclick = ev => { ev.stopPropagation(); move.onDown(); };
+      b.append(up, dn);
+    }
+    const n = document.createElement("span"); n.className = "nm"; n.textContent = p.name;
+    b.appendChild(n);
+    b.onclick = () => applyLayout(p);
+    const x = document.createElement("button");
+    x.className = "x"; x.type = "button"; x.textContent = "×"; x.title = "Delete this layout";
+    x.onclick = ev => { ev.stopPropagation(); onDelete(); };
+    b.appendChild(x);
+    return b;
+  };
+
+  /* Reordering only matters for the list a person actually curates -- their
+     own saved layouts. Swap-with-neighbour rather than drag, since these
+     chips already use click for "apply" and the x for "delete"; a third
+     drag gesture on the same small target is more to get wrong, not less. */
+  const moveCustom = (i, j) => {
+    const [p] = CUSTOM.splice(i, 1);
+    CUSTOM.splice(j, 0, p);
+    persistCustomLayouts();
+    paintPresets();
+  };
+
+  if (CUSTOM.length){
+    const h = document.createElement("div");
+    h.className = "grouplabel"; h.textContent = "Saved";
+    box.appendChild(h);
+    CUSTOM.forEach((p, i) => box.appendChild(mkChip(p, () => {
+      CUSTOM = CUSTOM.filter(c => c.id !== p.id);
+      persistCustomLayouts();
+      paintPresets();
+    }, null, {
+      canUp: i > 0, canDown: i < CUSTOM.length - 1,
+      onUp: () => moveCustom(i, i - 1),
+      onDown: () => moveCustom(i, i + 1),
+    })));
+  }
+
+  const visible = PRESETS.filter(p => !DISMISSED.has(p.id));
+  if (visible.length){
+    const h = document.createElement("div");
+    h.className = "grouplabel"; h.textContent = "Built in";
+    box.appendChild(h);
+    visible.forEach(p => box.appendChild(mkChip(p, () => {
+      DISMISSED.add(p.id);
+      persistDismissed();
+      paintPresets();
+      toast('Removed "' + p.name + '" — Restore brings it back' +
+        (LS_OK ? "" : " (only for this browser tab)"));
+    })));
+  }
+
+  if (DISMISSED.size){
+    const restore = document.createElement("button");
+    restore.type = "button"; restore.className = "chip save";
+    restore.textContent = "↺ Restore " + DISMISSED.size + " hidden built-in" +
+      (DISMISSED.size === 1 ? "" : "s");
+    restore.onclick = () => {
+      DISMISSED = new Set();
+      persistDismissed();
+      paintPresets();
+    };
+    box.appendChild(restore);
+  }
+}
+
+function openSaveDialog(anchor){
+  closePop();
+  const pop = document.createElement("div");
+  pop.className = "pop";
+  const r = anchor.getBoundingClientRect();
+  pop.style.left = Math.min(window.scrollX + r.left, window.scrollX + window.innerWidth - 266) + "px";
+  pop.style.top = (window.scrollY + r.bottom + 6) + "px";
+  const h = document.createElement("h3"); h.textContent = "Save this layout";
+  const input = document.createElement("input");
+  input.type = "text"; input.placeholder = suggestedLayoutName();
+  input.style.cssText = "font:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--divider);" +
+    "border-radius:5px;width:100%;color:var(--navy);background:var(--surface-1)";
+  const row = document.createElement("div"); row.className = "row";
+  const cancel = document.createElement("button");
+  cancel.className = "tinybtn"; cancel.type = "button"; cancel.textContent = "Cancel";
+  cancel.onclick = closePop;
+  const save = document.createElement("button");
+  save.className = "tinybtn primary"; save.type = "button"; save.textContent = "Save";
+  const doSave = () => {
+    const name = input.value.trim() || suggestedLayoutName();
+    CUSTOM.push(currentLayout(name));
+    persistCustomLayouts();
+    closePop();
+    paintPresets();
+    toast('Saved "' + name + '"');
+  };
+  save.onclick = doSave;
+  input.addEventListener("keydown", ev => { if (ev.key === "Enter") doSave(); });
+  row.append(cancel, save);
+  pop.append(h, input, row);
+  document.body.appendChild(pop);
+  POP = pop;
+  input.focus();
+}
+
+/* Same scroll-preservation problem as render() (see the comment above it):
+   paintFields() rebuilds the whole sidebar list, so any control that routes
+   through paint() -- adding/removing a chip, a preset, the whale or period
+   toggle -- can drop focus and jump the page the same way. */
+function paint(){
+  const sx = window.scrollX, sy = window.scrollY;
+  paintNow();
+  if (sx || sy){
+    window.scrollTo(sx, sy);
+    requestAnimationFrame(() => window.scrollTo(sx, sy));
+  }
+}
+
+function paintNow(){
+  paintZones(); paintFields(); paintPresets(); render();
+  const wf = S.filters.whale;
+  const whaleOut = wf && wf.size === 1 && F.whale.levels[[...wf][0]].indexOf("Everyone") === 0;
+  const btn = document.getElementById("whaleBtn");
+  btn.textContent = RAW.meta.whale.username + ": " + (whaleOut ? "excluded" : "included");
+  btn.title = whaleOut
+    ? "Player " + RAW.meta.whale.player_id + " is out of every figure. Click to put him back."
+    : "Player " + RAW.meta.whale.player_id + " is in every figure — deposits read 3-4x higher. Click to take him out.";
+  btn.setAttribute("aria-pressed", whaleOut ? "false" : "true");
+  document.getElementById("perFull").setAttribute("aria-pressed", S.period === "full");
+  document.getElementById("perMtd").setAttribute("aria-pressed", S.period === "mtd");
+}
+
+/* ------------------------------------------------------------------ drops */
+document.querySelectorAll(".zone").forEach(z => {
+  z.addEventListener("dragover", ev => { ev.preventDefault(); z.classList.add("over"); });
+  z.addEventListener("dragleave", () => z.classList.remove("over"));
+  z.addEventListener("drop", ev => {
+    ev.preventDefault(); z.classList.remove("over");
+    let p; try { p = JSON.parse(ev.dataTransfer.getData("text/plain")); } catch(e){ return; }
+    const zone = z.dataset.zone;
+    if (zone === "vals" && !M[p.key]) return toast("That is a dimension — drop it in Rows, Columns or Filters.");
+    if (zone !== "vals" && !F[p.key]) return toast("That is a measure — drop it in Values.");
+    if (p.from !== "list" && p.from !== zone) removeFrom(p.from, p.key);
+    const after = [...z.querySelectorAll(".chip")].find(c => c.getBoundingClientRect().top > ev.clientY
+      || (c.getBoundingClientRect().bottom > ev.clientY && c.getBoundingClientRect().left > ev.clientX));
+    addTo(zone, p.key, after ? after.dataset.key : null);
+  });
+});
+
+/* ------------------------------------------------------------------ filter popover */
+let POP = null;
+function closePop(){ if (POP){ POP.remove(); POP = null; } }
+document.addEventListener("click", ev => { if (POP && !POP.contains(ev.target)) closePop(); });
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") closePop(); });
+
+function openFilterByKey(key){
+  const chip = [...document.querySelectorAll(".zone .chip")].find(c => c.dataset.key === key);
+  if (chip) openFilter(key, chip);
+}
+function openFilter(key, anchor){
+  closePop();
+  const f = F[key];
+  const sel = new Set(S.filters[key] && S.filters[key].size ? S.filters[key] : f.levels.map((_,i) => i));
+  const pop = document.createElement("div");
+  pop.className = "pop";
+  const r = anchor.getBoundingClientRect();
+  pop.style.left = Math.min(window.scrollX + r.left, window.scrollX + window.innerWidth - 266) + "px";
+  pop.style.top = (window.scrollY + r.bottom + 6) + "px";
+  const h = document.createElement("h3"); h.textContent = f.label;
+  const search = document.createElement("input");
+  search.type = "search"; search.placeholder = "Search " + f.levels.length + " values";
+  const opts = document.createElement("div"); opts.className = "opts";
+  const order = f.levels.map((l,i) => i).sort((a,b) => f.levels[a] > f.levels[b] ? 1 : -1);
+  function fill(){
+    opts.innerHTML = "";
+    const q = search.value.trim().toLowerCase();
+    order.filter(i => !q || f.levels[i].toLowerCase().includes(q)).slice(0, 400).forEach(i => {
+      const lab = document.createElement("label");
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.checked = sel.has(i);
+      cb.onchange = () => cb.checked ? sel.add(i) : sel.delete(i);
+      const sp = document.createElement("span"); sp.textContent = f.levels[i];
+      lab.append(cb, sp); opts.appendChild(lab);
+    });
+  }
+  search.oninput = fill; fill();
+  const row = document.createElement("div"); row.className = "row";
+  const all = document.createElement("button"); all.className = "tinybtn"; all.textContent = "All";
+  all.onclick = () => { f.levels.forEach((_,i) => sel.add(i)); fill(); };
+  const none = document.createElement("button"); none.className = "tinybtn"; none.textContent = "None";
+  none.onclick = () => { sel.clear(); fill(); };
+  const apply = document.createElement("button"); apply.className = "tinybtn primary"; apply.textContent = "Apply";
+  apply.onclick = () => {
+    if (sel.size === 0 || sel.size === f.levels.length) delete S.filters[key];
+    else S.filters[key] = sel;
+    closePop(); paint();
+  };
+  row.append(all, none, apply);
+  pop.append(h, search, opts, row);
+  document.body.appendChild(pop);
+  POP = pop;
+  search.focus();
+}
+
+/* ------------------------------------------------------------------ chrome */
+document.getElementById("whaleBtn").onclick = () => {
+  const wf = S.filters.whale;
+  const out = wf && wf.size === 1;
+  if (out) delete S.filters.whale;
+  else S.filters.whale = DEFAULTS().filters.whale;
+  paint();
+};
+/* The chart is drawn to the width it actually has, so a resized window — or the
+   fields panel folding away — redraws it at the new size. */
+let resizeT = null;
+window.addEventListener("resize", () => {
+  if (S.view !== "chart") return;
+  clearTimeout(resizeT);
+  resizeT = setTimeout(render, 140);
+});
+
+/* Sidebar cards fold from their own heading, so the fields list can be put away
+   once a layout is set and the chart gets the width. */
+document.querySelectorAll(".side .chead").forEach(h => {
+  h.onclick = () => {
+    const card = h.closest(".card");
+    const closed = card.classList.toggle("closed");
+    const tog = h.querySelector(".tog");
+    tog.textContent = closed ? "+" : "−";
+    tog.setAttribute("aria-expanded", String(!closed));
+    tog.title = closed ? "Expand" : "Collapse";
+    /* A folded panel gives its width back to the plot, so the chart is redrawn
+       at the size it now has rather than keeping the old one. */
+    document.querySelector(".wrap").classList.toggle("narrow",
+      document.getElementById("cardFields").classList.contains("closed"));
+    if (S.view === "chart") render();
+  };
+});
+
+/* MTD trims EVERY month to the current month's day count, so the part-month at
+   the end compares like-for-like against the complete ones. It is not "this
+   month so far", which is what the Full view already shows. */
+document.getElementById("perFull").onclick = () => { S.period = "full"; paint(); };
+document.getElementById("perMtd").onclick = () => { S.period = "mtd"; paint(); };
+document.getElementById("tabTable").onclick = () => { S.view = "table"; render(); };
+document.getElementById("tabChart").onclick = () => { S.view = "chart"; render(); };
+document.getElementById("chartMeas").onchange = e => { S.chartMeas = e.target.value; render(); };
+document.getElementById("subBtn").onclick = e => {
+  S.subtotals = !S.subtotals; e.currentTarget.setAttribute("aria-pressed", S.subtotals); render();
+};
+document.getElementById("resetBtn").onclick = () => { S = DEFAULTS(); paint(); };
+function toast(msg){
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+/* The caveats this page used to print under the table -- what the cube can and
+   cannot answer -- live in C:\redash-page\README.md under "Cube Pivot". They
+   were taken off the page on request; they have not stopped being true. */
+(function(){
+  const first = RAW.meta.months[0], last = RAW.meta.months[RAW.meta.months.length - 1];
+  const cap = RAW.meta.mtd_cap;
+  const d = new Date(last + "-01T00:00:00");
+  const daysInLast = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  /* The last month is a code like "2026-09" whether it has 30 days of data or
+     10 -- say so here, or "why is it only showing 9" is a fair question every
+     time the page is opened mid-month. */
+  const partial = cap < daysInLast
+    ? " (" + last + " only through the " + cap + (cap === 1 ? "st" :
+        cap === 2 ? "nd" : cap === 3 ? "rd" : "th") + ")"
+    : "";
+  document.getElementById("sub").textContent =
+    first + " to " + last + partial + " · drag a field into Rows, Columns or Values";
+})();
+
+paint();
+window.PV = {get state(){ return S; }, render, paint, aggregate, FIELDS, MEAS, SUMS, CODES, RAW,
+             fmt, get last(){ return LAST; }, PRESETS, applyLayout, currentLayout,
+             serializeFilters, deserializeFilters, persistCustomLayouts, paintPresets,
+             get CAN_SAVE(){ return CAN_SAVE; },
+             get custom(){ return CUSTOM; }, set custom(v){ CUSTOM = v; },
+             get dismissed(){ return DISMISSED; }, set dismissed(v){ DISMISSED = v; }};
+</script>

@@ -1,0 +1,2549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FTD (Country)</title>
+<style>
+:root{
+  --dark-green:#0B6E3A; --green-dk:#0A5A30; --sage:#4E9D5C; --light-green:#C0DD97;
+  --band:#E3F3E8; --row-alt:#F3F7F3; --navy:#0F2A43; --slate:#5B7285; --muted:#677181;
+  --axis:#C3CCD4; --border:#E5E5E5; --bar-bg:#EEF1F4; --surface:#FFFFFF; --plane:#F4F6F5;
+  --panel:#FAFBF9; --divider:#D8DEE0; --warning:#E67E22; --critical:#C0392B;
+  --grey-2:#8B93A1; --grey-5:#C6CED4; --grey:#B7C3CF;
+  --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --cover-padding:1.6rem 20px 1.4rem; --cover-title:1.55rem; --cover-subtitle:.86rem;
+  --page-width:1800px; --cover-line-height:1.45; --cover-inner-min:60px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--navy);font-family:var(--font-body);
+     font-size:14px;line-height:1.45}
+/* Cover band: values written out literally, not as var() references —
+   check-theme.js compares them against theme.css textually. */
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);
+       color:#fff;padding:1.6rem 20px 1.4rem;line-height:1.45}
+.cover-inner{max-width:1800px;margin:0 auto;height:60px;line-height:1.45;display:flex;
+       align-items:center;justify-content:space-between;gap:24px;flex-wrap:nowrap}
+.cover h1{font-size:1.55rem;font-weight:700;margin:0 0 .25rem;letter-spacing:-.01em;
+       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cover p{color:var(--light-green);font-size:.86rem;margin:0;white-space:nowrap;
+       overflow:hidden;text-overflow:ellipsis}
+.ctl{display:flex;gap:18px;align-items:center;flex-shrink:0}
+.grp{display:flex;flex-direction:column;gap:4px}
+.grp .lbl{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;
+       color:var(--light-green);opacity:.85}
+.grp .btns{display:flex}
+button{font:inherit;font-size:.78rem;padding:.3rem .7rem;background:rgba(255,255,255,.1);
+       color:#fff;border:1px solid rgba(255,255,255,.35);cursor:pointer}
+button+button{border-left:none}
+button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:600}
+.wrap{max-width:1800px;margin:0 auto;padding:18px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--border);margin-bottom:18px}
+.card>h2{font-size:.95rem;margin:0;padding:.7rem 16px;border-bottom:1px solid var(--border);
+       background:var(--panel)}
+.card>.body{padding:14px 16px 18px}
+.cap{color:var(--muted);font-size:.76rem;margin:.5rem 0 0}
+.strip{display:flex;flex-wrap:wrap;gap:26px;padding:0 0 12px;margin-bottom:10px;
+       border-bottom:1px solid var(--border)}
+.fig .k{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--grey-2)}
+.fig .v{font-size:1.32rem;font-weight:700;letter-spacing:-.02em}
+.fig .s{font-size:.72rem;color:var(--muted)}
+.neg{color:var(--critical)}
+.pos{color:var(--dark-green)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.li{display:flex;gap:6px;align-items:center;font-size:.78rem;cursor:pointer;
+    padding:2px 6px;border:1px solid transparent}
+.li.off{opacity:.35}
+.li .sw{width:11px;height:11px;border-radius:2px;display:inline-block}
+.chip{font-size:.72rem;border:1px solid var(--grey-5);background:var(--panel);
+      padding:.15rem .5rem;cursor:pointer;color:var(--slate)}
+.chip[hidden]{display:none}
+svg{display:block;width:100%;height:auto;overflow:visible}
+table{border-collapse:collapse;width:100%;font-size:.8rem}
+th,td{padding:.4rem .6rem;text-align:right;border-bottom:1px solid var(--border);
+      white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{background:var(--panel);font-size:.68rem;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--slate)}
+tbody tr:hover{background:var(--band)}
+tr.tot td{background:var(--row-alt);font-weight:700}
+.sc{overflow-x:auto}
+.sw-i{width:9px;height:9px;display:inline-block;border-radius:2px;margin-right:6px}
+.bar{display:inline-block;height:8px;background:var(--dark-green);vertical-align:middle}
+.barbg{display:inline-block;width:64px;height:8px;background:var(--bar-bg);
+       vertical-align:middle;margin-right:6px}
+.crumb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;
+       font-size:.76rem;color:var(--slate);min-height:22px}
+.crumb .chip{border-style:dashed}
+.crumb b{color:var(--navy)}
+#d10,#d11{margin-bottom:6px;min-height:0}
+/* Month-on-month movement, in the form the August FTD report established:
+   orange for ground lost, navy for ground gained, zero pinned at the centre. */
+.mom-hero{display:flex;align-items:baseline;gap:10px;margin:0 0 6px;flex-wrap:wrap}
+.mom-hero .n{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.mom-hero .c{font-size:.78rem;color:var(--muted)}
+.momkey{display:flex;gap:16px;margin:0 0 6px;font-size:.72rem;color:var(--muted);
+        align-items:center}
+.momkey i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;
+        vertical-align:-1px}
+/* Thirty rows of it, so the row is squeezed rather than the row count: the
+   list is the point. Bar, label and cell padding all shrink together — a 15px
+   bar in a 5px-padded row is what made it tall. */
+.momtbl{font-size:.76rem}
+.momtbl td{padding:1px 8px}
+.momtbl th{padding:0 8px 5px}
+.momtbl tfoot td{padding-top:4px}
+.mombar{position:relative;height:11px;min-width:240px}
+.mombar .zero{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--divider);left:50%}
+.mombar .fill{position:absolute;top:0;height:11px}
+.mombar .fill.neg{background:var(--warning);border-radius:3px 0 0 3px}
+.mombar .fill.pos{background:var(--navy);border-radius:0 3px 3px 0}
+td.mid{text-align:center}
+.momval{position:absolute;top:0;height:11px;line-height:11px;font-size:.66rem;
+        font-weight:600;color:var(--slate);white-space:nowrap;padding:0 4px}
+.momval.in{color:#fff;opacity:.95}
+.momtbl tr[data-aff]{cursor:pointer}
+.momtbl tr[data-aff]:hover td{background:var(--band)}
+.momtbl tr.picked td{background:var(--band);box-shadow:inset 3px 0 0 var(--dark-green)}
+
+/* Collapsible cards. The heading is the control — a separate button next to a
+   heading that already looks clickable is one target too many. */
+.card>h2{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px}
+.card>h2::before{content:"\25BE";color:var(--grey-2);font-size:.75rem;width:9px}
+.card.shut>h2::before{content:"\25B8"}
+.card.shut>h2{color:var(--slate)}
+.card.shut>.body{display:none}
+.card>h2 .peek{margin-left:auto;font-size:.72rem;font-weight:400;color:var(--grey-2)}
+/* Section numbers are written by the same loop that wires the collapse, from
+   the cards' order in the document — so they cannot drift out of step with the
+   markup the way hand-typed ones do. */
+.card>h2 .sec-num{font-size:.68rem;font-weight:700;letter-spacing:.06em;
+  color:var(--grey-2);font-variant-numeric:tabular-nums}
+.card.shut>h2 .sec-num{color:var(--grey-5)}
+.pagebar{display:flex;gap:8px;align-items:center;margin:0 0 12px}
+.note{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--sage);
+      padding:.7rem 14px;font-size:.8rem;color:var(--slate);margin-bottom:18px}
+.note b{color:var(--navy)}
+</style>
+</head>
+<!-- An explicit opening body tag is required: publish-worker.js injects the site
+     nav bar straight after it, and dies if it cannot find one.
+
+     NEVER write that tag literally above this line — not in a comment, not in
+     a CSS selector, not quoted in prose. The injector regex-matches the raw
+     file text and takes the FIRST occurrence, so any earlier copy wins and the
+     nav bar lands inside whatever contains it. A copy in this very comment did
+     exactly that: the bar was injected into a comment, the page rendered
+     perfectly without a switcher, and it read as the bar being lost on click
+     rather than never inserted at all. test_ftd_channels.js now injects the
+     bar the way the publisher does and asserts it survives. -->
+<body>
+
+<div class="cover"><div class="cover-inner">
+  <div style="min-width:0">
+    <h1>FTD (Country)</h1>
+    <p id="sub"></p>
+  </div>
+  <div class="ctl">
+    <div class="grp"><span class="lbl">Period</span><div class="btns">
+      <button id="b-full" aria-pressed="false">Full months</button>
+      <button id="b-mtd"  aria-pressed="true">MTD</button>
+    </div></div>
+    <!-- Channel filter. Bound to the same state.offCh the channel legend
+         writes to, so the two controls can never disagree. -->
+    <div class="grp"><span class="lbl">Channel</span><div class="btns" id="b-ch">
+      <button data-ch="__all"    aria-pressed="true">All</button>
+      <button data-ch="Direct"   aria-pressed="false">Direct</button>
+      <button data-ch="SEO"      aria-pressed="false">SEO</button>
+      <button data-ch="Streamer" aria-pressed="false">Streamer</button>
+      <button data-ch="Other"    aria-pressed="false">Other</button>
+    </div></div>
+    <!-- Quarter. Composes with Period rather than replacing it: pick Q1 and
+         every card compares Q1 2025 against Q1 2026, on the same bands. -->
+    <div class="grp"><span class="lbl">Quarter</span><div class="btns" id="b-q">
+      <button data-q="all" aria-pressed="true">All</button>
+      <button data-q="Q1"  aria-pressed="false">Q1</button>
+      <button data-q="Q2"  aria-pressed="false">Q2</button>
+      <button data-q="Q3"  aria-pressed="false">Q3</button>
+      <button data-q="Q4"  aria-pressed="false">Q4</button>
+    </div></div>
+    <!-- Calendar month, the finer grain of the same axis as Quarter — picking
+         one clears the other. Like Quarter it narrows BOTH years, so "Aug"
+         means Aug 2025 against Aug 2026. -->
+    <div class="grp"><span class="lbl">Month</span><div class="btns">
+      <select id="b-month"></select>
+    </div></div>
+    <!-- Payment rail. An FTD row carries no blockchain of its own; the builder
+         reads it across from that player's deposit rows on the same day. Mixed
+         is a real answer, not a rounding of one of the other two. -->
+    <div class="grp"><span class="lbl">Rail</span><div class="btns" id="b-rail">
+      <button data-rail="all"    aria-pressed="true">All</button>
+      <button data-rail="Crypto" aria-pressed="false">Crypto</button>
+      <button data-rail="Fiat"   aria-pressed="false">Fiat</button>
+      <button data-rail="Mixed"  aria-pressed="false">Mixed</button>
+    </div></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+  <div class="note" id="cmp-warn" hidden></div>
+
+  <div class="pagebar">
+    <span class="chip" id="excl-toggle"></span>
+    <span class="chip" id="collapse-all">Collapse all</span>
+    <span class="chip" id="expand-all">Expand all</span>
+    <span style="font-size:.72rem;color:var(--grey-2)">every card starts closed —
+      click a heading, or Expand all</span>
+  </div>
+
+  <!-- The channel pair leads the page: which channel the first deposits came
+       through is the question people open the report to ask. The methodology
+       note sits at the foot rather than above it. -->
+  <div class="card" data-shut><h2>FTD Count by Channels</h2><div class="body">
+    <div class="strip" id="s1"></div>
+    <svg id="c2" viewBox="0 0 1000 340" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l2"></div>
+    <p class="cap" id="cap2"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>FTD Amount by Channels</h2><div class="body">
+    <svg id="c12" viewBox="0 0 1000 340" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l12"></div>
+    <p class="cap" id="cap12"></p>
+    <p class="cap">Same bars as the count version above, on dollars. Each is
+      pinned to its own metric so the two can be read against each other.</p>
+  </div></div>
+
+  <div class="card" data-shut><h2>Deposits by Channels</h2><div class="body">
+    <div class="crumb" id="d16"></div>
+    <svg id="c16" viewBox="0 0 1000 340" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l16"></div>
+    <p class="cap" id="cap16"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>Adjusted GGR by Channels</h2><div class="body">
+    <div class="crumb" id="d17"></div>
+    <svg id="c17" viewBox="0 0 1000 340" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l17"></div>
+    <p class="cap" id="cap17"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>FTD Count by Countries</h2><div class="body">
+    <div class="crumb" id="d5"></div>
+    <svg id="c5" viewBox="0 0 1000 360" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l5"></div>
+    <p class="cap" id="cap5"></p>
+  </div></div>
+
+  <!-- The same chart on dollars. Pinned to FTD amount rather than following the
+       same metric, because the two rankings disagree — the point is reading
+       them against each other, which a toggle makes impossible. Each keeps its
+       own drill position. -->
+  <div class="card" data-shut><h2>FTD Amount by Countries</h2><div class="body">
+    <div class="crumb" id="d6"></div>
+    <svg id="c6" viewBox="0 0 1000 360" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l6"></div>
+    <p class="cap" id="cap6"></p>
+    <p class="cap" id="cap6b"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>FTD Count by Affiliates</h2><div class="body">
+    <div class="crumb" id="d14"></div>
+    <svg id="c14" viewBox="0 0 1000 360" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l14"></div>
+    <p class="cap" id="cap14"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>FTD Amount by Affiliates</h2><div class="body">
+    <div class="crumb" id="d15"></div>
+    <svg id="c15" viewBox="0 0 1000 360" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l15"></div>
+    <p class="cap" id="cap15"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2 id="h11"><span class="sec-title">Affiliate Movement</span></h2><div class="body">
+    <div class="crumb" id="d11"></div>
+    <div id="mom-hero-aff" class="mom-hero"></div>
+    <div class="momkey">
+      <span><i style="background:#E67E22"></i>lost vs prior period</span>
+      <span><i style="background:#0F2A43"></i>gained</span>
+    </div>
+    <div class="sc"><table id="t11" class="momtbl"></table></div>
+    <p class="cap" id="cap11"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2 id="h10"><span class="sec-title">Country Movement</span></h2><div class="body">
+    <div class="crumb" id="d10"></div>
+    <div id="mom-hero" class="mom-hero"></div>
+    <div class="momkey">
+      <span><i style="background:#E67E22"></i>lost vs prior month</span>
+      <span><i style="background:#0F2A43"></i>gained</span>
+    </div>
+    <div class="sc"><table id="t10" class="momtbl"></table></div>
+    <p class="cap" id="cap10"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>FTD Amount Concentration by Rank Tier</h2><div class="body">
+    <div class="strip" id="s8"></div>
+    <svg id="c8" viewBox="0 0 1000 340" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l8"></div>
+    <p class="cap" id="cap8"></p>
+    <p class="cap" id="cap8b"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2 id="h7"><span class="sec-title">Affiliates by Month</span></h2><div class="body">
+    <div class="crumb" id="d7"></div>
+    <div class="sc"><table id="t7"></table></div>
+    <p class="cap" id="cap7"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>Adjusted GGR by Countries</h2><div class="body">
+    <div class="crumb" id="d13"></div>
+    <div class="strip" id="s13"></div>
+    <svg id="c13" viewBox="0 0 1000 360" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l13"></div>
+    <p class="cap" id="cap13"></p>
+  </div></div>
+
+  <div class="card" data-shut><h2>FTD by Country, 2025 vs 2026</h2><div class="body">
+    <div class="crumb" id="d3"></div>
+    <div class="strip" id="s3"></div>
+    <svg id="c3" viewBox="0 0 1000 420" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="legend" id="l3"></div>
+    <p class="cap" id="cap3"></p>
+  </div></div>
+
+  <div class="note" id="note"></div>
+
+</div>
+
+<script>
+var DATA = __DATA__;
+(function(){
+  "use strict";
+
+  // cell layout: [year, month, country, channel, rail, count, amount]
+  var Y = 0, M = 1, C = 2, H = 3, R = 4, N = 5, A = 6;
+  // affCells:    [year, month, country, channel, rail, affiliate, count, amount]
+  var AM = 1, AC = 2, AH = 3, AR = 4, AA = 5, AN = 6, AV = 7;
+
+  var CH = DATA.channels;                       // Direct, SEO, Streamer, Other
+  // Nominal colours, not a green ramp — four greens go indistinguishable once
+  // the monthly bars get thin.
+  var CH_COL = {
+    "Direct":   "#0B6E3A",
+    "SEO":      "#E67E22",
+    "Streamer": "#0F2A43",
+    "Other":    "#B7C3CF"
+  };
+  var YR_COL = { "2025": "#5B7285", "2026": "#0B6E3A" };
+
+  // Ten nominal hues for the country bands plus grey for the pooled tail, in
+  // the order theme.css sets out so no two bands in one chart share a hue.
+  // Ten, not twelve: past that the bands are thinner than their own labels.
+  // Fifteen nominal hues plus grey for the pooled tail, ordered so neighbouring
+  // ranks never sit on neighbouring hues — the two reds and the three greens
+  // are pushed as far apart in the sequence as the list allows, because
+  // adjacent bands are the ones that touch in a stack.
+  var CTRY_COL = ["#0B6E3A", "#2F7ED8", "#E67E22", "#8E44AD", "#16A0A0",
+                  "#D64550", "#C9A227", "#0F2A43", "#4E9D5C", "#5B7285",
+                  "#7F8C8D", "#C0DD97", "#0A5A30", "#677181", "#C0392B"];
+  // Fills light enough that white text on them is unreadable. One entry today;
+  // the check is here so adding a pale colour later cannot silently produce an
+  // invisible label.
+  var LIGHT_FILL = { "#C0DD97": 1, "#B7C3CF": 1 };
+  function inkOn(fill){ return LIGHT_FILL[fill] ? "#0F2A43" : "#FFFFFF"; }
+  // A named set that can be lifted out of every figure on the page in one
+  // click. Names are the raw `player_country` values, verified against the
+  // data — a typo here would silently exclude nothing, so the page prints how
+  // many of the eight it actually matched.
+  var EXCLUDE = ["Brazil", "France", "Italy", "Japan", "Kazakhstan", "Norway",
+                 "Russian Federation", "United Arab Emirates"];
+  var EXCL_SET = {};
+  EXCLUDE.forEach(function(c){ EXCL_SET[c] = 1; });
+
+  var OTHER_COL = "#B7C3CF";
+  var OTHER = "Other countries";
+  var TOP_N = 15;
+
+  var state = {
+    // The one card that still needs a metric choice of its own. The four charts
+    // above are pinned in count/amount pairs; this one is a single chart, so
+    // removing the global Metric control left it stuck on counts while its
+    // caption still promised "the selected metric".
+    ctryMetric: "count",
+    metric: "count",        // count | amount
+    /* Opens on whole months. The newest month is a part month, so read the
+        page knowing its last bar is short — that is the trade for seeing every
+        month at its true size.
+
+        MTD is the other mode: EVERY month cut to the same day count, the way
+        the Business Overview and the FTD report do it, so the bars are
+        comparable to each other and to those pages. The old "like-for-like"
+        mode was a third thing again — matched month SLOTS with only the newest
+        month trimmed — and having two nearly-identical comparison modes meant
+        nobody could say which window a figure came from. */
+    period: "mtd",          // full | mtd — opens on MTD
+    // Opens on Direct. It is the biggest channel and the one people come to the
+    // page for; the default lives here AND in the markup's aria-pressed, since a
+    // default set in only one place renders buttons that lie on load.
+    offCh:  {},             // opens on every channel
+    rail:   "all",          // all | Crypto | Fiat | Mixed
+    // One drill position and one hidden set per affiliate chart, like the
+    // country pair: the count and the amount rank affiliates differently and
+    // are meant to be read side by side.
+    aff: { count: { tier: 0, off: {} }, amount: { tier: 0, off: {} } },
+    offVal: { dep: {}, adj: {} },   // hidden channel bands on the two value charts
+    valWhale: { dep: false, adj: false },
+    offAdj: {},             // hidden bands on the adjusted GGR chart
+    adjWhale: false,        // the one card where the top depositor is material
+    momMode:"year",         // year | month — what the movement table compares
+    // Off by default: these are eight of the biggest markets, not noise, and a
+    // page that hid them without being asked would understate the business by
+    // a third. The chip says how much it is removing while it is on.
+    excl:   false,
+    quarter:"all",          // all | Q1 | Q2 | Q3 | Q4
+    month:  "all",          // all | 01..12 — the same axis, finer
+    affFocus: null,         // an affiliate name, set from the affiliate table
+    offTier:{},             // hidden rank tiers, concentration chart only
+    // One drill position and one hidden set per country chart — the count and
+    // the amount view are read side by side, so walking one must not move the
+    // other.
+    ctry: { count: { tier: 0, off: {} }, amount: { tier: 0, off: {} } },
+    // The country selection itself is SHARED — picking Brazil in one chart has
+    // to move the other and the affiliate table, or the three panels are
+    // describing three different populations while sitting on one screen.
+    focus:  [],
+    offYr:  {}              // hidden years, chart 1 only
+  };
+
+  // ---- formatting ---------------------------------------------------------
+  function fmtInt(v){ return Math.round(v).toLocaleString("en-US"); }
+  function fmtMoney(v){
+    var s = v < 0 ? "-" : "";
+    return s + "$" + Math.round(Math.abs(v)).toLocaleString("en-US");
+  }
+  function moneyShort(v){
+    var s = v < 0 ? "-" : "", a = Math.abs(v);
+    if (a >= 1e6) return s + "$" + (a/1e6).toFixed(a >= 1e7 ? 0 : 1) + "M";
+    if (a >= 1e3) return s + "$" + Math.round(a/1e3) + "k";
+    return s + "$" + Math.round(a);
+  }
+  function intShort(v){
+    var a = Math.abs(v);
+    if (a >= 1e4) return Math.round(a/1e3) + "k";
+    return fmtInt(v);
+  }
+  // Whole-number percentages, with <1% rather than 0% for a real small value.
+  function pct(part, whole){
+    if (!whole) return "—";
+    var p = part / whole * 100;
+    if (p > 0 && p < 1) return "<1%";
+    return Math.round(p) + "%";
+  }
+  // True when the selected window has no 2026 side at all — Q4, today. Every
+  // year-on-year figure would otherwise read -100%, which is not a fall, it is
+  // a quarter that has not happened.
+  var cmpOff = false;
+  function delta(a, b){            // b vs a, as a signed whole percent
+    if (cmpOff) return { txt: "n/a", cls: "" };
+    if (!a) return { txt: "—", cls: "" };
+    var p = (b - a) / a * 100;
+    var t = (p > 0 ? "+" : "") + (Math.abs(p) < 1 && p !== 0
+              ? (p > 0 ? "<1" : ">-1") : Math.round(p)) + "%";
+    return { txt: t, cls: p > 0 ? "pos" : (p < 0 ? "neg" : "") };
+  }
+  function mLabel(m){
+    var names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return names[parseInt(m.slice(5), 10) - 1] + " " + m.slice(2,4);
+  }
+
+  // Metric-aware helpers take the metric as an argument; the bare ones read
+  // state. The two country charts are pinned to one metric each and everything
+  // else follows the toggle, so both forms are needed.
+  function valM(m, cell){ return m === "count" ? cell[N] : cell[A]; }
+  function fmtM(m, v){ return m === "count" ? fmtInt(v) : fmtMoney(v); }
+  function shortM(m, v){ return m === "count" ? intShort(v) : moneyShort(v); }
+  function nameM(m){ return m === "count" ? "FTD count" : "FTD amount"; }
+
+  function val(cell){ return valM(state.metric, cell); }
+  function fmtV(v){ return fmtM(state.metric, v); }
+  function shortV(v){ return shortM(state.metric, v); }
+  function metricName(){ return nameM(state.metric); }
+
+  // ---- the window ---------------------------------------------------------
+  // One object answers "which cells am I looking at", and every chart and table
+  // reads from it, so the period switch costs nothing downstream.
+  // Lives with the filters, not with any one chart: win(), winMonths() and the
+  // movement table all need it, and it used to sit inside the quarter chart —
+  // which took it down with the chart when that was removed.
+  function quarterOf(month){ return "Q" + Math.ceil(parseInt(month.slice(5), 10) / 3); }
+
+  // Which months the period / quarter / month filters select, derived from the
+  // calendar rather than from whichever cells happen to survive. win().months
+  // comes from surviving FTD cells, so a Rail filter that empties a month drops
+  // it from that list — fine for the FTD cards, wrong for any card the rail
+  // does not apply to, which would silently lose the month with it.
+  function winMonths(){
+    var partialMM = DATA.months[DATA.months.length - 1].slice(5);
+    var keep = {};
+    DATA.matchedMonths.forEach(function(mm){ keep[mm] = 1; });
+    return DATA.months.filter(function(m){
+      var mm = m.slice(5);
+      // MTD trims the DAYS, not the month list: every month stays, each cut
+      // to the same day count. Dropping months as well was the old mode.
+      if (false && !keep[mm]) return false;
+      if (state.quarter !== "all" && quarterOf(m) !== state.quarter) return false;
+      if (state.month !== "all" && mm !== state.month) return false;
+      return true;
+    });
+  }
+
+  function win(){
+    var partialMM = DATA.months[DATA.months.length - 1].slice(5);
+    var cells;
+    // mtdCells is every month already cut to DATA.mtdDays by the builder, so
+    // MTD is a straight swap of the source rather than a filter.
+    cells = state.period === "mtd" ? DATA.mtdCells : DATA.cells.ex;
+    if (state.rail !== "all"){
+      cells = cells.filter(function(c){ return c[R] === state.rail; });
+    }
+    // Quarter narrows both years at once, which is the point: Q1 selected means
+    // Q1 2025 against Q1 2026 on every card, not a single quarter in isolation.
+    if (state.quarter !== "all"){
+      cells = cells.filter(function(c){ return quarterOf(c[M]) === state.quarter; });
+    }
+    if (state.month !== "all"){
+      cells = cells.filter(function(c){ return c[M].slice(5) === state.month; });
+    }
+    if (state.excl){
+      cells = cells.filter(function(c){ return !EXCL_SET[c[C]]; });
+    }
+    var months = {};
+    cells.forEach(function(c){ months[c[M]] = 1; });
+    return {
+      cells: cells,
+      months: Object.keys(months).sort(),
+      chCells: cells.filter(function(c){ return !state.offCh[c[H]]; }),
+      // The channel cards must honour a country picked in the charts above but
+      // must NOT honour the channel filter — the channel split is the thing
+      // they are drawing. Hence a third view rather than reusing either.
+      fCells: state.focus.length
+        ? cells.filter(function(c){ return state.focus.indexOf(c[C]) > -1; })
+        : cells
+    };
+  }
+  function shownCh(){ return CH.filter(function(c){ return !state.offCh[c]; }); }
+
+  function sumBy(cells, keyFn){
+    var o = {};
+    cells.forEach(function(c){
+      var k = keyFn(c);
+      o[k] = (o[k] || 0) + val(c);
+    });
+    return o;
+  }
+  function countBy(cells, keyFn){          // always the FTD count, whatever the metric
+    var o = {};
+    cells.forEach(function(c){ var k = keyFn(c); o[k] = (o[k] || 0) + c[N]; });
+    return o;
+  }
+  function amtBy(cells, keyFn){
+    var o = {};
+    cells.forEach(function(c){ var k = keyFn(c); o[k] = (o[k] || 0) + c[A]; });
+    return o;
+  }
+
+  // ---- svg plumbing -------------------------------------------------------
+  var NS = "http://www.w3.org/2000/svg";
+  // Headings that change at render time own a .sec-title span. Setting the h2's
+  // textContent instead would delete the section number and the show/hide
+  // affordance the collapse loop puts there — which it silently did.
+  function setHeading(id, text){
+    var h = document.getElementById(id);
+    if (!h) return;
+    var t = h.querySelector(".sec-title");
+    if (!t){
+      t = document.createElement("span");
+      t.className = "sec-title";
+      h.appendChild(t);
+    }
+    t.textContent = text;
+  }
+
+  function el(tag, attrs, text){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined)
+      e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function clear(svg){ while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+  // Anchors ticks to multiples of a step so every axis labels its own zero.
+  function niceStep(range, want){
+    var raw = range / Math.max(want, 1);
+    var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var n = raw / mag;
+    var m = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+    return m * mag;
+  }
+
+  // Axis + gridlines. Returns the y() mapper. Zero is always a tick and the
+  // zero rule is drawn darker than the rest.
+  function scaffold(svg, W, Ht, pad, maxV, fmt){
+    var iw = W - pad.l - pad.r, ih = Ht - pad.t - pad.b;
+    var step = niceStep(Math.max(maxV, 1e-9), 5);
+    var top  = Math.ceil(maxV / step) * step || step;
+    var y = function(v){ return pad.t + ih - (v / top) * ih; };
+    for (var v = 0; v <= top + 1e-9; v += step){
+      var yy = y(v), zero = Math.abs(v) < 1e-9;
+      svg.appendChild(el("line", { x1: pad.l, x2: pad.l + iw, y1: yy, y2: yy,
+        stroke: zero ? "#5B7285" : "#E5E5E5", "stroke-width": zero ? 1.3 : 1 }));
+      svg.appendChild(el("text", { x: pad.l - 8, y: yy + 3.5, "text-anchor": "end",
+        "font-size": 10, fill: "#5B7285" }, fmt(v)));
+    }
+    return { y: y, iw: iw, ih: ih, top: top };
+  }
+
+  function legend(id, items, isOff, onPick){
+    var box = document.getElementById(id);
+    box.innerHTML = "";
+    items.forEach(function(it){
+      var d = document.createElement("span");
+      d.className = "li" + (isOff(it.key) ? " off" : "");
+      d.innerHTML = '<span class="sw" style="background:' + it.color + '"></span>' +
+        '<span>' + it.label + (it.value !== undefined
+          ? ' <b>' + it.value + '</b>' : '') + '</span>';
+      d.addEventListener("click", function(e){ onPick(it.key, e.altKey || e.metaKey || e.ctrlKey); });
+      box.appendChild(d);
+    });
+    var anyOff = items.some(function(it){ return isOff(it.key); });
+    var chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = "Show all";
+    chip.hidden = !anyOff;
+    chip.addEventListener("click", function(){ onPick(null, false); });
+    box.appendChild(chip);
+  }
+
+  // Clicking a series shows only that one; clicking again restores everything.
+  // People click a thing because they want to look at it.
+  function pick(off, allKeys, key, hideOnly){
+    if (key === null){ allKeys.forEach(function(k){ delete off[k]; }); return; }
+    if (hideOnly){ if (off[key]) delete off[key]; else off[key] = 1; return; }
+    var isolated = !off[key] && allKeys.every(function(k){ return k === key || off[k]; });
+    allKeys.forEach(function(k){ delete off[k]; });
+    if (!isolated) allKeys.forEach(function(k){ if (k !== key) off[k] = 1; });
+  }
+
+  function tip(target, text){
+    target.appendChild(el("title", {}, text));
+  }
+
+  // ---- chart 2/12: monthly stacked bars by channel ------------------------
+  // The same form as the country charts above: one bar per month, split by
+  // channel, drawn twice — once pinned to FTD count, once to FTD amount. The
+  // year-on-year comparison this card used to hold now lives in the Channel
+  // Table, which is a better shape for it than four pairs of bars.
+  function drawMonths(cfg){
+    var metric = cfg.metric;
+    var fV = function(v){ return fmtM(metric, v); };
+    var sV = function(v){ return shortM(metric, v); };
+    var svg = document.getElementById(cfg.svgId), W = 1000, Ht = 340;
+    clear(svg);
+    var w = win(), months = w.months, shown = shownCh();
+
+    var byMC = {};
+    w.fCells.forEach(function(c){
+      byMC[c[M] + "|" + c[H]] = (byMC[c[M] + "|" + c[H]] || 0) + valM(metric, c); });
+    var tot = months.map(function(m){
+      return shown.reduce(function(s2, ch){ return s2 + (byMC[m + "|" + ch] || 0); }, 0);
+    });
+    var maxV = Math.max.apply(null, tot.concat([1]));
+
+    var pad = { t: 26, r: 16, b: 52, l: 66 };
+    var sc = scaffold(svg, W, Ht, pad, maxV, sV);
+    var bandW = sc.iw / Math.max(months.length, 1);
+    var barW = Math.min(34, bandW - 6);
+
+    months.forEach(function(m, i){
+      var x = pad.l + bandW * i + (bandW - barW) / 2, acc = 0;
+      shown.forEach(function(ch){
+        var v = byMC[m + "|" + ch] || 0;
+        if (!v) return;
+        var y0 = sc.y(acc), y1 = sc.y(acc + v), h = Math.max(0, y0 - y1);
+        var r = el("rect", { x: x, y: y1, width: barW, height: h, fill: CH_COL[ch] });
+        tip(r, mLabel(m) + " · " + ch + " · " + fV(v));
+        svg.appendChild(r);
+        // Segment value inside the block where it fits, exactly as the country
+        // charts do it — a label spilling across a block edge is worse than none.
+        if (h >= 15 && barW >= 30)
+          svg.appendChild(el("text", { x: x + barW / 2, y: y1 + h / 2 + 3.5,
+            "text-anchor": "middle", "font-size": 9, fill: inkOn(CH_COL[ch]),
+            "fill-opacity": 0.92 }, sV(v)));
+        acc += v;
+      });
+      // Channels partition — a player has one — so the stack height is the
+      // month's total, not a row-sum that double-counts.
+      if (bandW >= 30)
+        svg.appendChild(el("text", { x: x + barW / 2, y: sc.y(acc) - 6, "text-anchor": "middle",
+          "font-size": 9.5, "font-weight": 700, fill: "#0F2A43" }, sV(acc)));
+      svg.appendChild(el("text", { x: x + barW / 2, y: Ht - pad.b + 16, "text-anchor": "end",
+        "font-size": 9.5, fill: "#5B7285",
+        transform: "rotate(-40 " + (x + barW / 2) + " " + (Ht - pad.b + 16) + ")" }, mLabel(m)));
+    });
+
+    var split = months.indexOf("2026-01");
+    if (split > 0){
+      var xd = pad.l + bandW * split;
+      svg.appendChild(el("line", { x1: xd, x2: xd, y1: pad.t - 8, y2: pad.t + sc.ih,
+        stroke: "#C3CCD4", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: xd + 4, y: pad.t - 12, "font-size": 10, fill: "#8B93A1" }, "2026"));
+    }
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "month · " + nameM(metric)));
+
+    var legTot = {};
+    w.fCells.forEach(function(c){
+      legTot[c[H]] = (legTot[c[H]] || 0) + valM(metric, c); });
+    legend(cfg.legendId, CH.map(function(ch){
+      return { key: ch, label: ch, color: CH_COL[ch], value: sV(legTot[ch] || 0) };
+    }), function(k){ return !!state.offCh[k]; },
+      function(k, only){ pick(state.offCh, CH, k, only); render(); });
+
+    document.getElementById(cfg.capId).textContent =
+      (state.focus.length ? state.focus.join(", ") + " only — e" : "E") +
+      "ach bar is one month of " + nameM(metric) +
+      ", split Direct / SEO / Streamer / Other. Channels partition, so the " +
+      "figure on top is the month's total. Click a channel in the legend to " +
+      "show only that one — it moves the Channel filter in the header too. " +
+      (state.period === "full"
+        ? "The newest month runs to " + (DATA.lastDay["2026"] || "") + " only, so its bar is short."
+        : "Every month is cut to its first " + DATA.mtdDays +
+          (DATA.mtdDays === 1 ? " day." : " days.")) + lopsided();
+  }
+
+  // ---- chart 5: monthly stacked bars by country ---------------------------
+  // The same form as the game-category chart on Business Overview, with the
+  // top ten countries as bands and the tail pooled into grey. The tail is
+  // ~40% of FTDs — too big to drop and too long to stack, so it is pooled
+  // rather than quietly truncated.
+  // Clicking Other opens it up rather than isolating a grey lump: 143 countries
+  // sit in there and a dozen of them are real markets bigger than the smallest
+  // named band. Each click takes the next ten by rank, so the pooled band is a
+  // door rather than a dead end.
+  function topCountries(cells, tier, metric){
+    var m = metric || state.metric, tot = {};
+    cells.forEach(function(c){ tot[c[C]] = (tot[c[C]] || 0) + valM(m, c); });
+    var ranked = Object.keys(tot).sort(function(a, b){
+      var d = tot[b] - tot[a];
+      return d || (a < b ? -1 : 1);      // ties broken by name, so bands are stable
+    });
+    var t = Math.max(0, Math.min(tier || 0, Math.ceil(ranked.length / TOP_N) - 1));
+    var from = t * TOP_N;
+    return {
+      list: ranked.slice(from, from + TOP_N),
+      rest: ranked.slice(from + TOP_N),
+      all: ranked, tot: tot, tier: t, from: from
+    };
+  }
+  function bandOf(ctry, top){ return top.indexOf(ctry) >= 0 ? ctry : OTHER; }
+
+  // Drawn twice: once pinned to FTD count, once to FTD amount. The two views
+  // rank countries differently -- Norway is 7th by count and near the top by
+  // dollars -- so they are shown side by side rather than behind a toggle.
+  // Which countries get their own band, what colour, and which are in scope.
+  // Shared by the monthly country charts and the quarterly one so the three
+  // cannot drift into showing different bands for the same selection.
+  function bandSet(w, metric, st){
+    var rank = topCountries(w.chCells, st.tier, metric);
+    st.tier = rank.tier;                          // clamped: the window may have shrunk
+    var focus = state.focus;
+    var bands = rank.list.concat(rank.rest.length ? [OTHER] : []);
+    var colOf = function(b){
+      if (b === OTHER) return OTHER_COL;
+      var i = rank.list.indexOf(b);
+      if (i < 0) i = focus.indexOf(b);              // focused from another tier
+      return CTRY_COL[Math.max(0, i) % CTRY_COL.length];
+    };
+    // A focused country is drawn even when this chart's ranking puts it in a
+    // different block — the charts rank differently, and the selection is a
+    // country, not a band position.
+    var shown = focus.length ? focus.slice()
+                             : bands.filter(function(b){ return !st.off[b]; });
+    // Below the top tier the countries ranked ABOVE this block are left out
+    // rather than pooled — a second grey lump holding the biggest markets would
+    // swallow the chart. So the bar top is the total of what is on screen, and
+    // the breadcrumb says so instead of the caption claiming a month total.
+    var inScope = {};
+    (focus.length ? focus : rank.list.concat(rank.rest))
+      .forEach(function(c){ inScope[c] = 1; });
+    return { rank: rank, bands: bands, focus: focus, colOf: colOf,
+             shown: shown, inScope: inScope,
+             bandFor: function(ctry){
+               return focus.length ? ctry : bandOf(ctry, rank.list); } };
+  }
+
+  function drawMonthsCountry(cfg){
+    var metric = cfg.metric, st = state.ctry[metric];
+    var fV = function(v){ return fmtM(metric, v); };
+    var sV = function(v){ return shortM(metric, v); };
+    var svg = document.getElementById(cfg.svgId), W = 1000, Ht = 360;
+    clear(svg);
+    var w = win(), months = w.months;
+    var bs = bandSet(w, metric, st);
+    var rank = bs.rank, bands = bs.bands, focus = bs.focus;
+    var colOf = bs.colOf, shown = bs.shown, inScope = bs.inScope;
+
+    var byMB = {}, bandTot = {};
+    w.chCells.forEach(function(c){
+      if (!inScope[c[C]]) return;
+      var b = bs.bandFor(c[C]);
+      byMB[c[M] + "|" + b] = (byMB[c[M] + "|" + b] || 0) + valM(metric, c);
+      bandTot[b] = (bandTot[b] || 0) + valM(metric, c);
+    });
+    var tot = months.map(function(m){
+      return shown.reduce(function(s, b){ return s + (byMB[m + "|" + b] || 0); }, 0);
+    });
+    var maxV = Math.max.apply(null, tot.concat([1]));
+
+    var pad = { t: 26, r: 16, b: 56, l: 66 };
+    var sc = scaffold(svg, W, Ht, pad, maxV, sV);
+    var bandW = sc.iw / Math.max(months.length, 1);
+    var barW = Math.min(34, bandW - 6);
+
+    months.forEach(function(m, i){
+      var x = pad.l + bandW * i + (bandW - barW) / 2, acc = 0;
+      shown.forEach(function(b){
+        var v = byMB[m + "|" + b] || 0;
+        if (!v) return;
+        var y0 = sc.y(acc), y1 = sc.y(acc + v), h = Math.max(0, y0 - y1);
+        var r = el("rect", { x: x, y: y1, width: barW, height: h, fill: colOf(b) });
+        tip(r, mLabel(m) + " · " + b + " · " + fV(v));
+        svg.appendChild(r);
+        // Segment value inside the block, but only where it fits: a label that
+        // spills across two colours is worse than no label.
+        if (h >= 15 && barW >= 34)
+          svg.appendChild(el("text", { x: x + barW / 2, y: y1 + h / 2 + 3.5,
+            "text-anchor": "middle", "font-size": 9, fill: inkOn(colOf(b)),
+            "fill-opacity": 0.92 }, sV(v)));
+        acc += v;
+      });
+      // The bands partition, so the stack height IS the month's total.
+      if (bandW >= 30)
+        svg.appendChild(el("text", { x: x + barW / 2, y: sc.y(acc) - 6, "text-anchor": "middle",
+          "font-size": 9.5, "font-weight": 700, fill: "#0F2A43" }, sV(acc)));
+      svg.appendChild(el("text", { x: x + barW / 2, y: Ht - pad.b + 16, "text-anchor": "end",
+        "font-size": 9.5, fill: "#5B7285",
+        transform: "rotate(-40 " + (x + barW / 2) + " " + (Ht - pad.b + 16) + ")" }, mLabel(m)));
+    });
+
+    var split = months.indexOf("2026-01");
+    if (split > 0){
+      var xd = pad.l + bandW * split;
+      svg.appendChild(el("line", { x1: xd, x2: xd, y1: pad.t - 8, y2: pad.t + sc.ih,
+        stroke: "#C3CCD4", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: xd + 4, y: pad.t - 12, "font-size": 10, fill: "#8B93A1" }, "2026"));
+    }
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "month · " + nameM(metric)));
+
+    // Legend entries stay the tier's bands even while focused, so you can move
+    // the focus straight to another country without clearing it first.
+    var legTot = {};
+    w.chCells.forEach(function(c){
+      var b = bandOf(c[C], rank.list);
+      legTot[b] = (legTot[b] || 0) + valM(metric, c);
+    });
+    legend(cfg.legendId, bands.concat(focus.filter(function(f){
+        return bands.indexOf(f) < 0;                // focused from another tier
+      })).map(function(b){
+      return { key: b, label: b === OTHER ? OTHER + " ›" : b, color: colOf(b),
+               value: sV((focus.length ? bandTot[b] : legTot[b]) || 0) };
+    }), function(k){ return focus.length ? focus.indexOf(k) < 0 : !!st.off[k]; },
+      function(k, only){
+        // Other is a door, not a series: clicking it goes in. Everything else
+        // sets the shared country focus, which moves both charts and the table.
+        if (k === null){ state.focus = []; st.off = {}; render(); return; }
+        if (k === OTHER && !only){ st.tier = rank.tier + 1; st.off = {}; render(); return; }
+        if (only){ pick(st.off, bands, k, true); render(); return; }
+        state.focus = (focus.length === 1 && focus[0] === k) ? [] : [k];
+        st.off = {};
+        render();
+      });
+
+    // breadcrumb
+    var crumb = document.getElementById(cfg.crumbId);
+    crumb.innerHTML = "";
+    var lo = rank.from + 1, hi = rank.from + rank.list.length;
+    var here = document.createElement("span");
+    here.innerHTML = focus.length
+      ? "Focused on <b>" + focus.join(", ") + "</b> — this selection is shared with " +
+        "the other country chart and the affiliate table"
+      : st.tier === 0
+      ? "Showing the <b>top " + hi + "</b> countries by " + nameM(metric)
+      : "Showing countries ranked <b>" + lo + "–" + hi + "</b> by " +
+        nameM(metric) + " — the bars are this slice, not the month total";
+    crumb.appendChild(here);
+    if (focus.length){
+      var clr = document.createElement("span");
+      clr.className = "chip";
+      clr.textContent = "× Clear country";
+      clr.addEventListener("click", function(){ state.focus = []; st.off = {}; render(); });
+      crumb.appendChild(clr);
+    }
+    if (st.tier > 0){
+      var back = document.createElement("span");
+      back.className = "chip";
+      back.textContent = "← Back to the top " + TOP_N;
+      back.addEventListener("click", function(){
+        st.tier = 0; st.off = {}; render();
+      });
+      crumb.appendChild(back);
+      var up = document.createElement("span");
+      up.className = "chip";
+      up.textContent = "↑ Previous " + TOP_N;
+      up.addEventListener("click", function(){
+        st.tier = Math.max(0, rank.tier - 1); st.off = {}; render();
+      });
+      crumb.appendChild(up);
+    }
+
+    var shownTot = Object.keys(bandTot).reduce(function(s, k){ return s + bandTot[k]; }, 0);
+    document.getElementById(cfg.capId).textContent =
+      (focus.length
+        ? focus.join(", ") + " only — " + sV(shownTot) + " across the window. " +
+          "Click the country again in the legend, or Clear country, to go back."
+        : rank.rest.length
+        ? OTHER + " holds the " + rank.rest.length + " ranked below these — " +
+          pct(bandTot[OTHER] || 0, shownTot) + " of what is plotted. Click it to open the next " +
+          TOP_N + "; alt-click hides it instead."
+        : "These are the last " + rank.list.length + " countries in the ranking; nothing is pooled.") +
+      " " + (state.period === "full"
+        ? "The newest month runs to " + (DATA.lastDay["2026"] || "") + " only, so its bar is a part month."
+        : "Every month is cut to its first " + DATA.mtdDays +
+          (DATA.mtdDays === 1 ? " day." : " days.")) + lopsided();
+  }
+
+  // ---- chart 14/15: monthly stacked bars by affiliate ---------------------
+  // The country pair's shape applied to the affiliate dimension, drawn twice —
+  // count and amount — and reading from affCells, which is the only array that
+  // carries the affiliate at all.
+  //
+  // (direct / untagged) is half the FTDs and is not an affiliate. It keeps its
+  // own grey band, outside the ranking, so it can be switched off in one click
+  // without the ranked bands shifting underneath.
+  var AFF_TOP = 12;
+  var AFF_OTHER = "Other affiliates";
+  function drawMonthsAff(cfg){
+    var metric = cfg.metric, st = state.aff[metric];
+    var fV = function(v){ return fmtM(metric, v); };
+    var sV = function(v){ return shortM(metric, v); };
+    var svg = document.getElementById(cfg.svgId), W = 1000, Ht = 360;
+    clear(svg);
+    var months = winMonths(), mset = {};
+    months.forEach(function(m){ mset[m] = 1; });
+    var partialMM = DATA.months[DATA.months.length - 1].slice(5);
+    var src = state.period === "mtd" ? (DATA.affMtdCells || []) : (DATA.affCells || []);
+    var vi = metric === "count" ? AN : AV;
+
+    var byMA = {}, tot = {};
+    src.forEach(function(c){
+      if (!mset[c[AM]]) return;
+      if (state.offCh[c[AH]]) return;
+      if (state.rail !== "all" && c[AR] !== state.rail) return;
+      if (state.excl && EXCL_SET[c[AC]]) return;
+      if (state.focus.length && state.focus.indexOf(c[AC]) < 0) return;
+      if (state.affFocus && c[AA] !== state.affFocus) return;
+      byMA[c[AM] + "|" + c[AA]] = (byMA[c[AM] + "|" + c[AA]] || 0) + c[vi];
+      tot[c[AA]] = (tot[c[AA]] || 0) + c[vi];
+    });
+
+    var ranked = Object.keys(tot).filter(function(a){ return a !== DATA.noAff; })
+      .sort(function(a, b){ return tot[b] - tot[a] || (a < b ? -1 : 1); });
+    var t = Math.max(0, Math.min(st.tier, Math.ceil(ranked.length / AFF_TOP) - 1));
+    st.tier = t;
+    var from = t * AFF_TOP;
+    var top = ranked.slice(from, from + AFF_TOP);
+    var rest = ranked.slice(from + AFF_TOP);
+    var hasNoAff = tot[DATA.noAff] !== undefined && t === 0;
+    var bands = (hasNoAff ? [DATA.noAff] : []).concat(top,
+                  rest.length ? [AFF_OTHER] : []);
+    var colOf = function(b){
+      if (b === DATA.noAff) return "#8B93A1";
+      if (b === AFF_OTHER) return OTHER_COL;
+      return CTRY_COL[top.indexOf(b) % CTRY_COL.length];
+    };
+    var inScope = {};
+    top.concat(rest).forEach(function(a){ inScope[a] = 1; });
+    if (hasNoAff) inScope[DATA.noAff] = 1;
+    var bandFor = function(a){
+      if (a === DATA.noAff) return DATA.noAff;
+      return top.indexOf(a) >= 0 ? a : AFF_OTHER;
+    };
+    var shown = bands.filter(function(b){ return !st.off[b]; });
+
+    var byMB = {}, bandTot = {};
+    Object.keys(byMA).forEach(function(k){
+      var i = k.indexOf("|"), m = k.slice(0, i), a = k.slice(i + 1);
+      if (!inScope[a]) return;
+      var b = bandFor(a);
+      byMB[m + "|" + b] = (byMB[m + "|" + b] || 0) + byMA[k];
+      bandTot[b] = (bandTot[b] || 0) + byMA[k];
+    });
+
+    var totals = months.map(function(m){
+      return shown.reduce(function(s2, b){ return s2 + (byMB[m + "|" + b] || 0); }, 0); });
+    var maxV = Math.max.apply(null, totals.concat([1]));
+
+    var pad = { t: 26, r: 16, b: 56, l: 72 };
+    var sc = scaffold(svg, W, Ht, pad, maxV, sV);
+    var bandW = sc.iw / Math.max(months.length, 1);
+    var barW = Math.min(34, bandW - 6);
+
+    months.forEach(function(m, i){
+      var x = pad.l + bandW * i + (bandW - barW) / 2, acc = 0;
+      shown.forEach(function(b){
+        var v = byMB[m + "|" + b] || 0;
+        if (!v) return;
+        var y0 = sc.y(acc), y1 = sc.y(acc + v), h = Math.max(0, y0 - y1);
+        var r = el("rect", { x: x, y: y1, width: barW, height: h, fill: colOf(b) });
+        tip(r, mLabel(m) + " · " + b + " · " + fV(v));
+        svg.appendChild(r);
+        if (h >= 15 && barW >= 30)
+          svg.appendChild(el("text", { x: x + barW / 2, y: y1 + h / 2 + 3.5,
+            "text-anchor": "middle", "font-size": 9, fill: inkOn(colOf(b)),
+            "fill-opacity": 0.92 }, sV(v)));
+        acc += v;
+      });
+      if (bandW >= 30)
+        svg.appendChild(el("text", { x: x + barW / 2, y: sc.y(acc) - 6, "text-anchor": "middle",
+          "font-size": 9.5, "font-weight": 700, fill: "#0F2A43" }, sV(acc)));
+      svg.appendChild(el("text", { x: x + barW / 2, y: Ht - pad.b + 16, "text-anchor": "end",
+        "font-size": 9.5, fill: "#5B7285",
+        transform: "rotate(-40 " + (x + barW / 2) + " " + (Ht - pad.b + 16) + ")" }, mLabel(m)));
+    });
+    var split = months.indexOf("2026-01");
+    if (split > 0){
+      var xd = pad.l + bandW * split;
+      svg.appendChild(el("line", { x1: xd, x2: xd, y1: pad.t - 8, y2: pad.t + sc.ih,
+        stroke: "#C3CCD4", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: xd + 4, y: pad.t - 12, "font-size": 10, fill: "#8B93A1" }, "2026"));
+    }
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "month · " + nameM(metric) + " by affiliate"));
+
+    legend(cfg.legendId, bands.map(function(b){
+      return { key: b, label: b === AFF_OTHER ? AFF_OTHER + " ›" : b,
+               color: colOf(b), value: sV(bandTot[b] || 0) };
+    }), function(k){ return !!st.off[k]; },
+      function(k, only){
+        if (k === null){ st.off = {}; render(); return; }
+        if (k === AFF_OTHER && !only){ st.tier = t + 1; st.off = {}; render(); return; }
+        pick(st.off, bands, k, only);
+        render();
+      });
+
+    var crumb = document.getElementById(cfg.crumbId);
+    crumb.innerHTML = "";
+    var here = document.createElement("span");
+    here.innerHTML = t === 0
+      ? "Showing the <b>top " + top.length + "</b> affiliates by " + nameM(metric)
+      : "Showing affiliates ranked <b>" + (from + 1) + "–" + (from + top.length) +
+        "</b> — the bars are this slice, not the month total";
+    crumb.appendChild(here);
+    if (t > 0){
+      var back = document.createElement("span");
+      back.className = "chip";
+      back.textContent = "← Back to the top " + AFF_TOP;
+      back.addEventListener("click", function(){ st.tier = 0; st.off = {}; render(); });
+      crumb.appendChild(back);
+    }
+
+    document.getElementById(cfg.capId).textContent =
+      (hasNoAff
+        ? DATA.noAff + " is " + pct(bandTot[DATA.noAff] || 0,
+            Object.keys(bandTot).reduce(function(s2, k){ return s2 + bandTot[k]; }, 0)) +
+          " of what is plotted and is not an affiliate — it keeps its own grey " +
+          "band outside the ranking, so switching it off leaves the ranked bands " +
+          "where they are. "
+        : "") +
+      (rest.length
+        ? AFF_OTHER + " holds the " + rest.length + " ranked below these; click it " +
+          "to open the next " + AFF_TOP + ". "
+        : "") +
+      "Every header filter applies, and so do a country or an affiliate picked " +
+      "elsewhere on the page.";
+  }
+
+  // ---- chart 16/17: deposits and adjusted GGR, split by channel -----------
+  // Both read cell arrays the builder keys the same way — year, month, country,
+  // channel — with the channel taken from the per-player map rather than the
+  // row, exactly as the adjusted GGR by country card does. Neither carries a
+  // payment rail, so the Rail filter cannot reach them; the caption says so.
+  //
+  // Each keeps its own whale toggle. He is 50% of deposited dollars and 52% of
+  // adjusted GGR, so on these two cards he is not a footnote.
+  function drawValueByChannel(cfg){
+    var rows = (DATA[cfg.data] || {})[state.valWhale[cfg.key] ? "inc" : "ex"] || [];
+    var svg = document.getElementById(cfg.svgId), W = 1000, Ht = 340;
+    clear(svg);
+    var months = winMonths(), mset = {};
+    months.forEach(function(m){ mset[m] = 1; });
+    var trimmed = state.period === "mtd";
+    var off = state.offVal[cfg.key];
+
+    var byMC = {}, tot = {};
+    rows.forEach(function(r){
+      // [year, month, country, channel, value, valueCutAtMtdDays]
+      if (!mset[r[1]]) return;
+      if (state.offCh[r[3]]) return;
+      if (state.excl && EXCL_SET[r[2]]) return;
+      if (state.focus.length && state.focus.indexOf(r[2]) < 0) return;
+      var v = trimmed ? r[5] : r[4];
+      if (!v) return;
+      byMC[r[1] + "|" + r[3]] = (byMC[r[1] + "|" + r[3]] || 0) + v;
+      tot[r[3]] = (tot[r[3]] || 0) + v;
+    });
+    var shown = CH.filter(function(c){ return !off[c]; });
+
+    // Signed: adjusted GGR goes negative when players win, so positives stack
+    // up and negatives down from a darkened zero rule. Deposits never do, and
+    // the same code handles both without a special case.
+    var posT = months.map(function(m){
+      return shown.reduce(function(s2, c){
+        return s2 + Math.max(0, byMC[m + "|" + c] || 0); }, 0); });
+    var negT = months.map(function(m){
+      return shown.reduce(function(s2, c){
+        return s2 + Math.min(0, byMC[m + "|" + c] || 0); }, 0); });
+    var maxBar = Math.max.apply(null, posT.concat([0]));
+    var minBar = Math.min.apply(null, negT.concat([0]));
+
+    var pad = { t: 26, r: 16, b: 56, l: 76 };
+    var iw = W - pad.l - pad.r, ih = Ht - pad.t - pad.b;
+    var step = niceStep(Math.max(maxBar - minBar, 1e-9), 5);
+    var topL = Math.ceil(maxBar / step) * step || step;
+    var botL = Math.floor(minBar / step) * step;
+    var y = function(v){ return pad.t + ih - ((v - botL) / (topL - botL)) * ih; };
+    for (var t = botL; t <= topL + 1e-9; t += step){
+      var yy = y(t), zero = Math.abs(t) < 1e-9;
+      svg.appendChild(el("line", { x1: pad.l, x2: pad.l + iw, y1: yy, y2: yy,
+        stroke: zero ? "#5B7285" : "#E5E5E5", "stroke-width": zero ? 1.3 : 1 }));
+      svg.appendChild(el("text", { x: pad.l - 8, y: yy + 3.5, "text-anchor": "end",
+        "font-size": 10, fill: "#5B7285" }, moneyShort(t)));
+    }
+
+    var bandW = iw / Math.max(months.length, 1);
+    var barW = Math.min(34, bandW - 6);
+    months.forEach(function(m, i){
+      var x = pad.l + bandW * i + (bandW - barW) / 2, accPos = 0, accNeg = 0;
+      shown.forEach(function(c){
+        var v = byMC[m + "|" + c] || 0;
+        if (!v) return;
+        var base = v > 0 ? accPos : accNeg;
+        var y0 = y(base), y1 = y(base + v), h = Math.abs(y1 - y0);
+        var r = el("rect", { x: x, y: Math.min(y0, y1), width: barW, height: h,
+          fill: CH_COL[c] });
+        tip(r, mLabel(m) + " · " + c + " · " + fmtMoney(v));
+        svg.appendChild(r);
+        if (h >= 15 && barW >= 30)
+          svg.appendChild(el("text", { x: x + barW / 2, y: Math.min(y0, y1) + h / 2 + 3.5,
+            "text-anchor": "middle", "font-size": 9, fill: inkOn(CH_COL[c]),
+            "fill-opacity": 0.92 }, moneyShort(v)));
+        if (v > 0) accPos += v; else accNeg += v;
+      });
+      var net = accPos + accNeg;
+      if (bandW >= 30)
+        svg.appendChild(el("text", { x: x + barW / 2,
+          y: (net >= 0 ? y(accPos) - 6 : y(accNeg) + 13), "text-anchor": "middle",
+          "font-size": 9.5, "font-weight": 700,
+          fill: net < 0 ? "#C0392B" : "#0F2A43" }, moneyShort(net)));
+      svg.appendChild(el("text", { x: x + barW / 2, y: Ht - pad.b + 16, "text-anchor": "end",
+        "font-size": 9.5, fill: "#5B7285",
+        transform: "rotate(-40 " + (x + barW / 2) + " " + (Ht - pad.b + 16) + ")" }, mLabel(m)));
+    });
+    var split = months.indexOf("2026-01");
+    if (split > 0){
+      var xd = pad.l + bandW * split;
+      svg.appendChild(el("line", { x1: xd, x2: xd, y1: pad.t - 8, y2: pad.t + ih,
+        stroke: "#C3CCD4", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: xd + 4, y: pad.t - 12, "font-size": 10, fill: "#8B93A1" }, "2026"));
+    }
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "month · " + cfg.label));
+
+    legend(cfg.legendId, CH.map(function(c){
+      return { key: c, label: c, color: CH_COL[c], value: moneyShort(tot[c] || 0) };
+    }), function(k){ return !!off[k]; },
+      function(k, only){ pick(off, CH, k, only); render(); });
+
+    var crumb = document.getElementById(cfg.crumbId);
+    crumb.innerHTML = "";
+    var lbl = document.createElement("span");
+    lbl.innerHTML = "Top depositor <b>" +
+      (state.valWhale[cfg.key] ? "included" : "excluded") + "</b>";
+    crumb.appendChild(lbl);
+    var chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = state.valWhale[cfg.key] ? "Exclude him" : "Include him";
+    chip.addEventListener("click", function(){
+      state.valWhale[cfg.key] = !state.valWhale[cfg.key]; render(); });
+    crumb.appendChild(chip);
+
+    var a25 = 0, a26 = 0;
+    months.forEach(function(m){
+      shown.forEach(function(c){
+        var v = byMC[m + "|" + c] || 0;
+        if (m.slice(0, 4) === "2025") a25 += v; else a26 += v;
+      });
+    });
+    var dv = delta(a25, a26);
+    document.getElementById(cfg.capId).textContent =
+      cfg.label + " split Direct / SEO / Streamer / Other, the channel taken " +
+      "from the player rather than the row. 2025 " + fmtMoney(a25) + " against " +
+      "2026 " + fmtMoney(a26) + " (" + dv.txt + "). " + cfg.note +
+      " The Rail filter cannot reach this card — these rows carry no payment " +
+      "rail — but every other filter does.";
+  }
+
+  // ---- table 10: month-on-month movement by country -----------------------
+  // Where the FTD dollars went, country by country, current month against the
+  // one before. Built on DATA.mtdCells, which the builder trims every month to
+  // the day count the newest month reaches — comparing August-to-the-26th
+  // against a whole July would show a collapse that is only the calendar.
+  var MOM_ROWS = 30;
+  // What the table compares depends on the Quarter filter:
+  //   All  -> the newest month against the one before it
+  //   Q1   -> Q1 2025 against Q1 2026, and so on
+  // Either way both sides are cut the same. The newest month is a part month,
+  // so it and its counterpart in the other year are read from mtdCells (every
+  // month trimmed to day mtdDays); complete months are read at full length,
+  // which keeps the figures equal to the charts above instead of quietly
+  // shaving the last days off every bar.
+  // What the whole page is comparing, in words. The subtitle and the movement
+  // table both read it, so the two can never describe different windows.
+  /* How many months each year actually has in the current selection. Whole Q3
+     2025 against two months of Q3 2026 reads as a collapse that is only the
+     calendar, and the mode that used to hide that problem is gone — so the
+     label states it. */
+  function yearSpans(){
+    var ms = winMonths(), a = 0, b = 0;
+    ms.forEach(function(m){ if (m.slice(0,4) === "2025") a++; else if (m.slice(0,4) === "2026") b++; });
+    return [a, b];
+  }
+  function lopsided(){
+    var sp = yearSpans();
+    return sp[0] && sp[1] && sp[0] !== sp[1]
+      ? "  \u26a0 2025 has " + sp[0] + " months here, 2026 has " + sp[1] +
+        " \u2014 the year-on-year columns are not like for like."
+      : "";
+  }
+
+  function windowLabel(){
+    if (state.period === "full")
+      return state.quarter === "all"
+        ? "full periods — 2025 whole (12 months) against 2026 to " +
+          (DATA.lastDay["2026"] || "")
+        : "full periods — " + state.quarter + " at its own length in each year";
+    return DATA.mtdDays === 1
+      ? "MTD — every month cut to its first day only"
+      : "MTD — every month cut to its first " + DATA.mtdDays + " days";
+  }
+
+  function momScope(){
+    var months = DATA.months.slice();
+    var newest = months[months.length - 1];
+    var partialMM = newest.slice(5);          // e.g. "08"
+    if (state.quarter === "all"){
+      // Month mode trims BOTH sides: the newest month is short, so the one
+      // before it has to be cut to the same day or the drop is just the calendar.
+      return { kind: "month", trimAll: true,
+               a: [months[months.length - 2]], b: [newest],
+               aLabel: mLabel(months[months.length - 2]), bLabel: mLabel(newest),
+               partialMM: partialMM };
+    }
+    var q = state.quarter;
+    var inQ = function(y){
+      return months.filter(function(m){
+        return m.slice(0, 4) === y && quarterOf(m) === q; });
+    };
+    var m25 = inQ("2025"), m26 = inQ("2026");
+    // Only the month slots both years have — Q3 2026 stops at August, so
+    // September 2025 is left out rather than counted against nothing.
+    var both = {};
+    m26.forEach(function(m){ both[m.slice(5)] = 1; });
+    // Quarter mode trims only the part month and its counterpart a year
+    // earlier; the complete months are read whole, so the figures still equal
+    // the charts above instead of quietly losing their last days.
+    return { kind: "quarter", trimAll: false,
+             a: m25.filter(function(m){ return both[m.slice(5)]; }),
+             b: m26,
+             aLabel: q + " 2025", bLabel: q + " 2026",
+             partialMM: partialMM, q: q,
+             dropped: m25.filter(function(m){ return !both[m.slice(5)]; }) };
+  }
+
+  function momTable(){
+    MOM_DIMS.forEach(function(dim){
+      if (state.momMode === "year") momTableYear(dim);
+      else momTableMonth(dim);
+    });
+  }
+
+  // Month-on-month, or a quarter against the same quarter a year earlier.
+  function momTableMonth(dim){
+    var sc = momScope();
+    var aSet = {}, bSet = {};
+    sc.a.forEach(function(m){ aSet[m] = 1; });
+    sc.b.forEach(function(m){ bSet[m] = 1; });
+    /* Which months are read from the trimmed cells.
+
+       Under MTD, all of them — that is what MTD means, and it is what win()
+       does for the charts. This table used to decide for itself and ignore the
+       toggle entirely, so switching to MTD moved every chart on the page and
+       left these two tables sitting on whole months.
+
+       Under Full months, only the part month and its counterpart a year
+       earlier: comparing a 1-day September against a whole August would show a
+       collapse that is only the calendar, and that trim is what makes the two
+       sides comparable at all. */
+    /* Which months are read from the trimmed cells — decided by the period
+       toggle and nothing else.
+
+       This table used to force the trim on in month mode whatever the toggle
+       said, so switching between Full months and MTD moved every chart on the
+       page and left these two tables identical. That was well meant: comparing
+       a 1-day September against a whole August shows a collapse that is only
+       the calendar. But a control that silently does nothing is worse than a
+       comparison the reader chose with their eyes open, and the caption below
+       says which window each side was read over. */
+    var trimmed = function(){ return state.period === "mtd"; };
+    var prior = {}, now = {}, ctries = {}, nPrior = {}, nNow = {};
+    var K = dim.affCell;                 // AC for country, AA for affiliate
+    var eat = function(c, src){
+      // [year, month, country, channel, rail, count, amount]
+      if (c[3] && state.offCh[c[3]]) return;
+      if (state.rail !== "all" && c[4] !== state.rail) return;
+      if (dim.key === "ctry" && state.excl && EXCL_SET[c[2]]) return;
+      if (state.affFocus && dim.key === "ctry" && c[AA] !== state.affFocus) return;
+      if (dim.key === "aff" && state.focus.length &&
+          state.focus.indexOf(c[AC]) < 0) return;
+      var k = c[K];
+      if (aSet[c[1]] && trimmed(c[1]) === src){
+        prior[k] = (prior[k] || 0) + c[AV];
+        nPrior[k] = (nPrior[k] || 0) + c[AN]; ctries[k] = 1;
+      } else if (bSet[c[1]] && trimmed(c[1]) === src){
+        now[k] = (now[k] || 0) + c[AV];
+        nNow[k] = (nNow[k] || 0) + c[AN]; ctries[k] = 1;
+      }
+    };
+    // affCells / affMtdCells carry BOTH dimensions, so one pair of arrays feeds
+    // either card and the two can never be built from different populations.
+    (DATA.affMtdCells || []).forEach(function(c){ eat(c, true); });
+    (DATA.affCells || []).forEach(function(c){ eat(c, false); });
+    var howCut = sc.kind === "month"
+      ? "Both months are cut at day " + DATA.mtdDays + ", the furthest the newest " +
+        "month reaches, so this is like for like rather than a part month against a whole one. "
+      : "The same month slots on both sides" +
+        (sc.dropped && sc.dropped.length
+          ? ", so " + sc.dropped.map(mLabel).join(" and ") +
+            " sits out — 2026 has not reached it"
+          : "") +
+        ". " + (sc.b.some(function(m){ return m.slice(5) === sc.partialMM; })
+          ? "The part month and its counterpart a year earlier are both cut at day " +
+            DATA.mtdDays + "; the complete months are read whole. "
+          : "");
+    momRender(dim, prior, now, ctries, sc.aLabel, sc.bLabel,
+      sc.kind === "month"
+        ? dim.label + " Movement — " + sc.bLabel + " vs " + sc.aLabel + ", first " +
+          DATA.mtdDays + " days of each"
+        : dim.label + " Movement — " + sc.bLabel + " vs " + sc.aLabel,
+      howCut + "Each GGR column is what that period's own first depositors " +
+      "booked inside that period, not the country's whole revenue. ",
+      cohortGgrBy(sc.a, sc.a.some(function(m){
+        return m.slice(5) === sc.partialMM; }), dim),
+      cohortGgrBy(sc.b, sc.b.some(function(m){
+        return m.slice(5) === sc.partialMM; }), dim),
+      nPrior, nNow);
+  }
+
+  // GGR booked by the players acquired in a set of months, during those same
+  // months. Both indices are filtered to the window, so a January cohort's
+  // August revenue counts only when August is in the window too — which is
+  // what "same period" has to mean for the number to sit beside an FTD figure.
+  //
+  // `trimmed` picks the column the builder cut at mtdDays on BOTH months, for
+  // the part month.
+  // The two movement cards, identical but for what a row is. `k` picks the
+  // dimension out of a cell; `src` names the arrays that carry it.
+  var MOM_DIMS = [
+    { key: "ctry", label: "Country", noun: "countries", rows: 30,
+      ids: { t: "t10", h: "h10", hero: "mom-hero", cap: "cap10", crumb: "d10" },
+      cell: 2, affCell: AC, ggr: "cohortGgr", ggrK: 2 },
+    { key: "aff", label: "Affiliate", noun: "affiliates", rows: 60,
+      ids: { t: "t11", h: "h11", hero: "mom-hero-aff", cap: "cap11", crumb: "d11" },
+      cell: null, affCell: AA, ggr: "cohortGgrAff", ggrK: 2 }
+  ];
+
+  function cohortGgrBy(months, trimmed, dim){
+    dim = dim || MOM_DIMS[0];              // default to the country dimension
+    var inWin = {};
+    months.forEach(function(m){ inWin[m] = 1; });
+    var col = trimmed ? 6 : 5;
+    var out = {};
+    // With an affiliate picked, the country card's GGR cannot be computed:
+    // cohortGgr has no affiliate grain. Returning null drops the two columns
+    // rather than showing every affiliate's revenue under one affiliate's name.
+    // Neither cohort index carries both dimensions, so a cross-filter has no
+    // GGR to show. Dropping the columns is the honest move in both directions:
+    // country picked -> the affiliate card cannot say GGR; affiliate picked ->
+    // the country card cannot.
+    if (state.affFocus && dim.key === "ctry") return null;
+    if (state.focus.length && dim.key === "aff") return null;
+    // [ftdMonth, ggrMonth, country|affiliate, channel, rail, ggr, ggrMtd]
+    // The affiliate table cannot honour the country exclude list — its rows are
+    // not countries — so that filter applies to the country card only, and the
+    // caption says so rather than the two silently disagreeing.
+    (DATA[dim.ggr] || []).forEach(function(r){
+      if (!inWin[r[0]] || !inWin[r[1]]) return;
+      if (state.offCh[r[3]]) return;
+      if (state.rail !== "all" && r[4] !== state.rail) return;
+      if (dim.key === "ctry" && state.excl && EXCL_SET[r[2]]) return;
+      out[r[2]] = (out[r[2]] || 0) + r[col];
+    });
+    return out;
+  }
+
+  function momRender(dim, prior, now, ctries, aLabel, bLabel, heading, capPrefix,
+                     ggrA, ggrB, cntA, cntB){
+    var ggr = ggrB;
+    var list = Object.keys(ctries).map(function(k){
+      return { c: k, p: prior[k] || 0, n: now[k] || 0, d: (now[k] || 0) - (prior[k] || 0) };
+    });
+    // Biggest loss first, biggest gain last — the shape reads top to bottom.
+    list.sort(function(a, b){ return a.d - b.d; });
+
+    var tP = list.reduce(function(s, r){ return s + r.p; }, 0);
+    var tN = list.reduce(function(s, r){ return s + r.n; }, 0);
+    var tD = tN - tP;
+
+    // Only the movers get a row; the rest are pooled, so the table is about
+    // what changed rather than 150 rows of nothing.
+    var nRows = dim.rows || MOM_ROWS;
+    var movers = list.filter(function(r){ return Math.abs(r.d) >= 1; });
+    var head = movers.slice(0, Math.ceil(nRows / 2));
+    var tail = movers.slice(-Math.floor(nRows / 2));
+    var shownRows = head.concat(tail.filter(function(r){ return head.indexOf(r) < 0; }));
+    var pooled = list.filter(function(r){ return shownRows.indexOf(r) < 0; });
+    var pool = pooled.reduce(function(s, r){
+      return { p: s.p + r.p, n: s.n + r.n, d: s.d + r.d }; }, { p: 0, n: 0, d: 0 });
+
+    var scale = Math.max.apply(null, shownRows.map(function(r){ return Math.abs(r.d); })
+                  .concat([Math.abs(pool.d), 1]));
+
+    // Share of loss is against the NET change — the figure in the Total row —
+    // so Norway losing $47k out of a $106k fall reads 44%, which is the
+    // question people actually ask of this column.
+    //
+    // The consequence is that the fallers' shares add to MORE than 100%
+    // whenever some countries grew: here 118 of decline against 106 of net
+    // fall is 111%, and the missing 11% is exactly what the risers gave back.
+    // That is a fact about the month, not an error, and the footer prints both
+    // numbers so the gap is visible rather than mysterious.
+    //
+    // When the window is net POSITIVE there is no fall to take a share of, so
+    // the column falls back to the gross decline and the footer says which.
+    var grossLoss = 0, netChange = 0;
+    list.forEach(function(r){
+      netChange += r.d;
+      if (r.d < 0) grossLoss += -r.d;
+    });
+    var netBasis = netChange < 0;
+    var lossTotal = netBasis ? -netChange : grossLoss;
+    var lossShare = function(r){
+      if (!lossTotal || r.d >= 0) return null;
+      return -r.d / lossTotal * 100;
+    };
+    var shareCell = function(lost, lostAbs){
+      if (lost === null)
+        return '<td><span style="color:#B8C0C8">—</span></td>';
+      var txt = lost > 0 && lost < 1 ? "<1%" : Math.round(lost) + "%";
+      return '<td class="neg" title="' + fmtMoney(lostAbs) + " of the " +
+        fmtMoney(lossTotal) + (netBasis ? " net fall" : " lost across every country that fell") +
+        ". Countries that fell lost " + fmtMoney(grossLoss) + " between them; those that " +
+        "grew gave back " + fmtMoney(grossLoss - (netBasis ? lossTotal : grossLoss)) +
+        '">' + txt + '</td>';
+    };
+
+    var pctTxt = function(p, n){
+      if (!p) return n ? "new" : "—";
+      var v = (n - p) / p * 100;
+      return (v > 0 ? "+" : "") + Math.round(v) + "%";
+    };
+    var row = function(label, r, cls, gA, gB, nA, nB){
+      var lost = lossShare(r);
+      var lostAbs = r.d < 0 ? -r.d : 0;
+      var w = Math.abs(r.d) / scale * 50;      // half the bar box is one side
+      // The figure goes on the bar. Inside it when the bar is long enough to
+      // hold it, just outside when it is not — a label that spills across the
+      // bar end is worse than one sitting beside it.
+      var txt = (r.d > 0 ? "+" : "") + fmtMoney(r.d);
+      // Both offsets are measured from the side the bar grows FROM, so a
+      // negative label is positioned with `right` and a positive one with
+      // `left`. Getting that backwards puts a loss label on the gain side of
+      // the zero rule, which reads as the opposite of the number it carries —
+      // it did, on exactly the bars long enough to take an inside label.
+      var inside = w > 14;
+      var lbl = r.d < 0
+        ? '<span class="momval' + (inside ? " in" : "") + '" style="right:' +
+            (inside ? "calc(50% + 4px)" : "calc(" + (50 + w) + "% + 4px)") + '">' +
+            txt + '</span>'
+        : '<span class="momval' + (inside ? " in" : "") + '" style="left:' +
+            (inside ? "calc(50% + 4px)" : "calc(" + (50 + w) + "% + 4px)") + '">' +
+            txt + '</span>';
+      var bar = '<div class="mombar"><div class="zero"></div>' +
+        (r.d < 0
+          ? '<div class="fill neg" style="right:50%;width:' + w + '%"></div>'
+          : '<div class="fill pos" style="left:50%;width:' + w + '%"></div>') +
+        (r.d ? lbl : '') + '</div>';
+      // Affiliate rows are a control: clicking one narrows the country card to
+      // that affiliate's players. Country rows are not, because the country
+      // card is already the country breakdown.
+      var pickable = dim.key === "aff" && cls !== "tot" &&
+                     label.indexOf("All other") < 0;
+      return '<tr' + (cls ? ' class="' + cls + '"' : '') +
+        (pickable ? ' data-aff="' + label.replace(/"/g, "&quot;") + '"' : '') +
+        '><td>' + label + '</td>' +
+        '<td class="mid">' + bar + '</td>' +
+        '<td class="' + (r.d < 0 ? "neg" : (r.d > 0 ? "pos" : "")) + '">' +
+          (r.d > 0 ? "+" : "") + fmtMoney(r.d) + '</td>' +
+        '<td>' + fmtMoney(r.p) + '</td><td>' + fmtMoney(r.n) + '</td>' +
+        '<td class="' + (r.d < 0 ? "neg" : (r.d > 0 ? "pos" : "")) + '">' +
+          pctTxt(r.p, r.n) + '</td>' +
+        shareCell(lost, lostAbs) +
+        (cntA
+          ? '<td>' + (nA ? fmtInt(nA) : '<span style="color:#B8C0C8">—</span>') + '</td>' +
+            '<td>' + (nB ? fmtInt(nB) : '<span style="color:#B8C0C8">—</span>') + '</td>'
+          : '') +
+        (ggr
+          ? '<td class="' + (gA < 0 ? "neg" : "") + '">' +
+              (gA ? fmtMoney(gA) : '<span style="color:#B8C0C8">—</span>') + '</td>' +
+            '<td class="' + (gB < 0 ? "neg" : "") + '">' +
+              (gB ? fmtMoney(gB) : '<span style="color:#B8C0C8">—</span>') + '</td>'
+          : '') +
+        '</tr>';
+    };
+
+    var h = ['<thead><tr><th>' + dim.label + '</th>' +
+      '<th style="text-align:center">&#9664; lost &middot; gained &#9654;</th>' +
+      '<th>Change</th><th>FTD $ ' + aLabel + '</th><th>FTD $ ' + bLabel + '</th>' +
+      '<th>%</th><th>Share of loss</th>' +
+      (cntA ? '<th>FTDs ' + aLabel + '</th><th>FTDs ' + bLabel + '</th>' : '') +
+      (ggr ? '<th>GGR ' + aLabel + '</th><th>GGR ' + bLabel + '</th>' : '') +
+      '</tr></thead><tbody>'];
+    var gget = function(o, k){ return o ? (o[k] || 0) : 0; };
+    shownRows.forEach(function(r){
+      h.push(row(r.c, r, "", gget(ggrA, r.c), gget(ggrB, r.c),
+                 gget(cntA, r.c), gget(cntB, r.c))); });
+    if (pooled.length){
+      var pA = 0, pB = 0, pnA = 0, pnB = 0;
+      pooled.forEach(function(r){
+        pA += gget(ggrA, r.c); pB += gget(ggrB, r.c);
+        pnA += gget(cntA, r.c); pnB += gget(cntB, r.c); });
+      h.push(row("All other " + dim.noun + " <span style=\"color:#8B93A1\">(" +
+        pooled.length + ")</span>", pool, "", pA, pB, pnA, pnB));
+    }
+    var sumAll = function(o){
+      return o ? Object.keys(o).reduce(function(t, k){ return t + o[k]; }, 0) : 0; };
+    var footHtml = row("Total", { p: tP, n: tN, d: tD }, "tot",
+          sumAll(ggrA), sumAll(ggrB), sumAll(cntA), sumAll(cntB));
+    // The footer's own share would be a percentage of itself. Replace it with
+    // the figure the column is a share OF, which is the useful number there.
+    footHtml = footHtml.replace(/<td[^>]*title="[^"]*(?:net fall|lost across)[^"]*"[^>]*>[^<]*<\/td>|<td><span style="color:#B8C0C8">—<\/span><\/td>/,
+      '<td title="' + (netBasis
+          ? "the net fall, which the shares above are taken against. Countries that fell lost "
+            + fmtMoney(grossLoss) + " between them, so those shares add to "
+            + Math.round(grossLoss / lossTotal * 100) + "% — the extra is what the risers gave back"
+          : "no net fall in this window, so the shares are against the gross decline") +
+        '">' + fmtMoney(lossTotal) + (netBasis ? " net" : " lost") + '</td>');
+    h.push('</tbody><tfoot>' + footHtml + '</tfoot>');
+    document.getElementById(dim.ids.t).innerHTML = h.join("");
+    if (dim.key === "aff"){
+      [].slice.call(document.querySelectorAll("#" + dim.ids.t + " tr[data-aff]"))
+        .forEach(function(tr){
+          var name = tr.getAttribute("data-aff");
+          if (state.affFocus === name) tr.classList.add("picked");
+          tr.title = "Click to show only " + name + "'s players in the country table below";
+          tr.addEventListener("click", function(){
+            state.affFocus = state.affFocus === name ? null : name;
+            render();
+          });
+        });
+    }
+
+    setHeading(dim.ids.h, heading);
+    document.getElementById(dim.ids.hero).innerHTML =
+      '<span class="n ' + (tD < 0 ? "neg" : "pos") + '">' +
+        (tD > 0 ? "+" : "") + fmtMoney(tD) + '</span>' +
+      '<span class="c">' + bLabel + " vs " + aLabel + " · " + fmtMoney(tP) +
+        " &rarr; " + fmtMoney(tN) + " · " + pctTxt(tP, tN) + '</span>';
+    document.getElementById(dim.ids.cap).textContent = capPrefix +
+      "Share of loss is against the " + fmtMoney(lossTotal) +
+      (netBasis
+        ? " net fall — the Total row. The countries that fell lost " +
+          fmtMoney(grossLoss) + " between them, so those shares add to " +
+          Math.round(grossLoss / lossTotal * 100) + "%; the extra is what the " +
+          "countries that grew gave back. "
+        : " lost across the countries that fell — this window is net positive, " +
+          "so there is no net fall to take a share of. ") +
+      "The " + shownRows.length + " biggest movers get a row; the remaining " +
+      pooled.length + " " + dim.noun + " are pooled, and the total covers all " +
+      list.length + ". Channel and rail apply" +
+      (dim.key === "ctry"
+        ? "; the country selection does not, since this table is the country breakdown."
+        : "; so does a country picked in the charts, which narrows this to the " +
+          "affiliates who brought that country's players. The country exclude " +
+          "list does not — a row here is an affiliate, not a country.");
+
+    // Which question the table is answering is a choice, so it is a control.
+    var crumb = document.getElementById(dim.ids.crumb);
+    crumb.innerHTML = "";
+    var lbl = document.createElement("span");
+    lbl.innerHTML = "Comparing <b>" +
+      (state.momMode === "year" ? "year on year" : "month on month") + "</b>" +
+      (state.affFocus && dim.key === "ctry"
+        ? ", players brought by <b>" + state.affFocus + "</b> only"
+        : "") +
+      (state.affFocus && dim.key === "aff"
+        ? " — <b>" + state.affFocus + "</b> is driving the country table below"
+        : "") +
+      (state.focus.length && dim.key === "aff"
+        ? ", affiliates who brought <b>" + state.focus.join(", ") + "</b> players"
+        : "");
+    crumb.appendChild(lbl);
+    if (state.focus.length && dim.key === "aff"){
+      var clrCtry = document.createElement("span");
+      clrCtry.className = "chip";
+      clrCtry.textContent = "× Clear country";
+      clrCtry.addEventListener("click", function(){
+        state.focus = []; state.ctry.count.off = {}; state.ctry.amount.off = {}; render();
+      });
+      crumb.appendChild(clrCtry);
+    }
+    if (state.affFocus){
+      var clrAff = document.createElement("span");
+      clrAff.className = "chip";
+      clrAff.textContent = "× Clear affiliate";
+      clrAff.addEventListener("click", function(){ state.affFocus = null; render(); });
+      crumb.appendChild(clrAff);
+    }
+    [["year", "Year on year"], ["month", "Month on month"]].forEach(function(o){
+      if (state.momMode === o[0]) return;
+      var chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = "Switch to " + o[1].toLowerCase();
+      chip.addEventListener("click", function(){ state.momMode = o[0]; render(); });
+      crumb.appendChild(chip);
+    });
+  }
+
+  // Year-on-year movement: the same window every other card is showing, split
+  // by country, 2026 against 2025. This is the default because the page as a
+  // whole compares years — a card that quietly compared two months instead was
+  // the one figure on the page describing a different question.
+  function momTableYear(dim){
+    var w = win();
+    var prior = {}, now = {}, ctries = {}, nPrior = {}, nNow = {};
+    // The country card reads win() straight — the same arrays the charts use,
+    // so its totals match them to the cent. The affiliate card has to go to the
+    // affiliate-grained arrays, which carry more cells and therefore a little
+    // more 2dp rounding; that is why the country card does NOT take the same
+    // path just to share code.
+    // With an affiliate picked the country card cannot use win() — win() has no
+    // affiliate grain — so it drops to the affiliate arrays like the other card.
+    if (dim.key === "ctry" && !state.affFocus){
+      w.chCells.forEach(function(c){
+        var is25 = c[Y] === "2025";
+        var bag = is25 ? prior : now, nbag = is25 ? nPrior : nNow;
+        bag[c[C]] = (bag[c[C]] || 0) + c[A];
+        nbag[c[C]] = (nbag[c[C]] || 0) + c[N];
+        ctries[c[C]] = 1;
+      });
+    } else {
+    var K = dim.affCell;
+    var mset = {};
+    w.months.forEach(function(m){ mset[m] = 1; });
+    /* MTD means EVERY month cut to the same day count, so the whole source is
+       swapped — exactly what win() does for the charts. This used to trim only
+       the newest month and read the rest whole, which was the old like-for-like
+       rule: the toggle appeared to do nothing to this table while the charts
+       above it moved. */
+    var src = state.period === "mtd" ? (DATA.affMtdCells || []) : (DATA.affCells || []);
+    src.forEach(function(c){
+      if (!mset[c[AM]]) return;
+      if (state.offCh[c[AH]]) return;
+      if (state.rail !== "all" && c[AR] !== state.rail) return;
+      if (dim.key === "ctry" && state.excl && EXCL_SET[c[AC]]) return;
+      if (state.affFocus && dim.key === "ctry" && c[AA] !== state.affFocus) return;
+      // The country picked in the charts narrows the AFFILIATE card — "who
+      // brought Brazil's players" — but never the country card, which is the
+      // country breakdown itself and would collapse to a single row.
+      if (dim.key === "aff" && state.focus.length &&
+          state.focus.indexOf(c[AC]) < 0) return;
+      var k = c[K], is25 = c[0] === "2025";
+      var bag = is25 ? prior : now, nbag = is25 ? nPrior : nNow;
+      bag[k] = (bag[k] || 0) + c[AV];
+      nbag[k] = (nbag[k] || 0) + c[AN];
+      ctries[k] = 1;
+    });
+    }
+    var m25 = w.months.filter(function(m){ return m.slice(0, 4) === "2025"; });
+    var m26 = w.months.filter(function(m){ return m.slice(0, 4) === "2026"; });
+    momRender(dim, prior, now, ctries, "2025", "2026",
+      dim.label + " Movement — 2026 vs 2025",
+      windowLabel().charAt(0).toUpperCase() + windowLabel().slice(1) + ". " +
+      "Each GGR column is what THAT year's own first depositors booked inside " +
+      "that year's window — 2025's cohort in 2025, 2026's in 2026 — not the " +
+      "country's whole revenue. ",
+      cohortGgrBy(m25, state.period === "mtd", dim),
+      cohortGgrBy(m26, state.period === "mtd", dim),
+      nPrior, nNow);
+  }
+
+  // ---- chart 8: concentration, share of FTD dollars by rank tier ----------
+  // A 100% stacked bar per month: how much of the money the leading countries
+  // carry, and whether that is moving. Pinned to dollars, like the chart it
+  // sits under.
+  //
+  // The tiers are a FIXED set of countries, ranked over the whole window, not
+  // re-ranked inside each month. Re-ranking monthly would make the top band
+  // mean "whoever led that month", which only ever goes up and answers a
+  // different question — this one is "are the same few countries still
+  // carrying the money".
+  var TIERS = [
+    { key: "t5",   label: "Top 5",        color: "#0B6E3A" },
+    { key: "t610", label: "Ranks 6–10",   color: "#E67E22" },
+    { key: "rest", label: "Everyone else", color: "#B7C3CF" }
+  ];
+  function drawConcentration(){
+    var svg = document.getElementById("c8"), W = 1000, Ht = 340;
+    clear(svg);
+    var w = win(), months = w.months;
+    var rank = topCountries(w.chCells, 0, "amount");
+    var tierOf = {};
+    rank.all.forEach(function(c, i){ tierOf[c] = i < 5 ? "t5" : (i < 10 ? "t610" : "rest"); });
+
+    // The country focus is deliberately ignored here: with one country selected
+    // every bar would read 100% and the chart would say nothing.
+    var byMT = {}, monthTot = {}, tierTot = {}, grand = 0;
+    w.chCells.forEach(function(c){
+      var t = tierOf[c[C]], v = c[A];
+      byMT[c[M] + "|" + t] = (byMT[c[M] + "|" + t] || 0) + v;
+      monthTot[c[M]] = (monthTot[c[M]] || 0) + v;
+      tierTot[t] = (tierTot[t] || 0) + v;
+      grand += v;
+    });
+    var shown = TIERS.filter(function(t){ return !state.offTier[t.key]; });
+
+    var pad = { t: 26, r: 16, b: 56, l: 66 };
+    // Fixed 0–100 domain: the whole point is comparing months, and an axis that
+    // rescaled to the tallest share would make identical mixes look different.
+    var sc = scaffold(svg, W, Ht, pad, 100, function(v){ return Math.round(v) + "%"; });
+    var bandW = sc.iw / Math.max(months.length, 1);
+    var barW = Math.min(34, bandW - 6);
+
+    months.forEach(function(m, i){
+      var tot = monthTot[m] || 0;
+      var x = pad.l + bandW * i + (bandW - barW) / 2, acc = 0;
+      if (tot > 0) shown.forEach(function(t){
+        var v = (byMT[m + "|" + t.key] || 0) / tot * 100;
+        if (!v) return;
+        var y0 = sc.y(acc), y1 = sc.y(acc + v), h = Math.max(0, y0 - y1);
+        var r = el("rect", { x: x, y: y1, width: barW, height: h, fill: t.color });
+        tip(r, mLabel(m) + " · " + t.label + " · " + pct(byMT[m + "|" + t.key] || 0, tot) +
+               " · " + fmtMoney(byMT[m + "|" + t.key] || 0));
+        svg.appendChild(r);
+        if (h >= 15 && barW >= 30)
+          svg.appendChild(el("text", { x: x + barW / 2, y: y1 + h / 2 + 3.5,
+            "text-anchor": "middle", "font-size": 9.5,
+            fill: t.key === "rest" ? "#0F2A43" : "#FFFFFF",
+            "fill-opacity": t.key === "rest" ? 1 : 0.92 },
+            pct(byMT[m + "|" + t.key] || 0, tot)));
+        acc += v;
+      });
+      // The month's dollars printed above the bar, so a share is never read
+      // without the size it is a share of. A 70% month on $28k and one on
+      // $198k are not the same fact.
+      if (bandW >= 30)
+        svg.appendChild(el("text", { x: x + barW / 2, y: sc.y(100) - 6, "text-anchor": "middle",
+          "font-size": 9.5, "font-weight": 700, fill: "#0F2A43" }, moneyShort(tot)));
+      svg.appendChild(el("text", { x: x + barW / 2, y: Ht - pad.b + 16, "text-anchor": "end",
+        "font-size": 9.5, fill: "#5B7285",
+        transform: "rotate(-40 " + (x + barW / 2) + " " + (Ht - pad.b + 16) + ")" }, mLabel(m)));
+    });
+
+    var split = months.indexOf("2026-01");
+    if (split > 0){
+      var xd = pad.l + bandW * split;
+      svg.appendChild(el("line", { x1: xd, x2: xd, y1: pad.t - 8, y2: pad.t + sc.ih,
+        stroke: "#C3CCD4", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: xd + 4, y: pad.t - 12, "font-size": 10, fill: "#8B93A1" }, "2026"));
+    }
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "month · share of FTD amount"));
+
+    legend("l8", TIERS.map(function(t){
+      return { key: t.key, label: t.label, color: t.color,
+               value: pct(tierTot[t.key] || 0, grand) };
+    }), function(k){ return !!state.offTier[k]; },
+      function(k, only){
+        pick(state.offTier, TIERS.map(function(t){ return t.key; }), k, only);
+        render();
+      });
+
+    // Headline figures over the window the filters select, never fixed.
+    var firstHalf = months.slice(0, Math.ceil(months.length / 2));
+    var lastHalf  = months.slice(Math.ceil(months.length / 2));
+    var shareOver = function(ms, key){
+      var a = 0, b = 0;
+      ms.forEach(function(m){ a += byMT[m + "|" + key] || 0; b += monthTot[m] || 0; });
+      return b ? a / b * 100 : 0;
+    };
+    var d1 = shareOver(firstHalf, "t5"), d2 = shareOver(lastHalf, "t5");
+    var move = Math.round(d2 - d1);
+    document.getElementById("s8").innerHTML =
+      fig("Top 5 share", pct(tierTot.t5 || 0, grand), fmtMoney(tierTot.t5 || 0)) +
+      fig("Ranks 6–10", pct(tierTot.t610 || 0, grand), fmtMoney(tierTot.t610 || 0)) +
+      fig("Top 10 together", pct((tierTot.t5 || 0) + (tierTot.t610 || 0), grand),
+          "of every FTD dollar") +
+      fig("Everyone else", pct(tierTot.rest || 0, grand),
+          (rank.all.length - 10) + " countries") +
+      fig("Top 5 trend", (move > 0 ? "+" : "") + move + " pts",
+          "later half vs earlier", move > 0 ? "pos" : (move < 0 ? "neg" : ""));
+
+    document.getElementById("cap8").textContent =
+      "Top 5: " + rank.all.slice(0, 5).join(", ") + ". " +
+      "Ranks 6–10: " + rank.all.slice(5, 10).join(", ") + ". " +
+      "Ranked on FTD amount across the whole selected window, then held fixed " +
+      "month to month — so a falling top band means those five countries are " +
+      "carrying less, not that the leaders changed.";
+    document.getElementById("cap8b").textContent =
+      "Each bar is 100% of that month's FTD dollars; the figure above it is how " +
+      "many dollars that is, because a share read without its size is half a " +
+      "fact. Channel, rail and period apply; the country selection deliberately " +
+      "does not — with one country picked every bar would read 100%.";
+  }
+
+  // ---- chart 13: adjusted GGR by country ----------------------------------
+  // Adjusted GGR rows carry player_country and aff_type but never aff_source,
+  // and never game_product. The channel therefore cannot come off the row — it
+  // comes from a per-player map the builder collects across every row, so this
+  // card uses the SAME four channels as the rest of the page rather than a
+  // coarser second taxonomy. 1.3% of the dollars sit on Affiliate players whose
+  // aff_source was never seen anywhere and land in Other; the caption says so.
+  //
+  // The Rail filter still cannot apply: that needs a deposit row, and these are
+  // not deposit rows.
+  //
+  // It goes NEGATIVE — players win — so the stack is signed: positives up,
+  // negatives down from a darkened zero rule, never clamped and never piled in
+  // with the positives.
+  var ADJ_TOP = 12;
+  function drawAdj(){
+    var svg = document.getElementById("c13"), W = 1000, Ht = 360;
+    clear(svg);
+    var rows = (DATA.adjCells || {})[state.adjWhale ? "inc" : "ex"] || [];
+    // [year, month, country, channel, adj, adjMtd]
+    var trimmed = state.period === "mtd";
+    var partialMM = DATA.months[DATA.months.length - 1].slice(5);
+    var months = winMonths(), mset = {};
+    months.forEach(function(m){ mset[m] = 1; });
+
+    var byMC = {}, tot = {};
+    rows.forEach(function(r){
+      if (!mset[r[1]]) return;
+      if (state.excl && EXCL_SET[r[2]]) return;
+      if (state.focus.length && state.focus.indexOf(r[2]) < 0) return;
+      if (state.offCh[r[3]]) return;
+      var v = (trimmed && r[1].slice(5) === partialMM) ? r[5] : r[4];
+      if (!v) return;
+      byMC[r[1] + "|" + r[2]] = (byMC[r[1] + "|" + r[2]] || 0) + v;
+      tot[r[2]] = (tot[r[2]] || 0) + v;
+    });
+
+    // Ranked on absolute size: a country that loses $200k matters as much as
+    // one that makes it, and ranking on the signed value would bury it.
+    var ranked = Object.keys(tot).sort(function(a, b){
+      return Math.abs(tot[b]) - Math.abs(tot[a]) || (a < b ? -1 : 1); });
+    var top = ranked.slice(0, ADJ_TOP);
+    var rest = ranked.slice(ADJ_TOP);
+    var bands = top.concat(rest.length ? [OTHER] : []);
+    var bandOfA = function(c){ return top.indexOf(c) >= 0 ? c : OTHER; };
+    var colOf = function(b){
+      return b === OTHER ? OTHER_COL : CTRY_COL[top.indexOf(b) % CTRY_COL.length]; };
+    var shown = bands.filter(function(b){ return !state.offAdj[b]; });
+
+    var byMB = {}, bandTot = {};
+    Object.keys(byMC).forEach(function(k){
+      var i = k.indexOf("|"), m = k.slice(0, i), c = k.slice(i + 1);
+      var b = bandOfA(c);
+      byMB[m + "|" + b] = (byMB[m + "|" + b] || 0) + byMC[k];
+      bandTot[b] = (bandTot[b] || 0) + byMC[k];
+    });
+
+    var posT = months.map(function(m){
+      return shown.reduce(function(s2, b){
+        return s2 + Math.max(0, byMB[m + "|" + b] || 0); }, 0); });
+    var negT = months.map(function(m){
+      return shown.reduce(function(s2, b){
+        return s2 + Math.min(0, byMB[m + "|" + b] || 0); }, 0); });
+    var maxBar = Math.max.apply(null, posT.concat([0]));
+    var minBar = Math.min.apply(null, negT.concat([0]));
+
+    var pad = { t: 26, r: 16, b: 56, l: 76 };
+    var iw = W - pad.l - pad.r, ih = Ht - pad.t - pad.b;
+    var step = niceStep(Math.max(maxBar - minBar, 1e-9), 5);
+    var topL = Math.ceil(maxBar / step) * step || step;
+    var botL = Math.floor(minBar / step) * step;
+    var y = function(v){ return pad.t + ih - ((v - botL) / (topL - botL)) * ih; };
+    for (var t = botL; t <= topL + 1e-9; t += step){
+      var yy = y(t), zero = Math.abs(t) < 1e-9;
+      svg.appendChild(el("line", { x1: pad.l, x2: pad.l + iw, y1: yy, y2: yy,
+        stroke: zero ? "#5B7285" : "#E5E5E5", "stroke-width": zero ? 1.3 : 1 }));
+      svg.appendChild(el("text", { x: pad.l - 8, y: yy + 3.5, "text-anchor": "end",
+        "font-size": 10, fill: "#5B7285" }, moneyShort(t)));
+    }
+
+    var bandW = iw / Math.max(months.length, 1);
+    var barW = Math.min(34, bandW - 6);
+    months.forEach(function(m, i){
+      var x = pad.l + bandW * i + (bandW - barW) / 2, accPos = 0, accNeg = 0;
+      shown.forEach(function(b){
+        var v = byMB[m + "|" + b] || 0;
+        if (!v) return;
+        var base = v > 0 ? accPos : accNeg;
+        var y0 = y(base), y1 = y(base + v);
+        var r = el("rect", { x: x, y: Math.min(y0, y1), width: barW,
+          height: Math.abs(y1 - y0), fill: colOf(b) });
+        tip(r, mLabel(m) + " · " + b + " · " + fmtMoney(v));
+        svg.appendChild(r);
+        if (v > 0) accPos += v; else accNeg += v;
+      });
+      var net = accPos + accNeg;
+      if (bandW >= 30)
+        svg.appendChild(el("text", { x: x + barW / 2,
+          y: (net >= 0 ? y(accPos) - 6 : y(accNeg) + 13), "text-anchor": "middle",
+          "font-size": 9.5, "font-weight": 700,
+          fill: net < 0 ? "#C0392B" : "#0F2A43" }, moneyShort(net)));
+      svg.appendChild(el("text", { x: x + barW / 2, y: Ht - pad.b + 16, "text-anchor": "end",
+        "font-size": 9.5, fill: "#5B7285",
+        transform: "rotate(-40 " + (x + barW / 2) + " " + (Ht - pad.b + 16) + ")" }, mLabel(m)));
+    });
+    var split = months.indexOf("2026-01");
+    if (split > 0){
+      var xd = pad.l + bandW * split;
+      svg.appendChild(el("line", { x1: xd, x2: xd, y1: pad.t - 8, y2: pad.t + ih,
+        stroke: "#C3CCD4", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: xd + 4, y: pad.t - 12, "font-size": 10, fill: "#8B93A1" }, "2026"));
+    }
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "month · adjusted GGR"));
+
+    legend("l13", bands.map(function(b){
+      return { key: b, label: b, color: colOf(b), value: moneyShort(bandTot[b] || 0) };
+    }), function(k){ return !!state.offAdj[k]; },
+      function(k, only){ pick(state.offAdj, bands, k, only); render(); });
+
+    var a25 = 0, a26 = 0;
+    months.forEach(function(m){
+      shown.forEach(function(b){
+        var v = byMB[m + "|" + b] || 0;
+        if (m.slice(0, 4) === "2025") a25 += v; else a26 += v;
+      });
+    });
+    var dA = delta(a25, a26);
+    document.getElementById("s13").innerHTML =
+      fig("Adjusted GGR 2025", fmtMoney(a25), "", a25 < 0 ? "neg" : "") +
+      fig("Adjusted GGR 2026", fmtMoney(a26), "", a26 < 0 ? "neg" : "") +
+      fig("Change", dA.txt, "2026 vs 2025", dA.cls) +
+      fig("Countries", fmtInt(ranked.length), "with any adjusted GGR") +
+      fig("Losing money", fmtInt(ranked.filter(function(c){ return tot[c] < 0; }).length),
+          "countries net negative");
+
+    // The top depositor is over half of adjusted GGR — the one figure on this
+    // page where he moves the answer — so this card, and only this card, carries
+    // the toggle the house convention asks for.
+    var crumb = document.getElementById("d13");
+    crumb.innerHTML = "";
+    var lbl = document.createElement("span");
+    lbl.innerHTML = "Top depositor <b>" +
+      (state.adjWhale ? "included" : "excluded") + "</b>";
+    crumb.appendChild(lbl);
+    var chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = state.adjWhale ? "Exclude him" : "Include him";
+    chip.addEventListener("click", function(){
+      state.adjWhale = !state.adjWhale; render(); });
+    crumb.appendChild(chip);
+
+    document.getElementById("cap13").textContent =
+      "Top " + Math.min(ADJ_TOP, ranked.length) + " countries by the size of their " +
+      "adjusted GGR — ranked on absolute value, so a country losing money is not " +
+      "buried below one making a little. " +
+      (rest.length ? "The remaining " + rest.length + " are pooled. " : "") +
+      "Bars go below the zero rule where players won; the figure on each bar is " +
+      "the month's net. Adjusted GGR is computed upstream and is NOT raw GGR " +
+      "minus bonus cost. Its rows carry no aff_source, so the channel comes " +
+      "from the player rather than the row — the Channel filter applies, with " +
+      "about 1% of the dollars falling into Other because those players' " +
+      "source was never recorded anywhere. The Rail filter is the one that " +
+      "cannot apply: these are not deposit rows.";
+  }
+
+  // ---- table 7: affiliates by month ---------------------------------------
+  // Follows the shared country focus and the channel filter. Each cell carries
+  // both figures — the count in ink and the dollars underneath — because an
+  // affiliate that brings volume and one that brings money are different
+  // things and the whole point of the table is telling them apart.
+  var AFF_ROWS = 60;
+  function affTable(){
+    var months = win().months, mset = {};
+    months.forEach(function(m){ mset[m] = 1; });
+    var focus = state.focus, fset = {};
+    focus.forEach(function(c){ fset[c] = 1; });
+
+    /* Same swap as the card above and as win(): under MTD every month is read
+       from the trimmed cells, not just the newest one. An affiliate table that
+       disagrees with the chart above it is worse than either being slightly
+       wrong. */
+    var partialMM = DATA.months[DATA.months.length - 1].slice(5);
+    var src = state.period === "mtd" ? (DATA.affMtdCells || []) : (DATA.affCells || []);
+    var n = {}, a = {}, rowN = {}, rowA = {}, chOf = {};
+    src.forEach(function(c){
+      if (!mset[c[AM]]) return;
+      if (state.offCh[c[AH]]) return;
+      if (state.rail !== "all" && c[AR] !== state.rail) return;
+      if (state.excl && EXCL_SET[c[AC]]) return;
+      if (focus.length && !fset[c[AC]]) return;
+      var k = c[AA];
+      n[k + "|" + c[AM]] = (n[k + "|" + c[AM]] || 0) + c[AN];
+      a[k + "|" + c[AM]] = (a[k + "|" + c[AM]] || 0) + c[AV];
+      rowN[k] = (rowN[k] || 0) + c[AN];
+      rowA[k] = (rowA[k] || 0) + c[AV];
+      (chOf[k] = chOf[k] || {})[c[AH]] = 1;
+    });
+    var affs = Object.keys(rowN).sort(function(x, y){
+      return (rowN[y] - rowN[x]) || (rowA[y] - rowA[x]) || (x < y ? -1 : 1);
+    });
+    var listed = affs.slice(0, AFF_ROWS);
+
+    var h = ['<thead><tr><th>Affiliate</th><th>Channel</th><th>FTDs</th><th>Amount</th>'];
+    months.forEach(function(m){ h.push('<th>' + mLabel(m) + '</th>'); });
+    h.push('</tr></thead><tbody>');
+    listed.forEach(function(k){
+      var chs = Object.keys(chOf[k] || {}).sort();
+      h.push('<tr><td>' + (k === DATA.noAff
+          ? '<span style="color:#8B93A1">' + k + '</span>' : k) + '</td>' +
+        '<td>' + chs.map(function(c){
+          return '<span class="sw-i" style="background:' + (CH_COL[c] || "#B7C3CF") +
+                 '"></span>' + c; }).join(' ') + '</td>' +
+        '<td><b>' + fmtInt(rowN[k]) + '</b></td>' +
+        '<td>' + fmtMoney(rowA[k]) + '</td>');
+      months.forEach(function(m){
+        var c = n[k + "|" + m] || 0, v = a[k + "|" + m] || 0;
+        h.push(c
+          ? '<td><b>' + fmtInt(c) + '</b><div style="font-size:.68rem;color:#677181">' +
+            moneyShort(v) + '</div></td>'
+          : '<td><span style="color:#B8C0C8">—</span></td>');
+      });
+      h.push('</tr>');
+    });
+    // Total row spans every affiliate, not only the rows on screen.
+    var tN = affs.reduce(function(s, k){ return s + rowN[k]; }, 0);
+    var tA = affs.reduce(function(s, k){ return s + rowA[k]; }, 0);
+    h.push('<tr class="tot"><td>All ' + affs.length + ' affiliates</td><td></td>' +
+      '<td>' + fmtInt(tN) + '</td><td>' + fmtMoney(tA) + '</td>');
+    months.forEach(function(m){
+      var c = 0, v = 0;
+      affs.forEach(function(k){ c += n[k + "|" + m] || 0; v += a[k + "|" + m] || 0; });
+      h.push('<td><b>' + fmtInt(c) + '</b><div style="font-size:.68rem;color:#677181">' +
+        moneyShort(v) + '</div></td>');
+    });
+    h.push('</tr></tbody>');
+    document.getElementById("t7").innerHTML = h.join("");
+
+    setHeading("h7", focus.length
+      ? "Affiliates by Month — " + focus.join(", ")
+      : "Affiliates by Month — All Countries");
+    var crumb = document.getElementById("d7");
+    crumb.innerHTML = "";
+    var here = document.createElement("span");
+    here.innerHTML = focus.length
+      ? "Following the country picked in the charts above: <b>" + focus.join(", ") + "</b>"
+      : "Every country. Click a country in either chart above to narrow this table.";
+    crumb.appendChild(here);
+    if (focus.length){
+      var clr = document.createElement("span");
+      clr.className = "chip";
+      clr.textContent = "× Clear country";
+      clr.addEventListener("click", function(){
+        state.focus = []; state.ctry.count.off = {}; state.ctry.amount.off = {}; render();
+      });
+      crumb.appendChild(clr);
+    }
+    var untagged = rowN[DATA.noAff] || 0;
+    document.getElementById("cap7").textContent =
+      "Each cell is that month's FTD count with the FTD amount underneath. " +
+      (affs.length > AFF_ROWS
+        ? "Top " + AFF_ROWS + " affiliates by FTD count; the total row covers all " +
+          affs.length + ". "
+        : "") +
+      (untagged
+        ? fmtInt(untagged) + " FTDs (" + pct(untagged, tN) + ") carry no affiliate " +
+          "username — almost all Direct — and are kept as their own row rather than " +
+          "dropped, so the table reconciles to the charts above. "
+        : "") +
+      "Channel filter and period apply.";
+  }
+
+  // The reason both charts exist: the two rankings disagree, and the countries
+  // they disagree about most are the interesting ones. Computed rather than
+  // written into the page, so it stays true under the filters.
+  function countryContrast(){
+    var w = win();
+    var byC = topCountries(w.chCells, 0, "count");
+    var byA = topCountries(w.chCells, 0, "amount");
+    var moved = byC.all.filter(function(c){ return byC.tot[c] >= 50; })
+      .map(function(c){
+        return { c: c, rc: byC.all.indexOf(c) + 1, ra: byA.all.indexOf(c) + 1,
+                 n: byC.tot[c], a: byA.tot[c] };
+      });
+    var up = moved.slice().sort(function(x, y){ return (x.ra - x.rc) - (y.ra - y.rc); })
+                  .filter(function(x){ return x.rc - x.ra >= 3; }).slice(0, 3);
+    var down = moved.slice().sort(function(x, y){ return (y.ra - y.rc) - (x.ra - x.rc); })
+                    .filter(function(x){ return x.ra - x.rc >= 3; }).slice(0, 3);
+    var say = function(x){
+      return x.c + " (#" + x.rc + " by count, #" + x.ra + " by dollars, " +
+             fmtMoney(x.n ? x.a / x.n : 0) + " average)";
+    };
+    var parts = [];
+    if (up.length) parts.push("Worth more than their volume suggests: " +
+      up.map(say).join("; ") + ".");
+    if (down.length) parts.push("Worth less: " + down.map(say).join("; ") + ".");
+    document.getElementById("cap6b").textContent = parts.length
+      ? parts.join(" ") + " Same bands and the same drill as the chart above, ranked on dollars."
+      : "Under this selection the two rankings agree closely. Same bands and the " +
+        "same drill as the chart above, ranked on dollars.";
+  }
+
+  // ---- chart 3: grouped bars by country -----------------------------------
+  function drawCountries(){
+    var metric = state.ctryMetric;
+    var fV = function(v){ return fmtM(metric, v); };
+    var sV = function(v){ return shortM(metric, v); };
+    var svg = document.getElementById("c3"), W = 1000, Ht = 420;
+    clear(svg);
+    var w = win();
+    var cells = w.chCells;
+    if (state.focus.length)
+      cells = cells.filter(function(c){ return state.focus.indexOf(c[C]) > -1; });
+
+    var by = {}, tot = {};
+    cells.forEach(function(c){
+      by[c[C] + "|" + c[Y]] = (by[c[C] + "|" + c[Y]] || 0) + valM(metric, c);
+      tot[c[C]] = (tot[c[C]] || 0) + valM(metric, c);
+    });
+    var list = Object.keys(tot).sort(function(a, b){
+      var d = (by[b + "|2026"] || 0) - (by[a + "|2026"] || 0);
+      return d || (tot[b] - tot[a]);
+    }).slice(0, 30);
+
+    var maxV = 0;
+    list.forEach(function(c){ DATA.years.forEach(function(y){
+      maxV = Math.max(maxV, by[c + "|" + y] || 0); }); });
+
+    var pad = { t: 26, r: 16, b: 116, l: 66 };
+    var sc = scaffold(svg, W, Ht, pad, maxV, sV);
+    var bandW = sc.iw / Math.max(list.length, 1);
+    var barW = Math.min(16, (bandW - 8) / 2);
+
+    list.forEach(function(ctry, i){
+      var cx = pad.l + bandW * i + bandW / 2;
+      var groupW = barW * 2 + 3;
+      DATA.years.forEach(function(y, j){
+        var v = by[ctry + "|" + y] || 0;
+        var x = cx - groupW / 2 + j * (barW + 3);
+        var yy = sc.y(v);
+        var r = el("rect", { x: x, y: yy, width: barW, height: Math.max(0, sc.y(0) - yy),
+          fill: YR_COL[y] });
+        tip(r, ctry + " · " + y + " · " + fV(v));
+        svg.appendChild(r);
+      });
+      var label = ctry.length > 18 ? ctry.slice(0, 17) + "…" : ctry;
+      svg.appendChild(el("text", { x: cx, y: Ht - pad.b + 14, "text-anchor": "end",
+        "font-size": 10, fill: "#0F2A43",
+        transform: "rotate(-45 " + cx + " " + (Ht - pad.b + 14) + ")" }, label));
+    });
+    svg.appendChild(el("text", { x: pad.l, y: Ht - 4, "font-size": 10, fill: "#8B93A1" },
+      "country · " + nameM(metric) + " · " + (shownCh().length === CH.length
+        ? "all channels" : shownCh().join(" + "))));
+
+    legend("l3", DATA.years.map(function(y){
+      return { key: y, label: y, color: YR_COL[y] };
+    }), function(){ return false; }, function(){});
+
+    // Its own metric switch, since this is the one chart not pinned as half of
+    // a count/amount pair.
+    var crumb = document.getElementById("d3");
+    crumb.innerHTML = "";
+    var lbl = document.createElement("span");
+    lbl.innerHTML = "Showing <b>" + nameM(metric) + "</b>";
+    crumb.appendChild(lbl);
+    var other = metric === "count" ? "amount" : "count";
+    var chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = "Switch to " + nameM(other);
+    chip.addEventListener("click", function(){ state.ctryMetric = other; render(); });
+    crumb.appendChild(chip);
+
+    document.getElementById("cap3").textContent =
+      (state.focus.length ? state.focus.join(", ") + " only. " : "") +
+      "Top " + Math.min(30, list.length) + " countries by " + nameM(metric) +
+      " across both years, ranked on the 2026 figure. Every filter in the header " +
+      "applies, and so does a country picked in the charts above.";
+  }
+
+  // ---- figure strips ------------------------------------------------------
+  function fig(k, v, s, cls){
+    return '<div class="fig"><div class="k">' + k + '</div><div class="v' +
+      (cls ? " " + cls : "") + '">' + v + '</div>' +
+      (s ? '<div class="s">' + s + '</div>' : '') + '</div>';
+  }
+  function strips(){
+    var w = win();
+    var c25 = 0, c26 = 0, a25 = 0, a26 = 0;
+    w.fCells.forEach(function(c){
+      if (c[Y] === "2025"){ c25 += c[N]; a25 += c[A]; } else { c26 += c[N]; a26 += c[A]; }
+    });
+    var dC = delta(c25, c26), dA = delta(a25, a26);
+    document.getElementById("s1").innerHTML =
+      fig("FTDs 2025", fmtInt(c25), fmtMoney(a25)) +
+      fig("FTDs 2026", fmtInt(c26), fmtMoney(a26)) +
+      fig("Change in count", dC.txt, "2026 vs 2025", dC.cls) +
+      fig("Change in amount", dA.txt, "2026 vs 2025", dA.cls) +
+      fig("Average FTD 2025", fmtMoney(c25 ? a25 / c25 : 0), "per first deposit") +
+      fig("Average FTD 2026", fmtMoney(c26 ? a26 / c26 : 0), "per first deposit");
+    // This strip heads the channel count chart and is the only place the two
+    // years are set against each other now that both the grouped chart and the
+    // Channel Table have gone.
+
+    var cn = {}, ct = {};
+    w.chCells.forEach(function(c){ cn[c[C]] = (cn[c[C]] || 0) + val(c); });
+    w.cells.forEach(function(c){ ct[c[C]] = (ct[c[C]] || 0) + val(c); });
+    var nC = Object.keys(ct).length;
+    var top = Object.keys(cn).sort(function(a, b){ return cn[b] - cn[a]; });
+    var whole = Object.keys(cn).reduce(function(s, k){ return s + cn[k]; }, 0);
+    var top10 = top.slice(0, 10).reduce(function(s, k){ return s + cn[k]; }, 0);
+    document.getElementById("s3").innerHTML =
+      fig("Countries", fmtInt(nC), "with at least one FTD") +
+      fig("Top country", top[0] || "—", top[0] ? fmtV(cn[top[0]]) : "") +
+      fig("Top 10 share", pct(top10, whole), "of " + metricName());
+  }
+
+  // ---- render -------------------------------------------------------------
+  function render(){
+    var w = win();
+    cmpOff = (state.quarter !== "all" && monthsIn(state.quarter, "2026").length === 0)
+          || (state.month !== "all" && !DATA.months.some(function(m){
+               return m.slice(0, 4) === "2026" && m.slice(5) === state.month; }));
+    var warn = document.getElementById("cmp-warn");
+    // MTD is cut to the furthest day the newest month reaches, so on the first
+    // days of a month it compares slivers — 20 months of one day each. The page
+    // opens on MTD, so it has to say when that is happening rather than let a
+    // near-empty view read as a collapse.
+    var thinMtd = state.period === "mtd" && DATA.mtdDays <= 5;
+    warn.hidden = !cmpOff && !thinMtd;
+    if (cmpOff) warn.textContent =
+      "2026 has not reached " +
+      (state.month !== "all" ? MONTH_NAMES[parseInt(state.month, 10) - 1] : state.quarter) +
+      " yet, so there is nothing to " +
+      "compare against. The 2025 figures stand alone and every year-on-year " +
+      "column reads n/a rather than −100%.";
+    else if (thinMtd) warn.innerHTML =
+      "<b>MTD is only " + DATA.mtdDays + (DATA.mtdDays === 1 ? " day" : " days") +
+      " right now.</b> The newest month in the data is " +
+      (DATA.lastDay["2026"] || "") + ", so every month on the page is cut to its " +
+      (DATA.mtdDays === 1 ? "first day" : "first " + DATA.mtdDays + " days") +
+      " — like for like, but a very thin slice. Switch Period to " +
+      "<b>Full months</b> for whole months.";
+    var per = windowLabel();
+    var chSel = shownCh();
+    document.getElementById("sub").textContent =
+      per + " · " + metricName() + " · " +
+      (chSel.length === CH.length ? "all channels" : chSel.join(" + ") || "no channel selected") +
+      (state.rail === "all" ? "" : " · " + state.rail + " only") +
+      (state.quarter === "all" ? "" : " · " + state.quarter + " only") +
+      (state.month === "all" ? "" :
+        " · " + MONTH_NAMES[parseInt(state.month, 10) - 1] + " only") +
+      (state.affFocus ? " · affiliate " + state.affFocus : "") +
+      (state.excl ? " · excluding " + EXCLUDE.length + " countries" : "");
+    syncChannelButtons();
+    (function(){
+      var btn = document.getElementById("excl-toggle");
+      if (!btn) return;
+      // Measured against the window WITHOUT the exclusion, so the chip can say
+      // what turning it on costs before you turn it on.
+      var was = state.excl;
+      state.excl = false;
+      var all = win().chCells;
+      state.excl = was;
+      var hitCountries = {}, hitN = 0, hitA = 0, totN = 0, totA = 0;
+      all.forEach(function(c){
+        totN += c[N]; totA += c[A];
+        if (EXCL_SET[c[C]]){ hitCountries[c[C]] = 1; hitN += c[N]; hitA += c[A]; }
+      });
+      var n = Object.keys(hitCountries).length;
+      btn.textContent = (state.excl ? "✓ Excluding " : "Exclude ") + n + " countries";
+      btn.title = EXCLUDE.join(", ") + " — " + fmtInt(hitN) + " FTDs, " +
+        fmtMoney(hitA) + " (" + pct(hitA, totA) + " of the dollars in this window)" +
+        (n < EXCLUDE.length
+          ? ". Only " + n + " of the " + EXCLUDE.length + " appear in this window."
+          : "");
+      btn.style.borderColor = state.excl ? "var(--dark-green)" : "";
+      btn.style.color = state.excl ? "var(--dark-green)" : "";
+      btn.style.fontWeight = state.excl ? "700" : "";
+    })();
+    strips();
+    drawMonths({ metric: "count",  svgId: "c2",  legendId: "l2",  capId: "cap2" });
+    drawMonths({ metric: "amount", svgId: "c12", legendId: "l12", capId: "cap12" });
+    drawMonthsCountry({ metric: "count",  svgId: "c5", legendId: "l5",
+                        capId: "cap5", crumbId: "d5" });
+    drawMonthsCountry({ metric: "amount", svgId: "c6", legendId: "l6",
+                        capId: "cap6", crumbId: "d6" });
+    countryContrast();
+    drawMonthsAff({ metric: "count",  svgId: "c14", legendId: "l14",
+                    capId: "cap14", crumbId: "d14" });
+    drawMonthsAff({ metric: "amount", svgId: "c15", legendId: "l15",
+                    capId: "cap15", crumbId: "d15" });
+    drawValueByChannel({ key: "dep", data: "depCells", label: "deposits",
+      svgId: "c16", legendId: "l16", capId: "cap16", crumbId: "d16",
+      note: "Deposits never go negative." });
+    drawValueByChannel({ key: "adj", data: "adjCells", label: "adjusted GGR",
+      svgId: "c17", legendId: "l17", capId: "cap17", crumbId: "d17",
+      note: "Adjusted GGR goes below the zero rule where players won, and is " +
+            "NOT raw GGR minus bonus cost — it is computed upstream." });
+    momTable();
+    drawAdj();
+    drawConcentration();
+    affTable();
+    drawCountries();
+  }
+
+  function bind(id, key, value, siblings){
+    document.getElementById(id).addEventListener("click", function(){
+      state[key] = value;
+      siblings.forEach(function(s){
+        document.getElementById(s[0]).setAttribute("aria-pressed", s[0] === id ? "true" : "false");
+      });
+      render();
+    });
+  }
+  // The channel buttons are a second face on state.offCh, not a second copy of
+  // it — clicking a channel isolates it exactly as clicking the legend does, so
+  // the two controls stay in step whichever one you reach for.
+  var chBtns = [].slice.call(document.querySelectorAll("#b-ch button"));
+  function syncChannelButtons(){
+    var shown = shownCh();
+    var all = shown.length === CH.length;
+    chBtns.forEach(function(b){
+      var k = b.getAttribute("data-ch");
+      b.setAttribute("aria-pressed",
+        (k === "__all" ? all : (!all && shown.length === 1 && shown[0] === k)) ? "true" : "false");
+    });
+  }
+  chBtns.forEach(function(b){
+    b.addEventListener("click", function(e){
+      var k = b.getAttribute("data-ch");
+      pick(state.offCh, CH, k === "__all" ? null : k, e.altKey || e.metaKey || e.ctrlKey);
+      render();
+    });
+  });
+
+  function monthsIn(q, year){
+    return DATA.months.filter(function(m){
+      return m.slice(0, 4) === year && quarterOf(m) === q; });
+  }
+  function setPeriod(p){
+    state.period = p;
+    document.getElementById("b-full").setAttribute("aria-pressed", p === "full" ? "true" : "false");
+    document.getElementById("b-mtd").setAttribute("aria-pressed", p === "mtd" ? "true" : "false");
+  }
+
+  var MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+                     "July", "August", "September", "October", "November", "December"];
+  var monthSel = document.getElementById("b-month");
+  (function(){
+    var o = document.createElement("option");
+    o.value = "all"; o.textContent = "All months";
+    monthSel.appendChild(o);
+    // Only the months that exist in the data, so the list cannot offer a
+    // selection that renders an empty page.
+    var have = {};
+    DATA.months.forEach(function(m){ have[m.slice(5)] = 1; });
+    Object.keys(have).sort().forEach(function(mm){
+      var op = document.createElement("option");
+      op.value = mm; op.textContent = MONTH_NAMES[parseInt(mm, 10) - 1];
+      monthSel.appendChild(op);
+    });
+  })();
+  monthSel.addEventListener("change", function(){
+    state.month = monthSel.value;
+    // Month and Quarter are two grains of one axis; holding both would select
+    // an intersection that is usually empty and always confusing.
+    if (state.month !== "all"){
+      state.quarter = "all";
+      qBtns.forEach(function(x){
+        x.setAttribute("aria-pressed", x.getAttribute("data-q") === "all" ? "true" : "false"); });
+    }
+    state.ctry.count.tier = 0; state.ctry.amount.tier = 0;
+    var partialMM = DATA.months[DATA.months.length - 1].slice(5);
+    var n26 = DATA.months.filter(function(m){
+      return m.slice(0, 4) === "2026" && m.slice(5) === state.month; }).length;
+    /* These used to force the period, so choosing a month silently moved a
+       control the reader had set. The period is theirs now; where the two years
+       do not line up, windowLabel() says so in words instead. */
+    render();
+  });
+
+  var qBtns = [].slice.call(document.querySelectorAll("#b-q button"));
+  qBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      var q = state.quarter = b.getAttribute("data-q");
+      if (q !== "all"){ state.month = "all"; monthSel.value = "all"; }
+      qBtns.forEach(function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      // The drill positions are ranks within a window; a new window can be
+      // shorter than the old tier, so start both charts at the top again.
+      state.ctry.count.tier = 0; state.ctry.amount.tier = 0;
+      /* A quarter 2026 has not finished cannot be read at full length without
+         saying so: whole Q3 2025 against two months of Q3 2026 looks like a
+         collapse that is only the calendar. The page used to silently switch
+         mode here; now the period stays as the reader set it and lopsided()
+         puts the warning in the caption where they can see it. */
+      render();
+    });
+  });
+
+  var railBtns = [].slice.call(document.querySelectorAll("#b-rail button"));
+  railBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      state.rail = b.getAttribute("data-rail");
+      railBtns.forEach(function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      render();
+    });
+  });
+
+  // The Metric control is gone: the count and the amount each have their own
+  // pinned card now (01/02 for countries, the two channel charts), so a global
+  // toggle only governed the cards at the foot and invited the two pinned pairs
+  // to be read as if it governed them too. state.metric stays as the default
+  // those remaining cards use.
+  var pBtns = [["b-full"], ["b-mtd"]];
+  bind("b-full",    "period", "full",    pBtns);
+  bind("b-mtd",     "period", "mtd",     pBtns);
+
+  document.getElementById("note").innerHTML =
+    '<b>How a first deposit is counted.</b> One row per player: the <code>ftd</code> field ' +
+    'in query 1732 is a dollar amount, so the count is distinct players with a positive ' +
+    'FTD and the amount is the sum of that field. ' +
+    '<b>Channels</b> come from <code>aff_type</code> and <code>aff_source</code>: Streamer = ' +
+    'type Streamer or source Influence/KOl; SEO = source SEO; Direct = type Direct; ' +
+    'everything else (Meta, Tipster, Community, Metamedia, PPC, DSP, Uncategorized) is ' +
+    'Other, so the bands add up to the site total. ' +
+    '<b>The top depositor</b> (player ' + DATA.whale + ') first deposited long before this ' +
+    'window, so excluding him changes nothing here — every figure on the page is the same ' +
+    'either way.';
+
+  // `const`/`var` inside this block never reaches window — hand over an explicit
+  // handle so the test, and the console, can read the state and re-render.
+  window.FC = { DATA: DATA, state: state, win: win, render: render,
+                CH: CH, CH_COL: CH_COL, YR_COL: YR_COL,
+                CTRY_COL: CTRY_COL, TOP_N: TOP_N, OTHER: OTHER,
+                topCountries: topCountries, bandOf: bandOf,
+                drawMonths: drawMonths,
+                drawMonthsCountry: drawMonthsCountry, countryContrast: countryContrast,
+                affTable: affTable, AFF_ROWS: AFF_ROWS, RAILS: DATA.rails,
+                drawConcentration: drawConcentration, TIERS: TIERS,
+                quarterOf: quarterOf, bandSet: bandSet,
+                momTable: momTable, MOM_ROWS: MOM_ROWS,
+                drawValueByChannel: drawValueByChannel,
+                drawMonthsAff: drawMonthsAff, AFF_TOP: AFF_TOP, AFF_OTHER: AFF_OTHER,
+                drawAdj: drawAdj, ADJ_TOP: ADJ_TOP, winMonths: winMonths,
+                windowLabel: windowLabel, EXCLUDE: EXCLUDE,
+                cohortGgrBy: cohortGgrBy, MOM_DIMS: MOM_DIMS,
+                monthsIn: monthsIn, setPeriod: setPeriod,
+                fmtInt: fmtInt, fmtMoney: fmtMoney, pct: pct, delta: delta,
+                niceStep: niceStep, shownCh: shownCh };
+
+  // Collapsing is CSS on the card, so a re-render never reopens a shut card —
+  // render() replaces what is inside .body, never the class on .card.
+  var cards = [].slice.call(document.querySelectorAll(".card"));
+  cards.forEach(function(card, i){
+    var h = card.querySelector("h2");
+    if (!h) return;
+    h.setAttribute("role", "button");
+    h.setAttribute("tabindex", "0");
+    // EVERY card opens shut, so the page opens as an index of what it holds
+    // rather than eleven feet of scrolling. `Expand all` sits in the page bar
+    // for the times you want the lot. Marked in the markup with data-shut so
+    // the default is visible where the card is, not buried in a list of ids
+    // here.
+    var num = document.createElement("span");
+    num.className = "sec-num";
+    num.textContent = (i + 1 < 10 ? "0" : "") + (i + 1);
+    h.insertBefore(num, h.firstChild);
+    // The peek chip is appended after this, so it stays at the right-hand end
+    // even on the headings whose title is rewritten every render.
+
+    var startShut = card.hasAttribute("data-shut");
+    if (startShut) card.classList.add("shut");
+    h.setAttribute("aria-expanded", startShut ? "false" : "true");
+    var peek = document.createElement("span");
+    peek.className = "peek";
+    peek.textContent = startShut ? "show" : "hide";
+    h.appendChild(peek);
+    var toggle = function(){
+      var shut = card.classList.toggle("shut");
+      h.setAttribute("aria-expanded", shut ? "false" : "true");
+      peek.textContent = shut ? "show" : "hide";
+    };
+    h.addEventListener("click", toggle);
+    h.addEventListener("keydown", function(e){
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); }
+    });
+  });
+  var setAll = function(shut){
+    cards.forEach(function(card){
+      var h = card.querySelector("h2"), peek = h && h.querySelector(".peek");
+      if (!h) return;
+      card.classList.toggle("shut", shut);
+      h.setAttribute("aria-expanded", shut ? "false" : "true");
+      if (peek) peek.textContent = shut ? "show" : "hide";
+    });
+  };
+  var exclBtn = document.getElementById("excl-toggle");
+  exclBtn.addEventListener("click", function(){ state.excl = !state.excl; render(); });
+
+  document.getElementById("collapse-all").addEventListener("click", function(){ setAll(true); });
+  document.getElementById("expand-all").addEventListener("click", function(){ setAll(false); });
+
+  window.FC.setAll = setAll;
+
+  render();
+})();
+</script>
+</body>
+</html>

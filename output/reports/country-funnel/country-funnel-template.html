@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registration funnel ratios by country</title>
+<style>
+:root{--dark-green:#0B6E3A;--green-hi:#0D7F43;--sage:#4E9D5C;--light-green:#C0DD97;
+--band:#E3F3E8;--row-alt:#F3F7F3;--navy:#0F2A43;--slate:#5B7285;--muted:#677181;
+--grey:#B7C3CF;--axis:#C3CCD4;--border:#E5E5E5;--surface:#FFFFFF;--plane:#F4F6F5;
+--panel:#FAFBF9;--divider:#D8DEE0;--warning:#E67E22;--warn-bg:#FDF6EC;--critical:#C0392B;
+--grey-2:#8B93A1;--grey-5:#C6CED4;--tint-1:#E7F1E9;--bar-bg:#EEF1F4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--navy);
+font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 72px}
+header{background:var(--dark-green);color:#fff;padding:26px 0 22px;margin-bottom:26px}
+header .wrap{padding-bottom:0}
+/* Filters live in the green band, in the same segmented-pill style the other
+   reports on this site use, so the pages read as one product. Copied from
+   business-overview.html rather than reinvented. */
+.hrow{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+ border-radius:20px;padding:2px}
+.seg button{appearance:none;border:0;background:transparent;color:#fff;font:inherit;font-weight:600;
+ font-size:12px;padding:5px 13px;border-radius:18px;cursor:pointer;white-space:nowrap}
+.seg button:hover{background:rgba(255,255,255,.16)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:700}
+.seg button:disabled{opacity:.45;cursor:default}
+.seg button:disabled:hover{background:transparent}
+select.iconbtn{appearance:none;border:1.5px solid rgba(255,255,255,.6);
+ background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:12px;font-weight:600;
+ padding:6px 10px;border-radius:20px;cursor:pointer}
+select.iconbtn:hover{background:#fff;color:var(--dark-green)}
+select.iconbtn option{color:var(--navy);background:#fff}
+h1{margin:0 0 6px;font-size:27px;font-weight:600;letter-spacing:-.2px}
+header p{margin:0;color:var(--light-green);font-size:14px}
+h2{font-size:18px;font-weight:600;margin:36px 0 4px;padding-top:20px;border-top:2px solid var(--dark-green)}
+h2 .n{color:var(--grey-2);font-weight:400;margin-right:8px}
+/* Collapsible sections. The whole heading is the hit area -- a 14px +/- glyph
+   is a poor click target -- and the glyph is the state, not the control. */
+h2[data-sec]{cursor:pointer;user-select:none;display:flex;align-items:center}
+h2[data-sec]:hover{color:var(--dark-green)}
+h2 .tg{margin-left:auto;width:22px;height:22px;line-height:20px;text-align:center;
+  border:1px solid var(--grey-5);border-radius:5px;color:var(--slate);
+  font-size:15px;font-weight:600;flex:none}
+h2[data-sec]:hover .tg{border-color:var(--dark-green);color:var(--dark-green)}
+h2[aria-expanded="false"]{margin-bottom:0}
+.sub{color:var(--slate);font-size:13.5px;margin:0 0 16px;max-width:80ch}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{text-align:right;padding:6px 7px;border-bottom:2px solid var(--divider);color:var(--slate);
+font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th.s{cursor:pointer;user-select:none}
+th.s:hover{color:var(--dark-green)}
+th.s .ar{color:var(--dark-green);font-size:9px}
+td{text-align:right;padding:5px 7px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr:hover{background:var(--band)}
+tr.tot td{font-weight:600;background:var(--row-alt);border-top:2px solid var(--divider)}
+tr.sel td{background:var(--tint-1)}
+tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--dark-green)}
+.bar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px;align-items:center}
+.bar .plbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--grey-2);margin-right:2px}
+.pbtn{font:inherit;font-size:12.5px;padding:4px 11px;border:1px solid var(--grey-5);
+background:var(--surface);color:var(--slate);border-radius:6px;cursor:pointer}
+.pbtn:hover{border-color:var(--dark-green);color:var(--dark-green)}
+.pbtn[aria-pressed="true"]{background:var(--dark-green);border-color:var(--dark-green);color:#fff}
+.pbtn:disabled{opacity:.45;cursor:default;border-color:var(--grey-5);color:var(--slate)}
+.pbtn:disabled:hover{border-color:var(--grey-5);color:var(--slate)}
+.scroll{overflow-x:auto}
+.warnflag{color:var(--warning);font-weight:600}
+td.pathcell{color:var(--slate);font-size:12px;max-width:280px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+a.replay{color:var(--dark-green);text-decoration:none;font-weight:600}
+a.replay:hover{text-decoration:underline}
+.hot{color:var(--critical);font-weight:600}
+/* the counts and the rates derived from them are different kinds of number;
+   one rule between them stops the eye reading across the boundary */
+th.sep,td.sep{border-left:1px solid var(--divider)}
+.mut{color:var(--slate);font-size:.7rem;line-height:1.3}
+th.part{font-style:italic}
+th.part::after{content:' ▪';color:#c98a2b}
+.brk{margin:14px 0 0;padding:9px 12px;border-radius:7px;font-size:12.5px;
+     line-height:1.5;border:1px solid #d7dee6;background:#f4f7fa;color:#41505f}
+.brk b{color:#1d2b3a}
+.brk.warn{border-color:#e2c48d;background:#fdf6e7;color:#6b5320}
+.brk.warn b{color:#7a4f10}
+.brk .bt{display:inline-block;font-weight:600;margin-right:6px}
+</style></head><body>
+<header><div class="wrap"><div class="hrow">
+<div>
+<h1>Registration funnel ratios by country</h1>
+<p>Pageview to first deposit · 1 May – 2 September 2026 · PostHog project 4163
+· built __BUILT__</p>
+</div>
+<div class="controls" id="period"></div>
+</div></div></header>
+<div class="wrap">
+
+<div class="brk" id="brk"></div>
+
+<h2 data-sec="s1"><span class="n">01</span>Countries<span class="tg">+</span></h2>
+<div class="sec" style="display:none" id="s1">
+<div class="panel scroll"><table id="tratio"></table></div>
+</div>
+
+<h2 data-sec="s2"><span class="n">02</span>Sources<span class="tg">+</span></h2>
+<div class="sec" style="display:none" id="s2">
+<p class="sub" id="snote"></p>
+<div class="panel scroll"><table id="tsrc"></table></div>
+</div>
+
+<h2 data-sec="s6"><span class="n">03</span>First deposits by channel<span class="tg">+</span></h2>
+<div class="sec" style="display:none" id="s6">
+<p class="sub" id="cnote"></p>
+<div class="panel scroll"><table id="tchan"></table></div>
+</div>
+
+<h2 data-sec="s4"><span class="n">04</span>Affiliate campaigns<span class="tg">+</span></h2>
+<div class="sec" style="display:none" id="s4">
+<p class="sub" id="bnote"></p>
+<div class="bar" id="btagcut"></div>
+<div class="panel scroll"><table id="tbtag"></table></div>
+</div>
+
+<h2 data-sec="s5"><span class="n">05</span>Clicks followed by an error<span class="tg">+</span></h2>
+<div class="sec" style="display:none" id="s5">
+<p class="sub" id="enote"></p>
+<div class="panel scroll"><table id="terr"></table></div>
+<p class="sub" id="esub"></p>
+<div class="panel scroll"><table id="tsess"></table></div>
+</div>
+
+<!-- Players sits last: it is the only section that needs two clicks to say
+     anything (a country, then a source), so it belongs after the tables that
+     are useful on arrival. The section ids are left alone -- they key the
+     remembered fold state, and renaming them would silently unfold everyone. -->
+<h2 data-sec="s3"><span class="n">06</span>Players<span class="tg">+</span></h2>
+<div class="sec" style="display:none" id="s3">
+<p class="sub" id="pnote2"></p>
+<div class="panel scroll"><table id="tply"></table></div>
+</div>
+
+</div>
+
+<script>window.DATA = __DATA__;</script>
+<script>
+(function(){
+var D=window.DATA;
+var ALL=D.countries;
+var byName={}; ALL.forEach(function(r){byName[r.c]=r;});
+
+// period: 'all' = the whole window, or a month key from D.months.
+// mtd: when a month is selected, trim every month to the current month's day
+// count so a part-month compares like for like against complete ones. It has no
+// effect on 'all', and none on the current month, which is already trimmed.
+// Opens on every market, the current month, MTD-trimmed. That is the view
+// someone actually arrives wanting -- "how is this month going, everywhere" --
+// and the trim is on so the month compares like for like the moment you click
+// back to a completed one. D.defaults is still what the "Top 5" preset returns.
+var state={sel:ALL.map(function(r){return r.c;}),
+  period:D.months[D.months.length-1], mtd:true, drill:null, drillSrc:null,
+  // one sort per table; null key means the table's own default order
+  rail:'all', view:'ratio',
+  sortRatio:{key:null,dir:-1}, sortSrc:{key:null,dir:-1}, sortPly:{key:null,dir:-1},
+  // The campaign table opens on All. The cut-off buttons are still there for
+  // narrowing it, and the ratio columns still go blank below MIN_DEN, but the
+  // default no longer hides a campaign just because it is small -- which is
+  // what made agomuk.com look like it had no btag at all.
+  btagCut:0, sortBtag:{key:null,dir:-1}, sortGsrc:{key:null,dir:-1},
+  // a source clicked in section 02, filtering section 03 to its campaigns
+  drillGsrc:null,
+  // a campaign clicked in section 03, listing its registrants in 04
+  drillBtag:null,
+  // a button/page row clicked in section 05
+  drillErr:null, sortErr:{key:null,dir:-1}};
+
+// A rail view keeps the rail-independent "Dep. Modal / Reg." step and inserts
+// the rail's own step after it, so the funnel reads
+//   visits -> reg modal -> registered -> deposit modal -> rail start -> deposit
+// That is one step longer than the All view, which is why the ratio list and
+// the counts array are both rail-dependent rather than fixed at five.
+// abs5/abs6 name the last two columns of the Numbers view, which follow the
+// rail the same way the ratio columns do: crypto reaches its deposit through
+// Copy Address, fiat through the Fiat Start hand-off to the payment provider.
+var RAILS={
+  all:   {label:'All', s5:'FTD', extra:[['Dep. / Dep. Modal',3,4]],
+          abs5:'Copy Address', abs6:'Deposit'},
+  fiat:  {label:'Fiat', k:'f', s5:'Fiat FTD',
+          extra:[['Fiat Start / Dep. Modal',3,4],['Fiat FTD / Start',4,5]],
+          abs5:'Fiat Start', abs6:'Fiat FTD'},
+  crypto:{label:'Crypto', k:'c', s5:'Crypto FTD',
+          extra:[['Copy Addr. / Dep. Modal',3,4],['Crypto FTD / Copy Addr.',4,5]],
+          abs5:'Copy Address', abs6:'Crypto FTD'}
+};
+function rail(){return RAILS[state.rail];}
+// swap steps 4 and 5 for the selected rail; null when that market has no row,
+// so the table shows a dash instead of a fabricated zero
+function railed(f, bucket){
+  var R=rail();
+  if(!R.k||!f)return f;
+  if(!bucket)return null;
+  var v=bucket[R.k];
+  // deposit modal stays in place at index 3; the rail's own start and deposit
+  // are appended, so the array is six long under a rail and five under All
+  return v?[f[0],f[1],f[2],f[3],v[0],v[1]]:null;
+}
+
+// Sep was missing here, so the September period button rendered as the raw key
+// "2026-09" while every other month showed a name.
+var MNAME={'2026-05':'May','2026-06':'Jun','2026-07':'Jul','2026-08':'Aug',
+           '2026-09':'Sep'};
+
+// the counts to use for a country under the current period
+// period is 'all', a 'YYYY-MM' month, or a 'YYYY-MM-DD' day
+function isDay(){return state.period.length===10;}
+function basis(r){
+  var rl=r.rail;
+  if(state.period==='all')return {base:r.f, bucket:rl&&rl.w};
+  if(isDay())return {base:(r.d&&r.d[state.period])||null,
+                     bucket:rl&&rl.d&&rl.d[state.period]};
+  var src=state.mtd?r.mtd:r.m;
+  var rs=rl&&(state.mtd?rl.mtd:rl.m);
+  return {base:(src&&src[state.period])||null, bucket:rs&&rs[state.period]};
+}
+function counts(r){var g=basis(r);return railed(g.base, g.bucket);}
+// the source row for the selected period; null when that source has nothing
+// in it. Days have no source detail, so a day falls back to the window and the
+// caption says so.
+function srcBasis(s){
+  if(state.period==='all')return {base:s.f, bucket:s.rail};
+  var src=isDay()?s.d:(state.mtd?s.mtd:s.m);
+  var got=src&&src[state.period];
+  return got?{base:got.f, bucket:got.rail}:{base:null, bucket:null};
+}
+function srcCounts(s){var g=srcBasis(s);return railed(g.base, g.bucket);}
+function absSrcRowPeriod(s){
+  var g=srcBasis(s);
+  if(!g.base)return null;
+  return absTail(g.base, g.bucket);
+}
+
+// --- sorting --------------------------------------------------------------
+// One helper for all three tables. Each column carries a `v` accessor
+// returning the value to sort on; null sorts last in both directions, because
+// a dash is an absence, not a low number, and letting it float to the top of
+// an ascending sort buries the real answers.
+function sortHeader(tbl, cols, st, redraw){
+  var hd=tbl.createTHead().insertRow();
+  cols.forEach(function(col,i){
+    var th=document.createElement('th');
+    th.textContent=col.h;
+    if(col.warn)th.classList.add('warnflag');
+    if(col.sep)th.classList.add('sep');
+    if(col.v){
+      th.classList.add('s');
+      if(st.key===col.h){
+        var ar=document.createElement('span');ar.className='ar';
+        ar.textContent=st.dir<0?' ▼':' ▲';th.appendChild(ar);
+      }
+      th.onclick=function(){
+        if(st.key===col.h)st.dir*=-1; else {st.key=col.h;st.dir=-1;}
+        redraw();
+      };
+    }
+    hd.appendChild(th);
+  });
+}
+function applySort(rows, cols, st){
+  if(!st.key)return rows;
+  var col=cols.filter(function(c){return c.h===st.key;})[0];
+  if(!col||!col.v)return rows;
+  return rows.slice().sort(function(a,b){
+    var x=col.v(a), y=col.v(b);
+    if(x==null&&y==null)return 0;
+    if(x==null)return 1;          // absences last, whichever way we sort
+    if(y==null)return -1;
+    if(typeof x==='string')return st.dir*x.localeCompare(y);
+    return st.dir*(x-y);
+  });
+}
+
+function n(v){return v==null?'—':Math.round(v).toLocaleString();}
+// ratios get one decimal: whole numbers would round 0.4% and 1.4% -- the gap
+// between South Africa and a market worth fixing -- into the same cell
+function pc1(v){if(v==null)return '—';if(v>0&&v<0.1)return '<0.1%';return v.toFixed(1)+'%';}
+function td(txt,cls){var e=document.createElement('td');e.textContent=txt;if(cls)e.className=cls;return e;}
+// only countries that actually have data for the chosen period, sorted by
+// registrants IN THAT PERIOD -- sorting by the window figure would put markets
+// at the top that contributed nothing to the month on screen
+function rowOf(r){return state.view==='abs'?absRow(r):counts(r);}
+function selected(){
+  return state.sel.map(function(c){return byName[c];})
+    .filter(function(r){return r&&rowOf(r);})
+    .sort(function(a,b){return rowOf(b)[2]-rowOf(a)[2];});
+}
+// picked but with nothing in this period -- named rather than silently dropped
+function missing(){
+  return state.sel.filter(function(c){
+    var r=byName[c];return r&&!rowOf(r);});
+}
+
+function buildPeriod(){
+  var box=document.getElementById('period');box.innerHTML='';
+  // Segmented pill groups in the green band, matching the other reports on
+  // this site. Each group is one decision, so the groups replace the old
+  // PERIOD / SHOW / RAIL text labels -- the grouping says what the labels did.
+  function seg(label){
+    var g=document.createElement('div');
+    g.className='seg';g.setAttribute('role','group');
+    g.setAttribute('aria-label',label);
+    box.appendChild(g);
+    return g;
+  }
+  function btn(g,text,pressed,disabled,onclick){
+    var b=document.createElement('button');b.type='button';b.textContent=text;
+    b.setAttribute('aria-pressed',pressed?'true':'false');
+    if(disabled)b.disabled=true;
+    b.onclick=onclick;
+    g.appendChild(b);
+    return b;
+  }
+
+  var gp=seg('Period');
+  [['all','Full window']].concat(D.months.map(function(m){return [m,MNAME[m]||m];}))
+    .forEach(function(p){
+      btn(gp,p[1],state.period===p[0],false,function(){state.period=p[0];render();});
+    });
+
+  // The day list is 121 long, so it stays a select rather than 121 pills.
+  var dsel=document.createElement('select');dsel.id='dsel';
+  dsel.className='iconbtn';dsel.title='Day';
+  var o0=document.createElement('option');o0.value='';o0.textContent='— day —';
+  dsel.appendChild(o0);
+  D.days.forEach(function(d){
+    var o=document.createElement('option');o.value=d;o.textContent=d.slice(5);
+    if(state.period===d)o.selected=true;
+    dsel.appendChild(o);
+  });
+  // picking a day replaces the period; clearing it returns to the last month
+  dsel.onchange=function(){
+    state.period=dsel.value||D.months[D.months.length-1];
+    render();};
+  box.appendChild(dsel);
+
+  var gm=seg('Month span');
+  [[false,'Whole months'],[true,'MTD (1–'+D.mtdDay+')']].forEach(function(o){
+    // trimming a month to a day count means nothing on the window or a day
+    btn(gm,o[1],state.mtd===o[0]&&state.period!=='all'&&!isDay(),
+        state.period==='all'||isDay(),
+        function(){state.mtd=o[0];render();});
+  });
+
+  var gv=seg('Show');
+  [['ratio','Ratios'],['abs','Numbers']].forEach(function(o){
+    btn(gv,o[1],state.view===o[0],false,function(){
+      state.view=o[0];state.sortRatio={key:null,dir:-1};
+      state.sortSrc={key:null,dir:-1};render();});
+  });
+
+  var gr=seg('Rail');
+  ['all','fiat','crypto'].forEach(function(k){
+    // The rail used to be disabled in Numbers view on the grounds that the
+    // absolute table already shows every step. It does not: its last two
+    // columns are the All-rail ones, and under a rail they become that rail's
+    // own steps -- Fiat Start / Fiat FTD, Copy Address / Crypto FTD. So the
+    // buttons work in both views now.
+    btn(gr,RAILS[k].label,state.rail===k,false,
+        function(){state.rail=k;render();});
+  });
+}
+// The market picker (preset buttons and 60 country chips) was removed on
+// request. state.sel survives as the mechanism the tables filter on -- it is
+// simply always every market now -- so the ratio, source and player tables
+// needed no change, and a picker could be put back by rebuilding the UI alone.
+
+// Short labels: the five ratios plus three session columns overflowed the page
+// at full width. Reg. = registered, Dep. = deposited.
+function ratios(){
+  var R=rail(), end=R.k?5:4;
+  return [['Reg. Modal / Visits',0,1],['Reg. / Reg. Modal',1,2],
+          ['Dep. Modal / Reg.',2,3]]
+    .concat(R.extra)
+    .concat([[R.k?R.s5+' / Reg.':'Dep. / Reg.',2,end]]);
+}
+// index of the final deposit count, which moves with the rail
+function endIdx(){return rail().k?5:4;}
+// a ratio is meaningless below a handful of people, and printing "50%" off a
+// denominator of 2 is worse than printing nothing
+var MIN_DEN=20;
+// Absolute mode shows the whole observed chain rather than the rail's slice,
+// so the rail buttons are disabled while it is on. Copy Address comes from the
+// crypto side of the rail data -- it is a step in the chain, not a rail view.
+function absCols(){
+  var R=rail();
+  return [{h:'Country', v:function(r){return r.c;}},
+    {h:'Visits', warn:true, v:function(r){return absRow(r)[0];}},
+    {h:'Reg. Modal', v:function(r){return absRow(r)[1];}},
+    {h:'Register',   v:function(r){return absRow(r)[2];}},
+    {h:'Dep. Modal', v:function(r){return absRow(r)[3];}},
+    {h:R.abs5,       v:function(r){return absRow(r)[4];}},
+    {h:R.abs6,       v:function(r){return absRow(r)[5];}}];
+}
+// [visits, reg modal, registered, dep modal, copy address, deposit] for the
+// selected period. Copy Address is null where the market is below the rail
+// reporting floor -- a dash, never a fabricated zero.
+function absRow(r){
+  var g=basis(r), base=g.base, bucket=g.bucket;
+  if(!base)return null;
+  return absTail(base, bucket);
+}
+// The first four steps are rail-independent -- everyone passes through them --
+// so only the last two follow the rail. Under a rail with no row for this
+// market the two rail columns are dashes rather than the row vanishing: the
+// four steps before them are real and still worth showing.
+function absTail(base, bucket){
+  var R=rail();
+  if(!R.k){
+    var cp=bucket&&bucket.c?bucket.c[0]:null;
+    return [base[0],base[1],base[2],base[3],cp,base[4]];
+  }
+  var v=bucket&&bucket[R.k];
+  return [base[0],base[1],base[2],base[3],
+          v?v[0]:null, v?v[1]:null];
+}
+function absSrcRow(s){return absSrcRowPeriod(s);}
+function ratioCols(){
+  // Visits is the step-1 count, and carries the same attribution defect as the
+  // ratio built on it, so both are marked.
+  var cols=[{h:'Country', v:function(r){return r.c;}},
+            {h:'Visits', warn:true, v:function(r){return counts(r)[0];}},
+            {h:'Regs', v:function(r){return counts(r)[2];}},
+            {h:rail().s5, v:function(r){var f=counts(r);return f?f[endIdx()]:null;}}];
+  ratios().forEach(function(spec,i){
+    cols.push({h:spec[0], warn:i===0, sep:i===0, v:function(r){
+      var f=counts(r), den=f[spec[1]];
+      return den<MIN_DEN?null:f[spec[2]]/den*100;}});
+  });
+  return cols;
+}
+function ratioTable(){
+  var t=document.getElementById('tratio');t.innerHTML='';
+  var rows=selected(), abs=state.view==='abs';
+  var cols=abs?absCols():ratioCols();
+  sortHeader(t, cols, state.sortRatio, render);
+  var tb=t.createTBody();
+  rows=applySort(rows, cols, state.sortRatio);
+  if(abs){
+    rows.forEach(function(r){
+      var f=absRow(r), tr=tb.insertRow();
+      if(state.drill===r.c)tr.className='sel';
+      tr.style.cursor='pointer';
+      tr.title='Show sources for '+r.c;
+      tr.onclick=function(){state.drill=(state.drill===r.c?null:r.c);
+        state.drillSrc=null;render();};
+      tr.appendChild(td(r.c));
+      f.forEach(function(v){tr.appendChild(td(v==null?'—':n(v)));});
+    });
+    if(rows.length>1){
+      var trT=tb.insertRow();trT.className='tot';
+      trT.appendChild(td('All markets ('+rows.length+')'));
+      for(var i=0;i<6;i++){
+        (function(i){
+          var any=rows.some(function(r){return absRow(r)[i]!=null;});
+          trT.appendChild(td(any?n(rows.reduce(function(a,r){
+            return a+(absRow(r)[i]||0);},0)):'—'));
+        })(i);
+      }
+    }
+    if(!rows.length){
+      var trE=tb.insertRow();
+      trE.appendChild(td(state.sel.length
+        ? 'None of the selected countries had enough traffic in this period.'
+        : 'No countries selected. Pick one above.'));
+    }
+    return;
+  }
+  rows.forEach(function(r){
+    var f=counts(r);
+    var tr=tb.insertRow();
+    if(state.drill===r.c)tr.className='sel';
+    tr.style.cursor='pointer';
+    tr.title='Show sources for '+r.c;
+    tr.onclick=function(){state.drill=(state.drill===r.c?null:r.c);state.drillSrc=null;render();};
+    tr.appendChild(td(r.c));
+    // the three absolute counts behind the rates: nobody should read a
+    // percentage without seeing what it is a percentage of
+    tr.appendChild(td(n(f[0])));
+    tr.appendChild(td(n(f[2])));
+    tr.appendChild(td(n(f[endIdx()])));
+    ratios().forEach(function(spec,i){
+      var den=f[spec[1]],num=f[spec[2]];
+      tr.appendChild(td(den<MIN_DEN?'—':pc1(num/den*100), i===0?'sep':null));
+    });
+  });
+  if(rows.length>1){
+    var tr2=tb.insertRow();tr2.className='tot';
+    tr2.appendChild(td('All markets ('+rows.length+')'));
+    [0,2,endIdx()].forEach(function(i){
+      tr2.appendChild(td(n(rows.reduce(function(a,r){return a+counts(r)[i];},0))));
+    });
+    // WEIGHTED: sum the numerators, sum the denominators, then divide. The mean
+    // of the country rates is a different number and it lets a 30-registrant
+    // market pull the figure as hard as a 3,750-registrant one.
+    ratios().forEach(function(spec,i){
+      var den=0,num=0;
+      rows.forEach(function(r){var f=counts(r);den+=f[spec[1]];num+=f[spec[2]];});
+      tr2.appendChild(td(den<MIN_DEN?'—':pc1(num/den*100), i===0?'sep':null));
+    });
+  }
+  if(!rows.length){
+    var tr3=tb.insertRow();
+    tr3.appendChild(td(state.sel.length
+      ? 'No market had enough traffic in this period.'
+      : 'No markets to show.'));
+  }
+  // No caption here on request. The period, MTD and rail buttons above the
+  // table already say what is selected, and a country with nothing in the
+  // chosen period is simply absent from the rows.
+}
+
+// --- section 03, unfiltered: every source, every country ------------------
+// Same shape as the campaign table below. It follows the period buttons and
+// the Ratios/Numbers switch, and it ignores the rail buttons for the same
+// reason the campaign table does: the rail split was pulled per country only.
+var GSRC=D.sources||[];
+function globalSourceTable(t, note){
+  if(!GSRC.length){
+    note.textContent='Click any country row above to break it down by the '
+      +'referring domain people arrived from.';
+    return;
+  }
+  var listed=GSRC.filter(function(x){return !x.rest;});
+  var restRow=GSRC.filter(function(x){return x.rest;})[0];
+  note.textContent='Every referring domain, all countries. Click a country '
+    +'above to filter this to that market.';
+
+  var abs=state.view==='abs';
+  var R=rail();
+  var cols=abs
+    ? [{h:'Source', v:function(x){return x.s;}},
+       {h:'Visits', warn:true, v:function(x){var f=plainAbs(x);return f?f[0]:null;}},
+       {h:'Reg. Modal', v:function(x){var f=plainAbs(x);return f?f[1]:null;}},
+       {h:'Register', v:function(x){var f=plainAbs(x);return f?f[2]:null;}},
+       {h:'Dep. Modal', v:function(x){var f=plainAbs(x);return f?f[3]:null;}},
+       {h:R.abs5, v:function(x){var f=plainAbs(x);return f?f[4]:null;}},
+       {h:R.abs6, v:function(x){var f=plainAbs(x);return f?f[5]:null;}}]
+    : [{h:'Source', v:function(x){return x.s;}},
+       {h:'Visits', warn:true, v:function(x){var f=plainCounts(x);return f?f[0]:null;}},
+       {h:'Regs', v:function(x){var f=plainCounts(x);return f?f[2]:null;}},
+       {h:R.s5, v:function(x){var f=plainCounts(x);return f?f[endIdx()]:null;}}];
+  if(!abs)ratios().forEach(function(spec,i){
+    cols.push({h:spec[0], warn:i===0, sep:i===0, v:function(x){
+      var f=plainCounts(x); if(!f)return null;
+      var den=f[spec[1]];
+      return den<MIN_DEN?null:f[spec[2]]/den*100;}});
+  });
+
+  sortHeader(t, cols, state.sortGsrc, render);
+  var tb=t.createTBody();
+  var here=listed.filter(function(x){return abs?plainAbs(x):plainCounts(x);});
+
+  function row(label, f, flag){
+    var tr=tb.insertRow();
+    var nm=td(label);
+    if(flag)nm.className='warnflag';
+    tr.appendChild(nm);
+    if(!f){
+      for(var i=1;i<cols.length;i++)tr.appendChild(td('—',cols[i].sep?'sep':null));
+      return tr;
+    }
+    if(abs){[0,1,2,3,4,5].forEach(function(i){
+      tr.appendChild(td(f[i]==null?'—':n(f[i])));});return tr;}
+    tr.appendChild(td(n(f[0])));
+    tr.appendChild(td(n(f[2])));
+    tr.appendChild(td(f[endIdx()]==null?'—':n(f[endIdx()])));
+    ratios().forEach(function(spec,i){
+      var den=f[spec[1]];
+      tr.appendChild(td(den<MIN_DEN?'—':pc1(f[spec[2]]/den*100), i===0?'sep':null));
+    });
+    return tr;
+  }
+
+  applySort(here, cols, state.sortGsrc).forEach(function(x){
+    var label=x.s==='fortunejack.com'?'fortunejack.com (attribution lost)'
+      :x.s==='$direct'?'Direct / no referrer'
+      :x.s==='(none)'?'No referrer recorded':x.s;
+    var tr=row(label, abs?plainAbs(x):plainCounts(x), x.s==='fortunejack.com');
+    // Only sources with campaign detail are clickable. The rest have no
+    // cross-tab row, and a click that silently emptied the table below would
+    // read as a bug rather than as an absence.
+    if(x.bt&&x.bt.length){
+      tr.style.cursor='pointer';
+      tr.title='Show the '+x.bt.length+' campaign(s) under '+x.s;
+      tr.onclick=function(){
+        state.drillGsrc=(state.drillGsrc===x.s?null:x.s);
+        state.drillBtag=null;          // one narrowing of section 04 at a time
+        state.sortBtag={key:null,dir:-1};state.sortPly={key:null,dir:-1};
+        render();};
+      if(state.drillGsrc===x.s)tr.className='sel';
+    }
+  });
+
+  // Summed over whichever array the current view uses, so the totals follow
+  // the rail like the rows above them. A null rail cell contributes nothing
+  // rather than a zero, which is why the accumulator tracks "seen" per column.
+  function sum(rows){
+    var w=abs?6:(endIdx()+1), acc=[], seen=[], any=false, i;
+    for(i=0;i<w;i++){acc.push(0);seen.push(false);}
+    rows.forEach(function(x){
+      var f=abs?plainAbs(x):plainCounts(x);
+      if(!f)return;
+      any=true;
+      for(i=0;i<w;i++)if(f[i]!=null){acc[i]+=f[i];seen[i]=true;}
+    });
+    if(!any)return null;
+    for(i=0;i<w;i++)if(!seen[i])acc[i]=null;
+    return acc;
+  }
+  var hidden=listed.filter(function(x){return here.indexOf(x)<0;})
+                   .concat(restRow?[restRow]:[]);
+  row('Below the cut-off / not listed ('+hidden.length+')', sum(hidden), false)
+    .className='tot';
+  row('All traffic', sum(GSRC), false).className='tot';
+}
+
+// --- section 03: the clicked country, split by first-touch source ---------
+function sourceTable(){
+  var t=document.getElementById('tsrc'), note=document.getElementById('snote');
+  t.innerHTML='';
+  var c=state.drill, r=c&&byName[c];
+  if(!c){
+    // No country picked: every referring domain, every country at once. The
+    // per-country rows below are a separate pull with its own cut-off, so this
+    // is not their sum -- it is its own pull, and it foots to its own total.
+    globalSourceTable(t, note);
+    return;
+  }
+  if(!r||!r.src){
+    note.textContent=c+' has no source breakdown: it is below the registrant '
+      +'threshold where a source split would mean anything. Pick a larger market.';
+    return;
+  }
+  // Section 03 has no per-period data: it is always the full window. When the
+  // table above is showing a month or a day, the two disagree -- US August is
+  // 58 FTDs against 233 for the window -- and a reader who clicks through has
+  // no way to know the range changed under them. Say so, loudly, until the
+  // per-period source data is pulled.
+  // Every period -- window, month, MTD and day -- now has its own source rows,
+  // so there is nothing to warn about. Sources below two people on a day are
+  // not in the pull and fall into the remainder row rather than vanishing.
+  note.textContent='';
+
+  if(state.view==='abs'){
+    var AR=rail();
+    var acols=[{h:'Source', v:function(s){return s.s;}},
+      {h:'Visits', warn:true, v:function(s){return absSrcRow(s)[0];}},
+      {h:'Reg. Modal', v:function(s){return absSrcRow(s)[1];}},
+      {h:'Register',   v:function(s){return absSrcRow(s)[2];}},
+      {h:'Dep. Modal', v:function(s){return absSrcRow(s)[3];}},
+      {h:AR.abs5,      v:function(s){return absSrcRow(s)[4];}},
+      {h:AR.abs6,      v:function(s){return absSrcRow(s)[5];}}];
+    sortHeader(t, acols, state.sortSrc, render);
+    var atb=t.createTBody();
+    var present=r.src.filter(function(x){return absSrcRow(x);});
+    var abody=applySort(present.filter(function(x){return !x.rest;}), acols, state.sortSrc)
+      .concat(present.filter(function(x){return x.rest;}));
+    abody.forEach(function(x){
+      var tr=atb.insertRow();
+      if(x.rest)tr.className='tot';
+      if(x.p){
+        tr.style.cursor='pointer';
+        tr.onclick=function(){state.drillSrc=(state.drillSrc===x.s?null:x.s);render();};
+        if(state.drillSrc===x.s)tr.className='sel';
+      }
+      var nm2=td(x.s==='fortunejack.com'?'fortunejack.com (attribution lost)'
+        :x.s==='$direct'?'Direct / no referrer':x.s);
+      if(x.s==='fortunejack.com')nm2.className='warnflag';
+      tr.appendChild(nm2);
+      absSrcRow(x).forEach(function(v){tr.appendChild(td(v==null?'—':n(v)));});
+    });
+    var atot=atb.insertRow();atot.className='tot';
+    atot.appendChild(td(c+' — all sources'));
+    for(var ai=0;ai<6;ai++){
+      (function(i){
+        var any=present.some(function(x){return absSrcRow(x)[i]!=null;});
+        atot.appendChild(td(any?n(present.reduce(function(a,x){
+          return a+(absSrcRow(x)[i]||0);},0)):'—'));
+      })(ai);
+    }
+    return;
+  }
+  var cols=[{h:'Source', v:function(s){return s.s;}},
+            // These two read the period basis, not s.f. They used to read the
+            // window array while the FTD column and every ratio beside them
+            // read the selected period, so one row mixed two ranges: Czechia
+            // in August showed 691 window visits against 7 August deposits.
+            {h:'Visits', warn:true, v:function(s){var f=srcCounts(s);return f?f[0]:null;}},
+            {h:'Regs', v:function(s){var f=srcCounts(s);return f?f[2]:null;}},
+            {h:rail().s5, v:function(s){var f=srcCounts(s);return f?f[endIdx()]:null;}}];
+  ratios().forEach(function(spec,i){
+    cols.push({h:spec[0], warn:i===0, sep:i===0, v:function(s){
+      var f=srcCounts(s); if(!f)return null;
+      var den=f[spec[1]];
+      return den<MIN_DEN?null:f[spec[2]]/den*100;}});
+  });
+  sortHeader(t, cols, state.sortSrc, render);
+  var tb=t.createTBody();
+  // the remainder row is a residue, not a source -- it stays pinned at the
+  // bottom whatever the sort, or it drifts into the middle of the ranking
+  var here=r.src.filter(function(s){return srcBasis(s).base;});
+  var body=applySort(here.filter(function(s){return !s.rest;}), cols, state.sortSrc)
+    .concat(here.filter(function(s){return s.rest;}));
+  body.forEach(function(s){
+    var tr=tb.insertRow();
+    if(s.rest)tr.className='tot';
+    if(s.p){
+      tr.style.cursor='pointer';
+      tr.title='Show the '+s.p.length+' players from '+s.s;
+      tr.onclick=function(){
+        state.drillSrc=(state.drillSrc===s.s?null:s.s);render();};
+      if(state.drillSrc===s.s)tr.className='sel';
+    }
+    var name=s.s;
+    if(name==='fortunejack.com')name='fortunejack.com (attribution lost)';
+    if(name==='$direct')name='Direct / no referrer';
+    var nm=td(name);
+    // the self-referred row is the redirect defect, not a real acquisition
+    // source, and on most markets it is the biggest row on the table
+    if(s.s==='fortunejack.com')nm.className='warnflag';
+    tr.appendChild(nm);
+    var sf=srcCounts(s);
+    tr.appendChild(td(sf?n(sf[0]):'—'));
+    tr.appendChild(td(sf?n(sf[2]):'—'));
+    tr.appendChild(td(sf?n(sf[endIdx()]):'—'));
+    ratios().forEach(function(spec,i){
+      var cls=i===0?'sep':null;
+      if(!sf){tr.appendChild(td('—',cls));return;}
+      var den=sf[spec[1]],num=sf[spec[2]];
+      tr.appendChild(td(den<MIN_DEN?'—':pc1(num/den*100), cls));
+    });
+  });
+  // A total row, so the reader can see the parts add up to the country rather
+  // than having to trust that they do. Ratios are weighted, never the mean.
+  var tr2=tb.insertRow();tr2.className='tot';
+  tr2.appendChild(td(c+' — all sources'));
+  // Under a rail the total covers only the sources that HAVE a rail row, so it
+  // is a total of what is shown rather than of the country. Labelled as such.
+  var withRail=here.filter(function(s){return srcCounts(s);});
+  [0,2,endIdx()].forEach(function(i){
+    tr2.appendChild(td(n(withRail.reduce(function(a,s){
+      return a+srcCounts(s)[i];},0))));
+  });
+  ratios().forEach(function(spec,i){
+    var den=0,num=0;
+    withRail.forEach(function(s){var f=srcCounts(s);den+=f[spec[1]];num+=f[spec[2]];});
+    tr2.appendChild(td(den<MIN_DEN?'—':pc1(num/den*100), i===0?'sep':null));
+  });
+}
+
+// --- section 04: the clicked source, player by player ---------------------
+function mins(m){
+  if(m==null)return '—';
+  if(m<60)return m+'m';
+  var h=Math.floor(m/60);
+  return h<24?h+'h '+(m%60)+'m':Math.floor(h/24)+'d '+(h%24)+'h';
+}
+// Clicking a country fills this with every player it has a list for; clicking
+// a source narrows it to that source. The rows carry a registration date, so
+// the period buttons filter them client-side -- no extra data needed.
+// Section 04 follows the narrowest selection that is active: a campaign beats
+// a source, a source beats a country. Each list is its own pull keyed on that
+// dimension, not a filter of the country lists -- a campaign's registrants are
+// spread across every market it ran in.
+function playersFor(){
+  if(state.drillBtag){
+    var b=BTAGS.filter(function(x){return x.t===state.drillBtag;})[0];
+    return b&&b.p?b.p.map(function(x){
+      return {u:x.u,d:x.d,m:x.m,f:x.f,t:x.t,src:state.drillBtag};}):null;
+  }
+  if(state.drillGsrc){
+    var g=GSRC.filter(function(x){return x.s===state.drillGsrc;})[0];
+    return g&&g.p?g.p.map(function(x){
+      return {u:x.u,d:x.d,m:x.m,f:x.f,t:x.t,src:state.drillGsrc};}):null;
+  }
+  var r=state.drill&&byName[state.drill];
+  if(!r||!r.src)return null;
+  var out=[];
+  r.src.forEach(function(s){
+    if(!s.p)return;
+    if(state.drillSrc&&s.s!==state.drillSrc)return;
+    s.p.forEach(function(x){
+      out.push({u:x.u,d:x.d,m:x.m,f:x.f,t:x.t,src:s.s});
+    });
+  });
+  return out;
+}
+// what section 04 is currently listing, for its own heading line
+function playerScope(){
+  if(state.drillBtag)return 'campaign '+state.drillBtag;
+  if(state.drillGsrc)return state.drillGsrc;
+  return state.drill+(state.drillSrc?' · '+state.drillSrc:'');
+}
+// registration dates are MM-DD; a month keeps its own days, a day keeps itself
+function inPeriod(x){
+  if(state.period==='all')return true;
+  if(isDay())return x.d===state.period.slice(5);
+  return x.d.slice(0,2)===state.period.slice(5,7);
+}
+function playerTable(){
+  var t=document.getElementById('tply'), note=document.getElementById('pnote2');
+  t.innerHTML='';
+  if(!state.drill&&!state.drillGsrc&&!state.drillBtag){
+    note.textContent='Click a country, a source or a campaign above to list '
+      +'the people who registered through it.';
+    return;
+  }
+  var all=playersFor();
+  if(!all||!all.length){
+    note.textContent=playerScope()+' has no player list: it is below the '
+      +'three-registrant cut-off, or it is the attribution-lost bucket, which '
+      +'is the Cloudflare challenge rather than a site anyone can act on.';
+    return;
+  }
+  var p=all.filter(inPeriod);
+  var noname=p.filter(function(x){return x.u==='-';}).length;
+  var ftd=p.filter(function(x){return x.f;}).length;
+  // the country row counts registrants from EVERY source; the player lists
+  // exclude the attribution-lost bucket, so say what share this actually is
+  var f=(!state.drillGsrc&&!state.drillBtag&&state.drill)
+    ? counts(byName[state.drill]) : null;
+  var covered=f?Math.round(100*p.length/f[2]):null;
+  note.textContent=playerScope()
+    +' — '+p.length+' registrants, '+ftd+' first deposits, '
+    +noname+' with no username on the account'
+    +(state.period==='all'?'':', in '+(isDay()?state.period
+        :(MNAME[state.period]||state.period)+' 2026'))
+    +(state.drillSrc||state.drillGsrc||state.drillBtag?'.':covered!=null
+       ? '. That is '+covered+'% of the country\u2019s registrants — sources with '
+         +'no player list, chiefly the attribution-lost bucket, are not here.'
+       : '.');
+
+  var cols=[{h:'User', v:function(x){return x.u==='-'?'\uFFFF':x.u.toLowerCase();}}];
+  if(!state.drillSrc)cols.push({h:'Source', v:function(x){return x.src;}});
+  cols=cols.concat([
+    {h:'Reg. Date', v:function(x){return x.d;}},
+    {h:'Dep. Modal', v:function(x){return x.m?1:0;}},
+    {h:'FTD', v:function(x){return x.f?1:0;}},
+    {h:'Time on Site', v:function(x){return x.t;}}]);
+  sortHeader(t, cols, state.sortPly, render);
+  var tb=t.createTBody();
+  // default order: depositors first, then by registration date -- the useful
+  // question is "who converted", not who is alphabetically first
+  var body=state.sortPly.key
+    ? applySort(p, cols, state.sortPly)
+    : p.slice().sort(function(a,b){
+        if(a.f!==b.f)return a.f?-1:1;
+        return a.d<b.d?-1:a.d>b.d?1:0;
+      });
+  body.forEach(function(x){
+    var tr=tb.insertRow();
+    var u=td(x.u==='-'?'(no username set)':x.u);
+    // an account that never got a username is the strongest single signal that
+    // a registration was not a real person
+    if(x.u==='-')u.className='warnflag';
+    tr.appendChild(u);
+    if(!state.drillSrc){
+      var sc=td(x.src==='$direct'?'Direct':x.src);
+      if(x.src==='fortunejack.com')sc.className='warnflag';
+      tr.appendChild(sc);
+    }
+    tr.appendChild(td(x.d));
+    tr.appendChild(td(x.m?'yes':'\u2014'));
+    tr.appendChild(td(x.f?'yes':'\u2014'));
+    tr.appendChild(td(mins(x.t)));
+  });
+}
+
+// --- section 05: affiliate campaigns -------------------------------------
+// One row per campaign, where a campaign is the btag with its per-click suffix
+// stripped: the raw parameter is affiliate_campaign-clickid and the click id is
+// unique per visit, so grouping on it raw gives 3.7M rows of one person each.
+//
+// This table follows the period buttons but NOT the rail buttons: the rail
+// split was pulled per country, not per campaign, so there is no fiat/crypto
+// figure to show here. Under a rail selection it keeps showing the All-rail
+// chain and says so, rather than blanking or, worse, printing the country
+// rail numbers beside campaign visit counts.
+var BTAGS=D.btags||[];
+// Click-error baseline across every campaign carrying the data. Computed once
+// from the window, so the red marking means the same thing in every period.
+var ERR_BASE=(function(){
+  var c=0,e=0;
+  BTAGS.forEach(function(r){ if(r.ce&&r.ce.f){c+=r.ce.f[0];e+=r.ce.f[1];} });
+  return c?100*e/c:0;
+})();
+// The five All-rail ratios. Used by both tables that have no rail split of
+// their own -- the campaigns and the site-wide sources.
+var PLAIN_RATIOS=[['Reg. Modal / Visits',0,1],['Reg. / Reg. Modal',1,2],
+                  ['Dep. Modal / Reg.',2,3],['Dep. / Dep. Modal',3,4],
+                  ['Dep. / Reg.',2,4]];
+var BTAG_RATIOS=PLAIN_RATIOS;
+// Campaigns with almost no registrations make the table long without making it
+// informative, so the reader picks the floor. The remainder row absorbs
+// whatever is hidden, and it is always the pulled total minus what is shown.
+var BTAG_CUTS=[['20+ regs',20],['5+',5],['1+',1],['All',0]];
+
+// Rows in the campaign and global-source tables carry the same shape as a
+// country -- f/m/mtd/d for the chain, and rail.w/m/mtd/d for the fiat and
+// crypto split -- so they use the same railed() and ratios() machinery and
+// the rail buttons apply to all three tables identically.
+function btagBasis(r){
+  if(state.period==='all')return r.f;
+  if(isDay())return (r.d&&r.d[state.period])||null;
+  var src=state.mtd?r.mtd:r.m;
+  return (src&&src[state.period])||null;
+}
+function plainBucket(r){
+  var rl=r.rail;
+  if(!rl)return null;
+  if(state.period==='all')return rl.w;
+  if(isDay())return rl.d&&rl.d[state.period];
+  var rs=state.mtd?rl.mtd:rl.m;
+  return rs&&rs[state.period];
+}
+// null under a rail when this row has no rail figures for the period, so the
+// table shows dashes rather than a fabricated zero -- same rule as countries
+function plainCounts(r){return railed(btagBasis(r), plainBucket(r));}
+// Clicks followed by an error, for the selected period. Per click, not per
+// person: the share of a campaign's PEOPLE who saw an error measures how much
+// of the site they used, not how broken it is -- registration runs higher among
+// error-hitters in every campaign. Clicks normalise that out.
+function errRate(r){
+  var e=r.ce;
+  if(!e)return null;
+  var f;
+  if(state.period==='all')f=e.f;
+  else if(isDay())f=e.d&&e.d[state.period];
+  else f=(state.mtd?e.mtd:e.m)&&(state.mtd?e.mtd:e.m)[state.period];
+  if(!f||!f[0]||f[0]<200)return null;   // too few clicks to read a rate from
+  // A click floor alone is not enough. 106545748_501694 has 3,486 clicks from
+  // 17 people -- about 205 each -- and scored 21.6%, top of the table, on what
+  // is really a few automated or rage-clicking sessions. The rate is only a
+  // campaign property if enough different people produced it.
+  var vis=plainCounts(r);
+  if(!vis||vis[0]<50)return null;
+  return f[1]/f[0]*100;
+}
+function plainAbs(r){
+  var base=btagBasis(r);
+  return base?absTail(base, plainBucket(r)):null;
+}
+function buildBtagCut(){
+  var bar=document.getElementById('btagcut');bar.innerHTML='';
+  var lab=document.createElement('span');lab.className='plbl';
+  lab.textContent='Campaigns with';bar.appendChild(lab);
+  BTAG_CUTS.forEach(function(o){
+    var b=document.createElement('button');b.className='pbtn';b.type='button';
+    b.textContent=o[0];
+    b.setAttribute('aria-pressed',state.btagCut===o[1]?'true':'false');
+    b.onclick=function(){state.btagCut=o[1];state.sortBtag={key:null,dir:-1};render();};
+    bar.appendChild(b);
+  });
+}
+function btagTable(){
+  var t=document.getElementById('tbtag');t.innerHTML='';
+  var note=document.getElementById('bnote');
+  if(!BTAGS.length){note.textContent='No campaign data in this build.';return;}
+
+  // Under a source drill the rows are that source's OWN share of each
+  // campaign, from the cross-tab pull -- not the campaign's totals. There is
+  // no remainder row for a drill: the cross-tab has a threshold of its own and
+  // no total to subtract from, so inventing one would be a guess.
+  var drillRows=null, drillSrcRow=null;
+  if(state.drillGsrc){
+    drillSrcRow=GSRC.filter(function(x){return x.s===state.drillGsrc;})[0];
+    drillRows=(drillSrcRow&&drillSrcRow.bt)||[];
+  }
+  var listed=drillRows||BTAGS.filter(function(r){return !r.rest;});
+  var restRow=drillRows?null:BTAGS.filter(function(r){return r.rest;})[0];
+  // The cut is applied on the SELECTED period, not on the window, or a campaign
+  // that ran only in August would be judged on months it did not exist for.
+  var shown=listed.filter(function(r){
+    var f=btagBasis(r);
+    return f&&f[2]>=state.btagCut;
+  });
+
+  // The explanatory note was removed on request. What remains is a filter
+  // indicator, which is state rather than explanation: without it a drilled
+  // table looks like the whole table with most of the rows missing.
+  note.textContent=state.drillGsrc
+    ? 'Campaigns under '+state.drillGsrc+' — click that source again to clear.'
+    : '';
+
+  var abs=state.view==='abs';
+  var R=rail();
+  var cols=abs
+    ? [{h:'Campaign', v:function(r){return r.t;}},
+       {h:'Visits', v:function(r){var f=plainAbs(r);return f?f[0]:null;}},
+       {h:'Reg. Modal', v:function(r){var f=plainAbs(r);return f?f[1]:null;}},
+       {h:'Register', v:function(r){var f=plainAbs(r);return f?f[2]:null;}},
+       {h:'Dep. Modal', v:function(r){var f=plainAbs(r);return f?f[3]:null;}},
+       {h:R.abs5, v:function(r){var f=plainAbs(r);return f?f[4]:null;}},
+       {h:R.abs6, v:function(r){var f=plainAbs(r);return f?f[5]:null;}},
+       {h:'Click errors', sep:true, v:errRate}]
+    : [{h:'Campaign', v:function(r){return r.t;}},
+       {h:'Visits', v:function(r){var f=plainCounts(r);return f?f[0]:null;}},
+       {h:'Regs', v:function(r){var f=plainCounts(r);return f?f[2]:null;}},
+       {h:R.s5, v:function(r){var f=plainCounts(r);return f?f[endIdx()]:null;}}];
+  if(!abs)cols.push({h:'Click errors', sep:false, v:errRate});
+  if(!abs)ratios().forEach(function(spec,i){
+    cols.push({h:spec[0], sep:i===0, v:function(r){
+      var f=plainCounts(r); if(!f)return null;
+      var den=f[spec[1]];
+      return den<MIN_DEN?null:f[spec[2]]/den*100;}});
+  });
+
+  sortHeader(t, cols, state.sortBtag, render);
+  var tb=t.createTBody();
+  var body=applySort(shown, cols, state.sortBtag);
+
+  // `f` is passed in rather than looked up, so the same renderer serves both a
+  // real campaign row and the two summed closing rows. Looking it up inside
+  // meant the closing rows -- which have no per-period buckets of their own --
+  // printed dashes on every period except the window.
+  function cells(tr,label,f,flag,row){
+    var nm=td(label);
+    // '123', 'test123' -- tagged traffic with no affiliate_campaign shape. Left
+    // in so the rows still add up, flagged so nobody reads it as a placement.
+    if(flag)nm.className='warnflag';
+    tr.appendChild(nm);
+    if(!f){
+      for(var i=1;i<cols.length;i++)tr.appendChild(td('—',cols[i].sep?'sep':null));
+      return;
+    }
+    // Baseline across the campaigns in this pull is about 3%. Marked red at
+    // twice that, so a row is judged against the site rather than in isolation.
+    function errCell(sep){
+      var rate=row?errRate(row):null;
+      var c=td(rate==null?'—':pc1(rate), sep?'sep':null);
+      if(rate!=null&&rate>=2*ERR_BASE)c.className=(sep?'sep ':'')+'hot';
+      return c;
+    }
+    if(abs){
+      [0,1,2,3,4,5].forEach(function(i){
+        tr.appendChild(td(f[i]==null?'—':n(f[i])));});
+      tr.appendChild(errCell(true));
+      return;
+    }
+    tr.appendChild(td(n(f[0])));
+    tr.appendChild(td(n(f[2])));
+    tr.appendChild(td(f[endIdx()]==null?'—':n(f[endIdx()])));
+    tr.appendChild(errCell(false));
+    ratios().forEach(function(spec,i){
+      var den=f[spec[1]];
+      tr.appendChild(td(den<MIN_DEN?'—':pc1(f[spec[2]]/den*100), i===0?'sep':null));
+    });
+  }
+
+  body.forEach(function(r){
+    var tr=tb.insertRow();
+    cells(tr,r.t,abs?plainAbs(r):plainCounts(r),r.bad,r);
+    // Only campaigns with a registrant list are clickable, for the same reason
+    // sources are: a click that emptied section 04 would read as a fault.
+    if(r.p&&r.p.length){
+      tr.style.cursor='pointer';
+      tr.title='List the '+r.p.length+' registrants of '+r.t;
+      tr.onclick=function(){
+        state.drillBtag=(state.drillBtag===r.t?null:r.t);
+        state.sortPly={key:null,dir:-1};render();};
+      if(state.drillBtag===r.t)tr.className='sel';
+    }
+  });
+
+  // Same rule as the source table: sum the array the current view uses, and
+  // leave a column null rather than zero when no row contributed to it.
+  function sum(rows){
+    var w=abs?6:(endIdx()+1), acc=[], seen=[], any=false, i;
+    for(i=0;i<w;i++){acc.push(0);seen.push(false);}
+    rows.forEach(function(r){
+      var f=abs?plainAbs(r):plainCounts(r);
+      if(!f)return;
+      any=true;
+      for(i=0;i<w;i++)if(f[i]!=null){acc[i]+=f[i];seen[i]=true;}
+    });
+    if(!any)return null;
+    for(i=0;i<w;i++)if(!seen[i])acc[i]=null;
+    return acc;
+  }
+
+  // Two closing rows. The first is everything the cut-off hid plus the
+  // campaigns below the pull threshold; the second is the affiliate total. The
+  // second must equal the pulled total for the period, which is what the test
+  // asserts -- a table that does not foot is a table that is quietly lying.
+  var hidden=listed.filter(function(r){return shown.indexOf(r)<0;})
+                   .concat(restRow?[restRow]:[]);
+
+  // Under a source drill the residual is the source's own total minus the
+  // campaigns listed under it -- which is mostly traffic carrying no btag at
+  // all. Google is 10% campaign-tagged and 90% organic; suppressing that row
+  // would make a 151-visit table look like the whole of a 6,889-visit source.
+  var resid=sum(hidden), grand;
+  if(state.drillGsrc&&drillSrcRow){
+    grand=abs?plainAbs(drillSrcRow):plainCounts(drillSrcRow);
+    // SHOWN, not listed. Subtracting every cross-tab row left anything the
+    // cut-off had hidden out of both halves: agomuk.com's one campaign has 4
+    // registrations, so at "20+ regs" the table showed a residual of 3 against
+    // a total of 1,141 and simply did not add up.
+    var got=sum(shown);
+    if(grand&&got){
+      resid=[];
+      for(var gi=0;gi<grand.length;gi++){
+        resid.push(grand[gi]==null||got[gi]==null
+          ? null : Math.max(0, grand[gi]-got[gi]));
+      }
+    }
+  }else{
+    grand=sum(BTAGS);
+  }
+
+  var trR=tb.insertRow();trR.className='tot';
+  cells(trR, state.drillGsrc
+      ? 'No campaign tag / below cut-off'
+      : 'Below the cut-off / not listed ('+hidden.length+')',
+    resid, false);
+
+  var trT=tb.insertRow();trT.className='tot';
+  cells(trT, state.drillGsrc?'All traffic from '+state.drillGsrc
+                            :'All affiliate traffic',
+        grand, false);
+}
+
+// --- section 05: clicks followed by an error ------------------------------
+// A row is one button on one page. "Followed by" is literal: a $exception in
+// the same session within five seconds of the click. It is correlation, so the
+// baseline sits in the heading and the column is never called "caused".
+var ERRS=D.clickErrors||[];
+var REPLAY=D.replayBase||'';
+function errTable(){
+  var t=document.getElementById('terr'), note=document.getElementById('enote');
+  t.innerHTML='';
+  note.textContent='';
+  if(!ERRS.length)return;
+
+  // Follows the period buttons like every other table. A pair with no clicks in
+  // the chosen period drops out rather than showing its window figures -- the
+  // mistake section 02 shipped with and had to be fixed in use.
+  var here=ERRS.filter(function(e){return errBasis(e);});
+  var totN=0, totE=0;
+  here.forEach(function(e){var f=errBasis(e);totN+=f[0];totE+=f[1];});
+  var base=totN?100*totE/totN:0;
+
+  var cols=[{h:'Button', v:function(e){return e.b;}},
+            {h:'Page', v:function(e){return e.p;}},
+            {h:'Clicks', v:function(e){var f=errBasis(e);return f?f[0]:null;}},
+            {h:'Followed by error', v:function(e){var f=errBasis(e);return f?f[1]:null;}},
+            {h:'Rate', sep:true, v:function(e){var f=errBasis(e);
+               return f&&f[0]?f[1]/f[0]*100:null;}},
+            {h:'People', v:function(e){var f=errBasis(e);return f?f[2]:null;}}];
+  sortHeader(t, cols, state.sortErr, render);
+  var tb=t.createTBody();
+  var body=state.sortErr.key
+    ? applySort(here, cols, state.sortErr)
+    : here.slice().sort(function(a,b){return errBasis(b)[1]-errBasis(a)[1];});
+
+  body.slice(0,150).forEach(function(e){
+    var f=errBasis(e);
+    var tr=tb.insertRow();
+    tr.appendChild(td(e.b));
+    var pc=td(e.p);pc.className='pathcell';tr.appendChild(pc);
+    tr.appendChild(td(n(f[0])));
+    tr.appendChild(td(n(f[1])));
+    var rate=f[0]?f[1]/f[0]*100:null;
+    var rc=td(rate==null?'—':pc1(rate),'sep');
+    // three times the rate across everything on screen is where a row stops
+    // looking like the site's ordinary background level of errors
+    if(rate!=null&&base&&rate>=3*base)rc.className='sep hot';
+    tr.appendChild(rc);
+    tr.appendChild(td(n(f[2])));
+    // Clickable whenever the pair has ANY sampled session, not just one inside
+    // the current period. Only 20 sessions are sampled per pair across the whole
+    // window, so on a single day about half the rows have none -- and gating the
+    // click on that made those rows look broken rather than empty. Now the click
+    // works and the panel below says there is nothing sampled for this period.
+    if(e.ss&&e.ss.length){
+      tr.style.cursor='pointer';
+      var inP=errSess(e).length;
+      tr.title=inP?('Show '+inP+' sessions')
+                  :'No sampled sessions in this period';
+      if(!inP)tr.style.opacity='0.75';
+      var key=e.b+'\u0000'+e.p;
+      tr.onclick=function(){state.drillErr=(state.drillErr===key?null:key);render();};
+      if(state.drillErr===key)tr.className='sel';
+    }
+  });
+}
+// counts for the selected period, null when this pair had no clicks in it
+function errBasis(e){
+  if(state.period==='all')return e.f;
+  if(isDay())return (e.d&&e.d[state.period])||null;
+  var src=state.mtd?e.mtd:e.m;
+  return (src&&src[state.period])||null;
+}
+// The sample sessions are a window-wide list, so they are filtered here by
+// their own date rather than pulled per period -- the same trick the player
+// lists use, and the reason the counts above can be period-aware cheaply.
+function errSess(e){
+  if(!e.ss)return [];
+  if(state.period==='all')return e.ss;
+  return e.ss.filter(function(x){return inPeriod(x);});
+}
+function errSessions(){
+  var t=document.getElementById('tsess'), note=document.getElementById('esub');
+  t.innerHTML='';
+  note.textContent='';
+  if(!state.drillErr)return;
+  var row=ERRS.filter(function(e){return e.b+'\u0000'+e.p===state.drillErr;})[0];
+  if(!row)return;
+  var ss=errSess(row);
+  var f=errBasis(row);
+  if(!ss.length){
+    // The counts above are complete; only the replay sample is thin. Say which
+    // it is, or an empty panel reads as missing data.
+    note.textContent=row.b+' on '+row.p+' — '+(f?n(f[1]):'?')+' clicks were '
+      +'followed by an error in this period, but none of the '+row.ss.length
+      +' sampled sessions for this pair fall inside it. The sample is 20 per '
+      +'pair across the whole window; widen the period to reach them.';
+    return;
+  }
+  note.textContent=row.b+' on '+row.p+' — '+ss.length+' of '
+    +(f?n(f[1]):'?')+' affected sessions. Replays are kept for about 30 days, '
+    +'so older ones will not open.';
+  var hd=t.createTHead().insertRow();
+  ['Session','Date','Country','Replay'].forEach(function(h){
+    var th=document.createElement('th');th.textContent=h;hd.appendChild(th);});
+  var tb=t.createTBody();
+  ss.forEach(function(x){
+    var tr=tb.insertRow();
+    tr.appendChild(td(x.s.slice(0,8)+'\u2026'));
+    tr.appendChild(td('2026-'+x.d));
+    tr.appendChild(td(x.c));
+    var cell=document.createElement('td');
+    var a=document.createElement('a');
+    a.className='replay';a.textContent='Watch \u2192';
+    a.href=REPLAY+x.s;a.target='_blank';a.rel='noopener';
+    cell.appendChild(a);tr.appendChild(cell);
+  });
+}
+
+// --- first deposits by channel --------------------------------------------
+// Channel is the ENTRY referring domain, banded in the builder. This is
+// deliberately not the Streamer/SEO/Direct/Other rule from the ftd-channels
+// report: that one classifies the AFFILIATE behind a first deposit out of
+// Redash and can see things PostHog cannot. Same word, different question, so
+// the bands are named for what they are rather than borrowing those labels.
+//
+// Sources are first-touch and disjoint, so a person sits in exactly one band
+// and the bands foot to the site total -- the builder asserts it.
+//
+// FTD counts are absolute, so unlike every rate on this page they ARE
+// comparable across the 29 August tracking break.
+function channelTable(){
+  var t=document.getElementById('tchan'); if(!t) return;
+  var CH=D.channels||[];
+  if(!CH.length){t.innerHTML='<tbody><tr><td>no channel data</td></tr></tbody>';return;}
+  var months=D.months||[], ftd=function(a){return (a||[0,0,0,0,0])[4];};
+  // Follow the page's own month-span toggle. In MTD every month is trimmed to
+  // days 1-D.mtdDay, which is the only way September compares like-for-like:
+  // the window ends on the 2nd, so its whole-month column is two days against
+  // thirty-one and would otherwise read as the channel collapsing.
+  var useMtd=state.mtd, key=useMtd?'mtd':'m';
+  var lastMo=(D.window&&D.window.end||'').slice(0,7);
+  var endDay=Number((D.window&&D.window.end||'').slice(8,10));
+  // a month is partial when the window stops inside it
+  var partial=function(m){
+    if(useMtd||m!==lastMo) return false;
+    return endDay>0 && endDay<new Date(Number(m.slice(0,4)),
+                                       Number(m.slice(5,7)),0).getDate();
+  };
+  var mLab=function(m){
+    var base=MNAME[m]||m;
+    if(useMtd) return base+' 1–'+D.mtdDay;
+    return partial(m)?base+' 1–'+endDay:base;
+  };
+  var site=CH.reduce(function(s,c){return s+ftd(c.f);},0);
+  var monTot={};
+  months.forEach(function(m){
+    monTot[m]=CH.reduce(function(s,c){return s+ftd((c[key]||{})[m]);},0);});
+  var pc=function(v,d){ if(!d||!v) return '—';
+    var p=v/d*100; return p<1?'<1%':Math.round(p)+'%'; };
+
+  var h='<thead><tr><th>Channel</th><th>FTDs</th><th>Share</th>';
+  months.forEach(function(m){
+    h+='<th'+(partial(m)?' class="part"':'')+'>'+mLab(m)+'</th>';});
+  h+='</tr></thead><tbody>';
+  CH.forEach(function(c){
+    h+='<tr><td>'+c.c+'</td><td><b>'+n(ftd(c.f))+'</b></td>'
+      +'<td>'+pc(ftd(c.f),site)+'</td>';
+    months.forEach(function(m){
+      var v=ftd((c[key]||{})[m]);
+      // a share of the month, not of the row: the question is who brought the
+      // deposits in that month, which is what a column is for
+      h+= v ? '<td><b>'+n(v)+'</b><div class="mut">'+pc(v,monTot[m])+'</div></td>'
+            : '<td class="mut">—</td>';
+    });
+    h+='</tr>';
+  });
+  h+='<tr class="tot"><td>All channels</td><td><b>'+n(site)+'</b></td><td>100%</td>';
+  months.forEach(function(m){h+='<td><b>'+n(monTot[m])+'</b></td>';});
+  h+='</tr></tbody>';
+  t.innerHTML=h;
+
+  var self=CH.filter(function(c){return c.c==='Self-referred';})[0];
+  // The month columns will NOT sum to the FTDs column, and the difference is
+  // not a dropped row. The funnel is cumulative WITHIN a period, so a month
+  // counts someone only if they registered AND deposited inside it; anyone who
+  // registered in July and deposited in August belongs to neither month. Say
+  // the number out loud -- otherwise the first person to add the columns finds
+  // a mismatch against the headline and reasonably assumes the page is broken.
+  var monSum=months.reduce(function(s,m){return s+monTot[m];},0);
+  var carried=site-monSum;
+  var note=document.getElementById('cnote');
+  if(note) note.textContent=
+    'First deposits by the referring domain the visitor arrived on, and the '
+    +'month they deposited in. '
+    +(self ? 'Self-referred is '+pc(ftd(self.f),site)+' of them — the '
+      +'Cloudflare challenge strips the referrer before PostHog records it, so '
+      +'those deposits carry no usable channel. It is shown as its own band '
+      +'rather than spread across the others, so the bands add to the site '
+      +'total exactly instead of to a tolerance that would hide a gap. ' : '')
+    // Only meaningful on whole months. Under MTD the columns are 2 days out of
+    // each month, so of course they fall short of the window -- saying "3,995
+    // registered in one month and deposited in another" there would be an
+    // invented explanation for arithmetic that needs none.
+    +(!useMtd&&carried>0
+      ? 'The month columns add to '+n(monSum)+', not '+n(site)+': a month '
+        +'counts a person only if they registered and deposited inside it, and '
+        +n(carried)+' registered in one month and deposited in another. '
+      : '')
+    +(useMtd
+      ? 'Every month is trimmed to days 1–'+D.mtdDay+', so all five compare '
+        +'like for like. '
+      : (months.some(partial)
+        ? months.filter(partial).map(function(m){return MNAME[m]||m;}).join(', ')
+          +' is a partial month — the window ends on the '+endDay+' — so it is '
+          +'not comparable with the full months beside it. Switch Month span to '
+          +'MTD to trim them all to the same '+D.mtdDay+' days. '
+        : ''))
+    +'Counts are absolute, so these are comparable across the 29 August break.';
+}
+
+// --- the 29 August tracking break -----------------------------------------
+// Visitors are not comparable across this date: roughly 95,000 junk sessions a
+// day stopped being recorded, so step 1 collapses about 25x while registrations
+// and deposits carry on unchanged. Any ratio measured over a period that
+// straddles the date therefore moves for a reason that has nothing to do with
+// the product, and saying so on the page is the whole point of this banner.
+//
+// Only two selections actually straddle it: the full window, and whole-August.
+// Every other month sits wholly on one side, a single day cannot span anything,
+// and MTD is days 1-2, so MTD never straddles either.
+function breakSpans(){
+  if(!D.breakDay) return false;
+  if(isDay()) return false;
+  if(state.period==='all') return true;
+  return state.period===D.breakDay.slice(0,7) && !state.mtd;
+}
+function renderBreak(){
+  var el=document.getElementById('brk');
+  if(!el||!D.breakDay){if(el)el.style.display='none';return;}
+  var spans=breakSpans(), ratio=state.view==='ratio';
+  // there is no shared escape helper in this file, and the note is builder
+  // text rather than anything a viewer supplies, but it still goes through
+  // textContent rather than innerHTML so a future edit cannot make it markup
+  var esc=function(s){var d=document.createElement('span');d.textContent=s;
+                      return d.innerHTML;};
+  el.className='brk'+(spans&&ratio?' warn':'');
+  el.innerHTML=(spans&&ratio
+      ? '<span class="bt">Rates below span the break.</span>'
+      : '<span class="bt">Tracking break, 29 August.</span>')
+    +esc(D.breakNote||'')
+    +(spans&&ratio
+      ? ' This selection covers both sides of it, so the ratios shown mix two '
+        +'different visitor bases. Pick a single month, a day, or MTD to stay '
+        +'on one side, or switch to Numbers.'
+      : '');
+}
+
+function render(){renderBreak();buildPeriod();ratioTable();sourceTable();
+  channelTable();playerTable();
+  buildBtagCut();btagTable();errTable();errSessions();}
+
+// --- collapsible sections -------------------------------------------------
+// Each heading folds its own section away. Set up once, outside render(),
+// because render() replaces table contents and would otherwise reset the fold
+// on every period click.
+//
+// The choice is remembered per browser. localStorage throws outright in a few
+// contexts (private windows, blocked site data, thumbnail capture), so every
+// read and write is guarded and the page opens fully expanded when it fails --
+// a remembered fold is a convenience, never a thing the page depends on.
+function foldKey(id){return 'cf.open.'+id;}
+// Sections open COLLAPSED by default: the page is four long tables and opening
+// on all of them buries the controls. A stored '1' means this browser opened
+// that section deliberately, so the choice survives; anything else, including
+// localStorage throwing, falls back to collapsed.
+function readFold(id){
+  try{return localStorage.getItem(foldKey(id))==='1';}catch(e){return false;}
+}
+function writeFold(id,open){
+  try{localStorage.setItem(foldKey(id),open?'1':'0');}catch(e){}
+}
+function initSections(){
+  [].forEach.call(document.querySelectorAll('h2[data-sec]'),function(h){
+    var id=h.getAttribute('data-sec'), box=document.getElementById(id);
+    var tg=h.querySelector('.tg');
+    if(!box)return;
+    function apply(open){
+      box.style.display=open?'':'none';
+      tg.textContent=open?'−':'+';       // minus sign, not a hyphen
+      h.setAttribute('aria-expanded',open?'true':'false');
+    }
+    var open=readFold(id);
+    apply(open);
+    h.addEventListener('click',function(){
+      open=!open;apply(open);writeFold(id,open);
+    });
+  });
+}
+
+render();initSections();
+
+// btagTable and renderBreak are exported alongside render() so a test that only
+// inspects one table does not have to re-render all five sections of a 10 MB
+// page to do it. The campaign-footing test sweeps 136 periods x 2 views; via
+// render() that is 272 full rebuilds and the suite stops finishing.
+window.CF={D:D,state:state,render:render,selected:selected,
+  RATIOS:ratios,RAILS:RAILS,MIN_DEN:MIN_DEN,counts:counts,missing:missing,mins:mins,
+  applySort:applySort,BTAGS:BTAGS,btagBasis:btagBasis,ERRS:ERRS,
+  btagTable:btagTable,renderBreak:renderBreak,
+  ratioTable:ratioTable,sourceTable:sourceTable,channelTable:channelTable};
+})();
+</script>
+</body></html>

@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FTD Bonus Treatment Dashboard</title>
+<style>
+:root{--bg:#f6f7f5;--panel:#fff;--ink:#1b1f1d;--muted:#5f6b66;--line:#dfe4e1;
+--green:#2f7d5d;--green-bg:#e8f3ed;--red:#a83232;--chip:#eef1ef;--amber:#b8860b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:13.5px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:26px 20px 70px}
+header{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:10px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:12.5px}
+.strip{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.kpi{flex:1 1 130px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.kpi .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.kpi .val{font-size:18px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi .val.neg{color:var(--red)}
+.bar{display:flex;gap:10px;align-items:center;margin:14px 0 10px;flex-wrap:wrap}
+select{padding:6px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:var(--panel);color:var(--ink)}
+input[type=search],input[type=date]{padding:6px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:var(--panel);color:var(--ink)}
+input[type=search]{min-width:220px}
+input[type=date]{width:140px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button{border:none;background:transparent;padding:6px 13px;font:inherit;cursor:pointer;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--ink);color:#fff}
+.hint{color:var(--muted);font-size:12px}
+label.flabel{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
+.section{margin-top:26px}
+.section h2{font-size:14px;margin:0 0 8px;display:flex;align-items:baseline;gap:8px}
+.section h2 .note{font-size:11.5px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0}
+.scroll{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{padding:5px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:nth-child(-n+7),td:nth-child(-n+7){text-align:left}
+thead th{position:sticky;top:0;background:#fafbfa;border-bottom:1.5px solid var(--ink);
+ font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);cursor:pointer;user-select:none}
+thead th:hover{color:var(--ink)}
+thead th .dir{font-size:9px}
+tbody tr:hover{background:var(--chip)}
+td.neg{color:var(--red)} td.pos{color:var(--green)}
+td.hotb{color:var(--red);font-weight:600}
+tfoot td{font-weight:600;border-top:1.5px solid var(--ink);background:#fafbfa;border-bottom:none}
+.dim{color:var(--muted)}
+.pill{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;background:var(--chip);color:var(--muted)}
+.pill.crypto{background:#eef3fb;color:#2f5d9c}
+.pill.fiat{background:var(--green-bg);color:var(--green)}
+footer{margin-top:26px;font-size:12px;color:var(--muted);max-width:100ch}
+footer .warn{background:#fbeeee;border:1px solid #edcccc;border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#7a2a2a}
+code{background:var(--chip);padding:1px 5px;border-radius:3px;font-size:11.5px}
+tbody tr{cursor:pointer}
+.ovl{position:fixed;inset:0;background:rgba(20,25,22,.45);display:flex;align-items:flex-start;
+ justify-content:center;padding:36px 14px;z-index:50;overflow:auto}
+.pop{background:var(--panel);border-radius:10px;max-width:1160px;width:100%;
+ box-shadow:0 12px 44px rgba(0,0,0,.28);border:1px solid var(--line)}
+.pop .hd{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;
+ padding:12px 18px;border-bottom:1px solid var(--line);background:#fafbfa;border-radius:10px 10px 0 0}
+.pop .uname{font-weight:600;font-size:16px}
+.pop .x{margin-left:auto;cursor:pointer;border:1px solid var(--line);background:var(--panel);
+ border-radius:6px;font:inherit;padding:2px 10px;color:var(--muted)}
+.pop .x:hover{color:var(--ink)}
+.pop .tots{width:100%;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pop .tots b{color:var(--ink)}
+.pop .tots .bad{color:var(--red)} .pop .tots .good{color:var(--green)}
+.pop .scr{overflow-x:auto;padding:4px 10px 12px}
+.pop table{min-width:100%}
+.pop td.bname{text-align:left;position:sticky;left:0;background:var(--panel);
+ border-right:1.5px solid var(--ink);font-size:11.5px;max-width:290px;overflow:hidden;
+ text-overflow:ellipsis;white-space:nowrap}
+.pop td.bname .sum{color:var(--muted);font-size:10.5px}
+.pop td.bname.hot{color:var(--red);font-weight:600}
+.pop th.rowlab,.pop td.rowlab{text-align:left;position:sticky;left:0;background:var(--panel);
+ font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;
+ border-right:1.5px solid var(--ink)}
+.pop thead th.ftdcol{background:var(--green-bg);color:var(--green)}
+.pop td.ftdcol{background:var(--green-bg)}
+.pop .chk{color:var(--muted)} .pop .xf{color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>FTD bonus treatment dashboard</h1>
+  <div class="sub">Are our highest-value first-time depositors getting proper bonus treatment? Top/bottom 20 FTD cohorts by month, deposits vs. adjusted GGR vs. bonus cost. Redash (query 1732) + Smartico <code>j_bonuses</code>, life-to-date since FTD.</div>
+</header>
+
+<div class="bar">
+  <label class="flabel" for="month">Month</label>
+  <select id="month"></select>
+  <label class="flabel">Status</label>
+  <div class="seg" id="statusSeg">
+    <button data-v="All" class="on">All</button>
+    <button data-v="Active">Active</button>
+    <button data-v="Blocked">Blocked</button>
+  </div>
+  <label class="flabel" for="ftdFrom">FTD date</label>
+  <input type="date" id="ftdFrom" title="From date">
+  <input type="date" id="ftdTo" title="To date">
+  <input type="search" id="q" placeholder="filter across all three tables: name, country, aff…">
+</div>
+
+<div class="section">
+  <h2>Top 20 by deposits <span class="note">largest lifetime deposits since FTD</span></h2>
+  <div class="scroll"><table id="t-dep" data-view="td"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+</div>
+
+<div class="section">
+  <h2>Top 20 by adjusted GGR <span class="note">most profitable players in this cohort</span></h2>
+  <div class="scroll"><table id="t-ggr" data-view="tg"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+</div>
+
+<div class="section">
+  <h2>Bottom 20 by adjusted GGR <span class="note">most GGR-negative — "who's beating us"</span></h2>
+  <div class="scroll"><table id="t-neg" data-view="bg"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+</div>
+
+<footer>
+  <div class="warn"><b>Caveat.</b> "Active bonus" and the day-by-day grant timeline in the player detail come from Smartico's <code>j_bonuses</code> feed. High-value VIP packages issued manually by account managers outside Smartico (e.g. bespoke reload/cashback offers) never appear here — a whale showing few or no bonuses in this view may still have received off-system treatment. Cross-check any surprising zero against the account manager before concluding a player was neglected.</div>
+  <b>Definitions.</b> Metrics are life-to-date since FTD (the FTD is a player's first-ever deposit, so summing the full data window equals lifetime-since-FTD). Deposit / Deposit count / Adj GGR / Bonus cost all from Redash query 1732. Adj GGR is Redash's own adjusted figure, not derived by subtracting bonus cost. Rail (Fiat/Crypto) is the payment method on the player's first deposit row carrying a payment method. Aff name is the affiliate captured on the FTD-day row itself; blank shows as "Direct". Active bonus = count of Smartico bonus grants that reached REDEEMED status (bonus_status_id 3); Smartico's own cost field is unreliable in this warehouse (always books 0), so bonus cost shown is Redash's realized figure, while the grant/redemption timeline in the player detail comes from Smartico. Click any row to see the day-by-day breakdown of deposits, casino GGR and every bonus template touched.
+</footer>
+</div>
+
+<script>
+__DASHBOARD_DATA__
+</script>
+<script>
+(function(){
+  function eur(v){var s=v<0?"-":"";return s+"€"+Math.abs(v).toLocaleString("en-US",{maximumFractionDigits:0});}
+  function esc(t){var d=document.createElement("span");d.textContent=t;return d.innerHTML;}
+  function lab(dd){return dd.slice(0,2)+"-"+dd.slice(2);}
+  function norm(s){return s.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,14);}
+  var HOT=/iva's|150% deposit|vip transfer/i;
+
+  // ---- parse compact detail data ----
+  var daily={};
+  DAILY_STR.split("|").forEach(function(s){if(!s)return;var p=s.split(":");
+    (daily[p[0]]=daily[p[0]]||{})[p[1]]={dep:+p[2],n:+p[3],ggr:+p[4]};});
+  var costs={};
+  CDATA_STR.split("|").forEach(function(s){if(!s)return;var p=s.split("~");
+    (costs[p[0]]=costs[p[0]]||[]).push({dd:p[1],nm:CDICT[+p[2]]||("bonus "+p[2]),eur:+p[3]});});
+  var grants={};
+  GDATA_STR.split("|").forEach(function(s){if(!s)return;var p=s.split("~");
+    (grants[p[0]]=grants[p[0]]||[]).push({dd:p[1],nm:GDICT[+p[2]]||("bonus "+p[2]),cnt:+p[3],fail:+p[4]});});
+
+  // ---- month / status selectors ----
+  var monthSel=document.getElementById("month");
+  MONTHS.forEach(function(m){var o=document.createElement("option");o.value=m;o.textContent=m;monthSel.appendChild(o);});
+  monthSel.value=MONTHS[MONTHS.length-1];
+
+  var state={month:monthSel.value,status:"All",q:"",ftdFrom:"",ftdTo:"",
+    sort:{td:{k:"d",asc:false},tg:{k:"g",asc:false},bg:{k:"g",asc:true}}};
+
+  var COLS=[
+    {k:"u",label:"Player",left:true},
+    {k:"c",label:"Country",left:true},
+    {k:"a",label:"Aff name",left:true},
+    {k:"fd",label:"FTD date",left:true},
+    {k:"ld",label:"Last dep date",left:true},
+    {k:"ft",label:"FTD type",left:true},
+    {k:"d",label:"Deposit €",num:true},
+    {k:"dn",label:"Dep ×",num:true,dim:true},
+    {k:"g",label:"Adj GGR €",num:true},
+    {k:"bc",label:"Bonus cost €",num:true},
+    {k:"r",label:"Rail"},
+    {k:"bu",label:"Bonuses used",num:true},
+    {k:"ba",label:"Bonuses available",num:true},
+  ];
+
+  function buildHead(table){
+    var tr=document.createElement("tr");
+    tr.innerHTML="<th data-k='i'>#</th>"+COLS.map(function(c){return "<th data-k='"+c.k+"'>"+c.label+"</th>";}).join("");
+    table.querySelector("thead").innerHTML="";
+    table.querySelector("thead").appendChild(tr);
+  }
+  document.querySelectorAll("table").forEach(buildHead);
+
+  function railPill(r){return r==="C"?"<span class='pill crypto'>Crypto</span>":"<span class='pill fiat'>Fiat</span>";}
+
+  function renderTable(table, view){
+    var rows=(RANKS[state.month][state.status][view]||[]).slice();
+    var q=state.q.toLowerCase();
+    if(q) rows=rows.filter(function(r){return (r.u+" "+r.c+" "+r.a).toLowerCase().indexOf(q)>=0;});
+    if(state.ftdFrom || state.ftdTo) {
+      rows=rows.filter(function(r){
+        var fd=r.fd||"";
+        if(state.ftdFrom && fd<state.ftdFrom) return false;
+        if(state.ftdTo && fd>state.ftdTo) return false;
+        return true;
+      });
+    }
+    var srt=state.sort[view];
+    rows.sort(function(a,b){var x=a[srt.k],y=b[srt.k];
+      if(typeof x==="string"){x=x.toLowerCase();y=(y||"").toLowerCase();}
+      return (x<y?-1:x>y?1:0)*(srt.asc?1:-1);});
+    var h="";
+    rows.forEach(function(r,ix){
+      h+="<tr data-pid='"+r.p+"'><td class='dim'>"+(ix+1)+"</td>"
+        +"<td>"+esc(r.u)+"</td><td title='"+esc(r.c)+"'>"+esc(r.cc)+"</td><td>"+esc(r.a)+"</td>"
+        +"<td>"+r.fd+"</td><td>"+r.ld+"</td><td>"+esc(r.ft)+"</td>"
+        +"<td><b>"+eur(r.d)+"</b></td><td class='dim'>"+r.dn+"</td>"
+        +"<td class='"+(r.g<0?"neg":r.g>0?"pos":"dim")+"'>"+eur(r.g)+"</td>"
+        +"<td>"+(r.bc?eur(r.bc):"<span class='dim'>—</span>")+"</td>"
+        +"<td>"+railPill(r.r)+"</td>"
+        +"<td>"+(r.ab?r.ab:"<span class='dim'>—</span>")+"</td></tr>";
+    });
+    table.querySelector("tbody").innerHTML=h;
+    var t={d:0,g:0,bc:0,ab:0};
+    rows.forEach(function(r){t.d+=r.d;t.g+=r.g;t.bc+=r.bc;t.ab+=r.ab;});
+    table.querySelector("tfoot").innerHTML="<tr><td></td><td>"+rows.length+" players</td><td></td><td></td><td></td><td></td><td></td>"
+      +"<td>"+eur(t.d)+"</td><td></td>"
+      +"<td class='"+(t.g<0?"neg":"pos")+"'>"+eur(t.g)+"</td>"
+      +"<td>"+eur(t.bc)+"</td><td></td><td>"+t.ab+"</td></tr>";
+    table.querySelectorAll("thead th").forEach(function(th){
+      var d=th.querySelector(".dir"); if(d) d.remove();
+      if(th.dataset.k===srt.k) th.insertAdjacentHTML("beforeend"," <span class='dir'>"+(srt.asc?"▲":"▼")+"</span>");
+    });
+  }
+
+  var TABLES=[
+    {el:document.getElementById("t-dep"), view:"td"},
+    {el:document.getElementById("t-ggr"), view:"tg"},
+    {el:document.getElementById("t-neg"), view:"bg"},
+  ];
+
+  function renderAll(){
+    TABLES.forEach(function(t){renderTable(t.el, t.view);});
+  }
+
+  document.querySelectorAll("table").forEach(function(table){
+    table.querySelectorAll("thead th").forEach(function(){});
+    table.addEventListener("click", function(e){
+      var th=e.target.closest("th");
+      if(th){
+        var view=table.dataset.view, k=th.dataset.k;
+        if(k==="i") return;
+        var srt=state.sort[view];
+        if(srt.k===k) srt.asc=!srt.asc; else {srt.k=k; srt.asc=false;}
+        renderTable(table, view);
+        return;
+      }
+      var tr=e.target.closest("tbody tr");
+      if(tr) openModal(tr.dataset.pid);
+    });
+  });
+
+  monthSel.addEventListener("change", function(){state.month=monthSel.value; renderAll();});
+  document.getElementById("statusSeg").addEventListener("click", function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    document.querySelectorAll("#statusSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); state.status=b.dataset.v; renderAll();
+  });
+  document.getElementById("ftdFrom").addEventListener("change", function(e){state.ftdFrom=e.target.value; renderAll();});
+  document.getElementById("ftdTo").addEventListener("change", function(e){state.ftdTo=e.target.value; renderAll();});
+  document.getElementById("q").addEventListener("input", function(e){state.q=e.target.value; renderAll();});
+
+  renderAll();
+
+  // ---- player detail modal ----
+  function openModal(pid){
+    var meta=PMETA[pid]; if(!meta) return;
+    var dl=daily[pid]||{}, cs=costs[pid]||[], gr=grants[pid]||[];
+    var fdd=meta.fd.slice(5).replace("-","");
+    var days={}; days[fdd]=1;
+    Object.keys(dl).forEach(function(d){days[d]=1;});
+    cs.forEach(function(x){days[x.dd]=1;});
+    gr.forEach(function(x){days[x.dd]=1;});
+    var cols=Object.keys(days).sort();
+
+    var bon={};
+    function key(nm){var k=norm(nm);
+      for(var e in bon){if(e===k||e.indexOf(k.slice(0,10))===0||k.indexOf(e.slice(0,10))===0)return e;}
+      return k;}
+    cs.forEach(function(x){var k=key(x.nm);
+      if(!bon[k])bon[k]={nm:x.nm,tot:0,days:{},first:x.dd};
+      bon[k].nm=x.nm;
+      var c=bon[k].days[x.dd]||(bon[k].days[x.dd]={});
+      c.cost=(c.cost||0)+x.eur; bon[k].tot+=x.eur;
+      if(x.dd<bon[k].first)bon[k].first=x.dd;});
+    gr.forEach(function(x){var k=key(x.nm);
+      if(!bon[k])bon[k]={nm:x.nm,tot:0,days:{},first:x.dd};
+      var c=bon[k].days[x.dd]||(bon[k].days[x.dd]={});
+      c.iss=(c.iss||0)+x.cnt; if(x.fail)c.fail=1;
+      if(x.dd<bon[k].first)bon[k].first=x.dd;});
+    var blist=Object.keys(bon).map(function(k){return bon[k];})
+      .sort(function(a,b){return (b.tot-a.tot)||(a.first<b.first?-1:1);});
+
+    var tdep=0,tggr=0;
+    Object.keys(dl).forEach(function(d){tdep+=dl[d].dep;tggr+=dl[d].ggr;});
+    var tbc=0; cs.forEach(function(x){tbc+=x.eur;});
+    var sentCount=0; gr.forEach(function(x){sentCount+=x.cnt;});
+
+    var railTxt = meta.r==="C" ? "Crypto" : "Fiat";
+    var missionsTxt = (meta.am && meta.am.length) ? ' · Missions: '+meta.am.map(esc).join(', ') : '';
+    var h='<div class="pop"><div class="hd">'
+      +'<span class="uname">'+esc(meta.u)+'</span>'
+      +'<span class="meta" style="color:var(--muted);font-size:12px">'+esc(meta.c)+' · '+esc(meta.a)+' · '+railTxt+' · id '+pid+' · FTD '+meta.fd+' ('+esc(meta.ft)+')'+missionsTxt+'</span>'
+      +'<button class="x" type="button">close ✕</button>'
+      +'<span class="tots">deposits <b>'+eur(tdep)+'</b> · casino GGR <b class="'+(tggr<0?"bad":"good")+'">'+eur(tggr)+'</b> · bonuses sent <b>'+sentCount+'</b> · bonus cost <b'+(tbc>tdep*0.8&&tbc>20?' class="bad"':'')+'>'+eur(tbc)+'</b></span>'
+      +'<span class="tots" style="font-size:11px">legend: <b>€</b> real cost booked that day &nbsp;·&nbsp; <span class="chk">✓</span> bonus issued, no cost recorded &nbsp;·&nbsp; <span class="xf">✗</span> grant failed &nbsp;·&nbsp; <span style="color:var(--muted)">·</span> nothing that day &nbsp;·&nbsp; <span class="hot" style="color:var(--red)">red name</span> = manual VIP bonus, likely bypasses Smartico</span>'
+      +'</div><div class="scr"><table><thead><tr><th class="rowlab"></th>';
+    cols.forEach(function(d){h+='<th'+(d===fdd?' class="ftdcol"':'')+'>'+lab(d)+(d===fdd?' · FTD':'')+'</th>';});
+    h+='</tr></thead><tbody>';
+    h+='<tr><td class="rowlab">Deposits</td>';
+    cols.forEach(function(d){var x=dl[d];
+      h+='<td'+(d===fdd?' class="ftdcol"':'')+'>'+(x&&x.dep?'<b>'+eur(x.dep)+'</b><span class="dim"> ×'+x.n+'</span>':'<span class="dim">—</span>')+'</td>';});
+    h+='</tr><tr><td class="rowlab">Casino GGR</td>';
+    cols.forEach(function(d){var x=dl[d];
+      h+='<td'+(d===fdd?' class="ftdcol"':'')+'>'+(x&&x.ggr?'<span class="'+(x.ggr<0?"neg":"pos")+'">'+eur(x.ggr)+'</span>':'<span class="dim">—</span>')+'</td>';});
+    h+='</tr>';
+    blist.forEach(function(bo){
+      var hot=HOT.test(bo.nm);
+      h+='<tr><td class="bname'+(hot?' hot':'')+'" title="'+esc(bo.nm)+'">'+esc(bo.nm)
+        +(bo.tot>0?' <span class="sum">€'+bo.tot.toLocaleString("en-US")+'</span>':'')+'</td>';
+      cols.forEach(function(d){var c=bo.days[d];
+        h+='<td'+(d===fdd?' class="ftdcol"':'')+'>';
+        if(!c)h+='<span class="dim">·</span>';
+        else if(c.fail)h+='<span class="xf">✗</span>';
+        else if(c.cost!=null)h+='<b'+(hot?' class="neg"':'')+'>'+eur(c.cost)+'</b>';
+        else h+='<span class="chk">✓'+(c.iss>1?"×"+c.iss:"")+'</span>';
+        h+='</td>';});
+      h+='</tr>';});
+    if(!blist.length){
+      h+='<tr><td class="bname dim">no bonuses in window</td>';
+      cols.forEach(function(d){h+='<td'+(d===fdd?' class="ftdcol"':'')+'><span class="dim">·</span></td>';});
+      h+='</tr>';}
+    h+='</tbody></table></div></div>';
+
+    var ovl=document.createElement("div");
+    ovl.className="ovl"; ovl.innerHTML=h;
+    ovl.addEventListener("click",function(e){if(e.target===ovl)close();});
+    ovl.querySelector(".x").addEventListener("click",close);
+    function onKey(e){if(e.key==="Escape")close();}
+    function close(){document.removeEventListener("keydown",onKey);ovl.remove();}
+    document.addEventListener("keydown",onKey);
+    document.body.appendChild(ovl);
+  }
+})();
+</script>
+</body>
+</html>

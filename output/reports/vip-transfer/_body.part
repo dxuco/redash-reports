@@ -1,0 +1,201 @@
+</head>
+<body>
+
+<div class="wrap">
+<h1>VIP Transfer Performance</h1>
+<p class="note" style="margin:-10px 0 14px">
+  Every player who asked to transfer to us from another casino, measured before and after their
+  transfer. <span id="cohortNote"></span>
+</p>
+
+<div class="switch">
+  <button data-cohort="req" class="on">All transfer requests</button>
+  <button data-cohort="onb">VA-onboarded only</button>
+</div>
+
+<h2>Did the VA onboarding matter?<span class="sub">split on request date, so both groups are measured the same way</span></h2>
+<div class="scroll"><table id="tCov"></table></div>
+
+<h2 class="onlyTracked">By VA</h2>
+<div class="scroll onlyTracked"><table id="tVA"></table></div>
+
+<h2>Player detail<span class="sub" id="playerNote"></span></h2>
+<div class="scroll tall"><table id="tPlayers"></table></div>
+
+<h2 class="onlyTracked">By source casino</h2>
+<div class="scroll onlyTracked"><table id="tCas"></table></div>
+
+<h2>By request month</h2>
+<div class="scroll"><table id="tMonth"></table></div>
+</div>
+
+<script>
+const D = __DATA__;
+const eur = n => (n<0?'-':'') + '€' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const pct = n => (Math.abs(n)<1 && n!==0 ? '<1%' : Math.round(n)+'%');
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PROD = { 'Provably Fair':'PF', 'Live Casino':'LC' };
+
+let COHORT = 'req';
+const C   = () => D.cohorts[COHORT];
+const TAG = () => C().tag;
+
+/* A percentage off a base of near-zero is arithmetically true and practically
+   meaningless, so anything under EUR 10/month counts as coming from nothing. */
+const BASE_FLOOR = 10;
+function delta(before, after){
+  if(before <= 0 && after === 0) return {t:'—', c:'', v:-Infinity};
+  if(before <= 0) return before < 0 ? {t:'n/m', c:'mut', v:-Infinity}
+                                    : {t:'new', c:after>0?'pos':'neg', v:Infinity};
+  if(before < BASE_FLOOR && after > before)
+    return {t:'new', c:'pos', v:Infinity, title:`from only ${eur(before)}/mo`};
+  const p = 100*(after-before)/before, capped = Math.abs(p) > 999;
+  return {t:(capped ? (p>0?'>+999%':'<-999%') : (p>=0?'+':'')+pct(p)), c:p<0?'neg':'pos', v:p,
+          title: capped ? `exactly ${(p>=0?'+':'')+Math.round(p).toLocaleString('en-US')}%` : ''};
+}
+/* Bonus cost against adjusted GGR. Meaningless when the house is behind. */
+const bcRatio = (bc, adj) => adj > 0 ? pct(100*bc/adj) : 'n/m';
+const rate = (v, mo) => mo > 0 ? v/mo : 0;
+
+/* ---------- summary tables ---------- */
+function summaryTable(id, list, firstHead){
+  const head = `<thead><tr><th class="l">${firstHead}</th><th>Players</th><th>Deposited</th><th>No activity</th>
+    <th class="grp">Avg. Dep. Bef</th><th>Avg. Dep. Aft</th><th>Δ Dep</th>
+    <th class="grp">All-time Dep. Bef</th><th>All-time Dep. Aft</th>
+    <th class="grp">Avg. GGR Bef</th><th>Avg. GGR Aft</th><th>Δ GGR</th>
+    <th class="grp">All-time GGR Bef</th><th>All-time GGR Aft</th>
+    <th class="grp">BC / adj GGR Bef</th><th>BC / adj GGR Aft</th></tr></thead>`;
+  const money = (x,sign,g)=>`<td class="${sign&&x<0?'neg':''}${g?' grp':''}">${eur(x)}</td>`;
+  const row = (v, bold) => {
+    const dd = delta(v.bef_dep, v.aft_dep), dg = delta(v.bef_ggr, v.aft_ggr);
+    return `<tr${bold?' style="font-weight:600"':` class="pick" data-name="${esc(v.name)}"`}>`
+      + `<td class="l txt">${esc(v.name)}</td><td>${v.players}</td><td>${v.depositors}</td><td>${v.silent}</td>`
+      + money(v.bef_dep,false,1) + money(v.aft_dep,false) + `<td class="${dd.c}" title="${dd.title||''}">${dd.t}</td>`
+      + money(v.t_bef_dep,false,1) + money(v.t_aft_dep,false)
+      + money(v.bef_ggr,true,1) + money(v.aft_ggr,false) + `<td class="${dg.c}" title="${dg.title||''}">${dg.t}</td>`
+      + money(v.t_bef_ggr,true,1) + money(v.t_aft_ggr,true)
+      + `<td class="grp">${bcRatio(v.bef_bc, v.bef_adj)}</td><td>${bcRatio(v.aft_bc, v.aft_adj)}</td></tr>`;
+  };
+  const tot = Object.assign({}, C().total, {name:'Total'});
+  document.getElementById(id).innerHTML = head + '<tbody>' + list.map(v=>row(v,false)).join('') + '</tbody>'
+    + '<tfoot>' + row(tot, true) + '</tfoot>';
+}
+
+/* ---------- player table ---------- */
+const PCOLS = [
+  ['username','Player','l'],['ftd_date','FTD date','l'],['first_req','Requested','l'],
+  ['onboard','Onboarded','l'],['last_active','Last active','l'],['fav_product','Product','l'],
+  ['bef_dep','Avg. Dep. Bef','m'],['aft_dep','Avg. Dep. Aft','m'],['d_dep','Δ Dep','d'],
+  ['t_bef_dep','All-time Dep. Bef','t'],['t_aft_dep','All-time Dep. Aft','t'],
+  ['bef_ggr','Avg. GGR Bef','m'],['aft_ggr','Avg. GGR Aft','m'],['d_ggr','Δ GGR','d'],
+  ['t_bef_ggr','All-time GGR Bef','t'],['t_aft_ggr','All-time GGR Aft','t'],
+  ['bc_ratio','BC / adj GGR Aft','r']
+];
+const GRP = new Set(['bef_dep','t_bef_dep','bef_ggr','t_bef_ggr','bc_ratio']);
+const F = { va:'', casino:'', month:'' };
+let sortKey='aft_dep', sortDir=-1;
+
+const val = (r,k) => {              // resolve a display key against the active basis
+  const g = TAG();
+  if(k.startsWith('t_')) return r[g + '_' + k.slice(2)];
+  if(k.startsWith('bef_')||k.startsWith('aft_')) {
+    const side = k.slice(0,3), m = k.slice(4);
+    return rate(r[g+'_'+side+'_'+m], r[g+'_mo_'+(side==='bef'?'bef':'aft')]);
+  }
+  return r[k];
+};
+
+function visibleRows(){
+  let rs = COHORT==='onb' ? D.rows.filter(r=>r.tracked) : D.rows;
+  if(F.va)     rs = rs.filter(r=>r.va===F.va);
+  if(F.casino) rs = rs.filter(r=>r.casino===F.casino);
+  if(F.month)  rs = rs.filter(r=>r.req_month===F.month);
+  return rs;
+}
+
+function renderPlayers(){
+  const g = TAG();
+  let rs = visibleRows().slice();
+  const kind = (PCOLS.find(c=>c[0]===sortKey)||[])[2];
+  const sv = r => {
+    if(kind==='d'){ const b = sortKey==='d_dep'?'bef_dep':'bef_ggr', a = sortKey==='d_dep'?'aft_dep':'aft_ggr';
+                    return delta(val(r,b), val(r,a)).v; }
+    if(kind==='r'){ const adj = r[g+'_aft_adj']; return adj>0 ? r[g+'_aft_bc']/adj : -Infinity; }
+    return val(r, sortKey);
+  };
+  rs.sort((a,b)=>{
+    const x=sv(a), y=sv(b);
+    if(typeof x==='number'&&typeof y==='number') return (x-y)*sortDir;
+    return String(x||'').localeCompare(String(y||''))*sortDir;
+  });
+  const head = '<thead><tr>' + PCOLS.map(([k,l,c])=>
+    `<th class="${c==='l'?'l':''}${GRP.has(k)?' grp':''}" data-k="${k}">${l}${sortKey===k?(sortDir<0?' ▾':' ▴'):''}</th>`).join('') + '</tr></thead>';
+  const body = rs.map(r=>'<tr>' + PCOLS.map(([k,l,c])=>{
+    const gc = GRP.has(k) ? ' grp' : '';
+    if(c==='d'){
+      const b = k==='d_dep'?'bef_dep':'bef_ggr', a = k==='d_dep'?'aft_dep':'aft_ggr';
+      const x = delta(val(r,b), val(r,a));
+      return `<td class="${x.c}${gc}" title="${x.title||''}">${x.t}</td>`;
+    }
+    if(c==='r'){ const adj=r[g+'_aft_adj']; return `<td class="${gc.trim()}">${bcRatio(r[g+'_aft_bc'], adj)}</td>`; }
+    if(c==='m'||c==='t'){
+      const v = val(r,k), sign = k.includes('ggr');
+      const days = k.includes('bef') ? r[g+'_days_bef'] : r[g+'_days_aft'];
+      return `<td class="${sign&&v<0?'neg':''}${gc}" title="over ${days} days">${v===0?'—':eur(v)}</td>`;
+    }
+    let v = r[k];
+    if(k==='fav_product') return `<td class="l txt${gc}" title="${esc(v)}">${esc(PROD[v]||v)||'—'}</td>`;
+    if(k==='username')    return `<td class="l${gc}">${esc(v)}</td>`;
+    return `<td class="${c==='l'?'l':''}${gc}">${esc(v===''||v==null?'—':v)}</td>`;
+  }).join('') + '</tr>').join('');
+  document.getElementById('tPlayers').innerHTML = head + '<tbody>' + body + '</tbody>';
+  document.getElementById('playerNote').textContent =
+    rs.length.toLocaleString('en-US') + ' of ' + C().n.toLocaleString('en-US') + ' players'
+    + (F.va||F.casino||F.month ? ' — filtered' : '');
+  document.querySelectorAll('#tPlayers thead th').forEach(th=>th.onclick=()=>{
+    const k = th.dataset.k;
+    if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=-1; }
+    renderPlayers();
+  });
+}
+
+function bindPick(tableId, key){
+  document.querySelectorAll('#'+tableId+' tr.pick').forEach(tr=>{
+    const name = tr.dataset.name;
+    if(F[key] === name) tr.classList.add('on');
+    tr.onclick = () => {
+      const already = F[key] === name;
+      F.va=''; F.casino=''; F.month='';
+      if(!already) F[key] = name;
+      render();
+      const tp = document.getElementById('tPlayers');
+      if(!already && tp.scrollIntoView) tp.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+  });
+}
+
+function render(){
+  const c = C();
+  summaryTable('tCov',  D.coverage, 'Group');
+  summaryTable('tVA',   c.by_va,     'VA');
+  summaryTable('tCas',  c.by_casino, 'Source casino');
+  summaryTable('tMonth',c.by_month,  'Request month');
+  document.querySelectorAll('#tCov tr.pick').forEach(tr=>tr.classList.remove('pick'));
+  bindPick('tVA','va'); bindPick('tCas','casino'); bindPick('tMonth','month');
+  renderPlayers();
+  document.getElementById('cohortNote').innerHTML = COHORT==='req'
+    ? 'Showing all <b>' + D.rows.length.toLocaleString('en-US') + '</b> requesters, with history split on the date they first requested the transfer.'
+    : 'Showing the <b>' + c.n + '</b> players a VA onboarded, with history split on the onboarding date from the tracker sheet.';
+  document.querySelectorAll('.onlyTracked').forEach(el=>el.style.display = COHORT==='req' ? '' : '');
+}
+
+document.querySelectorAll('.switch button').forEach(b=>b.onclick=()=>{
+  COHORT = b.dataset.cohort;
+  document.querySelectorAll('.switch button').forEach(x=>x.classList.toggle('on', x===b));
+  F.va=''; F.casino=''; F.month='';
+  render();
+});
+render();
+</script>
+</body>
+</html>

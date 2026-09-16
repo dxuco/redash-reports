@@ -1,0 +1,371 @@
+Albania|2026-05|1|1|0|0
+Albania|2026-06|2|0|4|3
+Albania|2026-07|0|0|2|1
+Albania|2026-08|0|0|3|3
+Algeria|2026-05|0|0|1|0
+Algeria|2026-06|1|0|3|1
+Algeria|2026-07|0|0|1|0
+Algeria|2026-08|0|0|5|4
+Algeria|2026-09|1|0|0|0
+Angola|2026-06|0|0|2|0
+Argentina|2026-05|2|0|45|28
+Argentina|2026-06|6|0|169|77
+Argentina|2026-07|1|0|125|82
+Argentina|2026-08|2|1|52|31
+Armenia|2026-05|0|0|2|2
+Armenia|2026-06|0|0|1|1
+Armenia|2026-07|0|0|1|1
+Armenia|2026-08|1|0|3|3
+Australia|2026-05|6|2|11|3
+Australia|2026-06|14|6|22|7
+Australia|2026-07|12|4|17|8
+Australia|2026-08|5|0|7|3
+Australia|2026-09|0|0|1|0
+Austria|2026-05|3|2|5|5
+Austria|2026-06|7|4|14|11
+Austria|2026-07|15|9|19|15
+Austria|2026-08|8|4|32|27
+Azerbaijan|2026-07|0|0|1|1
+Azerbaijan|2026-08|0|0|1|0
+Bahrain|2026-07|1|0|0|0
+Belarus|2026-05|0|0|1|1
+Bolivia|2026-05|0|0|1|1
+Bolivia|2026-06|0|0|2|1
+Bolivia|2026-07|0|0|2|1
+Bolivia|2026-08|0|0|2|1
+Bosnia and Herzegovina|2026-05|0|0|2|1
+Bosnia and Herzegovina|2026-06|0|0|7|1
+Bosnia and Herzegovina|2026-07|6|1|39|4
+Bosnia and Herzegovina|2026-08|2|0|10|0
+Bosnia and Herzegovina|2026-09|0|0|1|0
+Brazil|2026-05|1|0|14|9
+Brazil|2026-06|6|1|41|35
+Brazil|2026-07|33|24|29|13
+Brazil|2026-08|16|14|47|18
+Brazil|2026-09|1|1|3|0
+Brunei|2026-08|0|0|1|0
+Bulgaria|2026-05|1|0|1|0
+Bulgaria|2026-06|1|0|1|1
+Bulgaria|2026-07|1|0|5|0
+Bulgaria|2026-08|1|0|1|0
+Cabo Verde|2026-06|1|0|1|0
+Cabo Verde|2026-08|1|0|0|0
+Cameroon|2026-07|0|0|2|0
+Canada|2026-05|8|2|11|8
+Canada|2026-06|14|2|31|22
+Canada|2026-07|12|3|48|35
+Canada|2026-08|8|3|30|16
+Canada|2026-09|0|0|1|0
+Chile|2026-05|1|0|12|3
+Chile|2026-06|1|0|71|61
+Chile|2026-07|1|0|18|9
+Chile|2026-08|0|0|16|15
+Chile|2026-09|0|0|1|1
+Colombia|2026-05|0|0|1|1
+Colombia|2026-06|0|0|3|2
+Colombia|2026-08|0|0|2|2
+Congo (DRC)|2026-05|0|0|1|0
+Cook Islands|2026-07|0|0|1|0
+Croatia|2026-05|1|0|2|0
+Croatia|2026-06|1|0|3|1
+Croatia|2026-07|2|1|4|1
+Croatia|2026-08|2|2|0|0
+Curaçao|2026-08|0|0|1|0
+Cyprus|2026-05|1|0|0|0
+Cyprus|2026-07|2|1|0|0
+Cyprus|2026-08|2|0|3|3
+Czechia|2026-05|1|1|6|4
+Czechia|2026-06|4|0|11|2
+Czechia|2026-07|5|2|6|1
+Czechia|2026-08|1|0|8|4
+Czechia|2026-09|2|0|2|0
+Denmark|2026-05|4|2|3|3
+Denmark|2026-06|25|12|12|7
+Denmark|2026-07|41|21|14|8
+Denmark|2026-08|43|22|8|6
+Denmark|2026-09|3|1|1|1
+Dominican Republic|2026-06|0|0|1|0
+Dominican Republic|2026-07|1|0|0|0
+Dominican Republic|2026-08|0|0|1|0
+Dominican Republic|2026-09|1|0|0|0
+Ecuador|2026-05|1|0|12|0
+Ecuador|2026-06|2|0|21|1
+Ecuador|2026-07|2|0|7|0
+Egypt|2026-05|0|0|1|0
+Egypt|2026-06|1|0|1|0
+Egypt|2026-07|1|0|3|2
+Egypt|2026-08|0|0|1|1
+El Salvador|2026-06|2|0|1|0
+El Salvador|2026-08|0|0|1|0
+Estonia|2026-06|0|0|1|1
+Estonia|2026-07|2|1|1|1
+Estonia|2026-08|1|1|0|0
+Ethiopia|2026-05|0|0|2|0
+Ethiopia|2026-06|0|0|7|2
+Ethiopia|2026-07|0|0|6|1
+Ethiopia|2026-08|0|0|6|2
+Finland|2026-05|0|0|14|14
+Finland|2026-06|2|1|9|7
+Finland|2026-07|34|20|19|13
+Finland|2026-08|13|6|10|7
+Finland|2026-09|0|0|2|1
+France|2026-05|1|1|2|1
+France|2026-06|0|0|1|1
+France|2026-07|0|0|7|5
+France|2026-08|0|0|4|1
+Georgia|2026-05|3|0|7|5
+Georgia|2026-06|17|0|17|15
+Georgia|2026-07|13|0|9|4
+Georgia|2026-08|9|0|7|2
+Georgia|2026-09|0|0|16|0
+Germany|2026-05|12|8|43|23
+Germany|2026-06|30|19|55|35
+Germany|2026-07|34|21|123|95
+Germany|2026-08|58|30|71|26
+Germany|2026-09|2|1|1|0
+Ghana|2026-07|0|0|1|0
+Greece|2026-05|2|2|2|1
+Greece|2026-06|0|0|2|2
+Greece|2026-07|1|0|2|1
+Greenland|2026-07|0|0|1|1
+Guadeloupe|2026-06|0|0|1|1
+Guam|2026-06|0|0|1|0
+Guatemala|2026-08|0|0|1|1
+Guinea|2026-07|0|0|1|0
+Guinea|2026-08|0|0|1|0
+Honduras|2026-06|0|0|2|0
+Honduras|2026-08|0|0|1|1
+Hong Kong|2026-05|0|0|1|1
+Hong Kong|2026-06|1|0|3|3
+Hong Kong|2026-07|0|0|3|2
+Hong Kong|2026-08|1|0|4|4
+Hungary|2026-05|4|4|6|1
+Hungary|2026-06|7|5|14|4
+Hungary|2026-07|12|8|32|23
+Hungary|2026-08|9|8|16|11
+Indonesia|2026-05|0|0|3|2
+Indonesia|2026-06|1|0|5|2
+Indonesia|2026-07|0|0|1|1
+Indonesia|2026-08|1|0|0|0
+Iraq|2026-06|1|0|1|0
+Ireland|2026-05|2|1|3|3
+Ireland|2026-06|7|2|13|11
+Ireland|2026-07|5|2|5|5
+Ireland|2026-08|8|6|4|2
+Israel|2026-05|3|0|9|9
+Israel|2026-06|4|0|11|10
+Israel|2026-07|2|0|2|2
+Israel|2026-08|1|0|8|5
+Israel|2026-09|0|0|1|1
+Italy|2026-05|1|1|4|4
+Italy|2026-06|0|0|2|1
+Italy|2026-07|2|1|7|4
+Italy|2026-08|4|0|3|3
+Italy|2026-09|1|1|0|0
+Ivory Coast|2026-05|0|0|1|0
+Ivory Coast|2026-06|1|0|4|3
+Ivory Coast|2026-07|0|0|1|1
+Jamaica|2026-07|0|0|1|1
+Japan|2026-05|0|0|12|12
+Japan|2026-06|3|0|6|4
+Japan|2026-07|6|0|11|7
+Japan|2026-08|0|0|4|4
+Jersey|2026-06|1|0|0|0
+Jordan|2026-06|0|0|1|1
+Jordan|2026-07|0|0|1|1
+Kazakhstan|2026-07|0|0|1|1
+Kenya|2026-05|0|0|1|0
+Kenya|2026-06|0|0|1|1
+Kosovo|2026-06|1|0|0|0
+Kosovo|2026-07|5|0|9|6
+Kosovo|2026-08|2|0|2|2
+Kuwait|2026-06|1|1|1|1
+Kuwait|2026-07|0|0|1|0
+Laos|2026-06|0|0|1|0
+Laos|2026-07|0|0|3|2
+Laos|2026-08|0|0|2|2
+Latvia|2026-06|0|0|2|1
+Latvia|2026-07|1|0|1|0
+Latvia|2026-08|0|0|2|2
+Lebanon|2026-05|0|0|2|1
+Lebanon|2026-06|1|0|3|2
+Lebanon|2026-07|0|0|2|2
+Lebanon|2026-08|0|0|1|1
+Lesotho|2026-06|0|0|1|0
+Libya|2026-06|0|0|1|1
+Lithuania|2026-05|7|5|4|2
+Lithuania|2026-06|3|0|10|6
+Lithuania|2026-07|11|7|11|4
+Lithuania|2026-08|5|4|5|4
+Luxembourg|2026-06|1|0|2|2
+Luxembourg|2026-07|1|0|1|1
+Luxembourg|2026-08|0|0|3|3
+Madagascar|2026-05|0|0|1|0
+Madagascar|2026-06|0|0|2|0
+Madagascar|2026-07|0|0|1|0
+Madagascar|2026-08|0|0|1|0
+Malaysia|2026-05|0|0|2|0
+Malaysia|2026-07|0|0|1|0
+Malaysia|2026-08|0|0|1|1
+Malaysia|2026-09|0|0|1|0
+Maldives|2026-06|2|0|7|3
+Maldives|2026-07|1|0|1|1
+Mali|2026-06|0|0|1|0
+Mali|2026-08|0|0|1|0
+Malta|2026-05|1|0|2|2
+Malta|2026-07|1|1|0|0
+Malta|2026-08|1|1|1|0
+Malta|2026-09|1|1|0|0
+Mauritania|2026-08|0|0|1|1
+Mexico|2026-05|1|0|7|7
+Mexico|2026-06|14|1|113|8
+Mexico|2026-07|4|1|6|3
+Mexico|2026-08|0|0|19|14
+Moldova|2026-05|0|0|1|1
+Moldova|2026-06|0|0|1|1
+Moldova|2026-07|0|0|1|1
+Moldova|2026-08|0|0|1|1
+Montenegro|2026-06|0|0|1|0
+Morocco|2026-06|0|0|7|5
+Morocco|2026-07|1|0|11|10
+Morocco|2026-08|1|0|18|18
+Mozambique|2026-06|0|0|1|0
+Myanmar|2026-07|1|0|1|0
+Namibia|2026-06|0|0|1|0
+Nepal|2026-06|0|0|1|0
+Nepal|2026-08|0|0|2|1
+Netherlands|2026-08|1|1|1|1
+New Zealand|2026-05|1|1|5|3
+New Zealand|2026-06|2|1|5|5
+New Zealand|2026-07|6|2|19|17
+New Zealand|2026-08|2|0|12|11
+Nigeria|2026-05|0|0|2|1
+Nigeria|2026-06|0|0|7|5
+Nigeria|2026-07|1|0|36|22
+Nigeria|2026-08|0|0|10|9
+Nigeria|2026-09|0|0|1|1
+Norway|2026-05|5|5|41|40
+Norway|2026-06|20|11|55|47
+Norway|2026-07|25|15|24|19
+Norway|2026-08|30|15|36|30
+Oman|2026-07|0|0|1|0
+Pakistan|2026-05|0|0|2|0
+Pakistan|2026-06|1|0|0|0
+Pakistan|2026-07|2|0|2|0
+Pakistan|2026-08|0|0|3|3
+Palestine|2026-08|0|0|1|0
+Panama|2026-07|0|0|1|1
+Papua New Guinea|2026-06|0|0|1|0
+Papua New Guinea|2026-07|0|0|1|0
+Paraguay|2026-05|0|0|1|1
+Paraguay|2026-06|3|0|22|1
+Paraguay|2026-07|3|0|24|4
+Paraguay|2026-08|0|0|1|1
+Peru|2026-05|1|0|6|0
+Peru|2026-06|1|0|11|1
+Peru|2026-07|1|0|5|1
+Peru|2026-08|0|0|4|2
+Philippines|2026-06|0|0|6|1
+Philippines|2026-07|1|0|14|6
+Philippines|2026-08|0|0|4|1
+Poland|2026-05|0|0|5|5
+Poland|2026-06|3|3|7|7
+Poland|2026-07|2|0|19|19
+Poland|2026-08|2|0|6|6
+Poland|2026-09|1|0|0|0
+Portugal|2026-05|16|16|161|159
+Portugal|2026-06|7|5|45|41
+Portugal|2026-07|6|5|34|32
+Portugal|2026-08|1|0|8|7
+Puerto Rico|2026-05|0|0|1|1
+Puerto Rico|2026-06|1|0|0|0
+Qatar|2026-07|1|0|1|1
+Romania|2026-05|2|1|13|1
+Romania|2026-06|7|5|19|6
+Romania|2026-07|7|5|37|4
+Romania|2026-08|13|10|14|9
+Romania|2026-09|0|0|1|1
+Russia|2026-06|0|0|3|3
+Russia|2026-08|1|1|1|0
+Rwanda|2026-06|0|0|1|0
+Saudi Arabia|2026-05|0|0|1|0
+Serbia|2026-05|0|0|5|2
+Serbia|2026-06|7|0|37|2
+Serbia|2026-07|5|0|26|6
+Serbia|2026-08|2|0|11|4
+Slovakia|2026-05|1|1|1|1
+Slovakia|2026-06|0|0|1|0
+Slovakia|2026-07|3|0|9|1
+Slovakia|2026-08|2|1|1|1
+Slovakia|2026-09|0|0|2|2
+Slovenia|2026-08|0|0|1|1
+Somalia|2026-05|0|0|1|1
+Somalia|2026-06|0|0|2|0
+South Africa|2026-05|1|0|13|0
+South Africa|2026-06|7|0|67|0
+South Africa|2026-07|8|0|29|0
+South Africa|2026-08|0|0|20|1
+South Africa|2026-09|0|0|1|0
+South Korea|2026-06|0|0|1|1
+South Sudan|2026-07|0|0|1|0
+Spain|2026-05|1|1|9|2
+Spain|2026-06|9|5|24|5
+Spain|2026-07|11|4|16|6
+Spain|2026-08|13|9|18|11
+Spain|2026-09|0|0|2|1
+Sri Lanka|2026-06|1|0|1|0
+Sri Lanka|2026-08|0|0|2|2
+Sweden|2026-05|8|4|20|18
+Sweden|2026-06|11|3|14|4
+Sweden|2026-07|17|6|32|20
+Sweden|2026-08|24|11|14|5
+Sweden|2026-09|2|2|1|1
+Switzerland|2026-05|1|1|4|4
+Switzerland|2026-06|3|1|6|4
+Switzerland|2026-07|1|1|6|6
+Switzerland|2026-08|1|1|6|5
+Taiwan|2026-06|1|0|0|0
+Tajikistan|2026-06|0|0|1|1
+Thailand|2026-06|0|0|1|0
+Thailand|2026-07|2|0|5|1
+Thailand|2026-08|0|0|1|1
+The Netherlands|2026-05|7|6|13|9
+The Netherlands|2026-06|9|6|15|7
+The Netherlands|2026-07|12|7|22|15
+The Netherlands|2026-08|12|5|21|16
+The Netherlands|2026-09|1|1|0|0
+Togo|2026-06|0|0|1|0
+Trinidad and Tobago|2026-06|0|0|2|1
+Tunisia|2026-06|0|0|3|3
+Tunisia|2026-07|1|0|5|1
+Tunisia|2026-08|1|0|1|1
+Türkiye|2026-06|1|0|8|8
+Türkiye|2026-07|3|0|9|7
+Türkiye|2026-08|2|0|3|2
+Türkiye|2026-09|0|0|1|0
+Uganda|2026-08|0|0|1|0
+Ukraine|2026-05|0|0|2|1
+Ukraine|2026-06|1|0|3|1
+Ukraine|2026-07|0|0|7|4
+Ukraine|2026-08|1|0|4|1
+United Kingdom|2026-05|11|0|11|10
+United Kingdom|2026-06|31|8|11|8
+United Kingdom|2026-07|2|1|1|1
+United Kingdom|2026-08|0|0|1|1
+United States|2026-05|15|1|53|26
+United States|2026-06|41|0|124|33
+United States|2026-07|53|0|131|62
+United States|2026-08|24|3|106|47
+United States|2026-09|0|0|3|1
+Uruguay|2026-06|1|0|11|8
+Uruguay|2026-08|0|0|6|6
+Uzbekistan|2026-08|0|0|1|1
+Venezuela|2026-06|0|0|9|0
+Venezuela|2026-07|2|0|9|2
+Venezuela|2026-08|0|0|2|1
+Vietnam|2026-05|0|0|2|2
+Vietnam|2026-06|0|0|5|4
+Vietnam|2026-07|0|0|5|5
+Vietnam|2026-08|0|0|5|4
+Zambia|2026-06|0|0|1|0
+Åland Islands|2026-08|2|1|0|0

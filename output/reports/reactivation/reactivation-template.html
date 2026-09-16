@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reactivation</title>
+<style>
+*{box-sizing:border-box}
+/* House palette — same names and values as theme.css, so this page sits beside
+   the Bonus Cost, FTD, Acquisition and Business Overview reports. */
+:root{
+ --dark-green:#0B6E3A;--green-hi:#0d7f43;--green-dk:#0a5a30;--sage:#4E9D5C;
+ --navy:#0F2A43;--slate:#5B7285;--light-green:#C0DD97;
+ --surface-1:#FFFFFF;--plane:#F4F6F5;--row-alt:#F3F7F3;--band:#E3F3E8;
+ --text-primary:#0F2A43;--text-secondary:#5B7285;--muted:#677181;
+ --grid:#E5E5E5;--axis:#C3CCD4;--border:#E5E5E5;--grey:#B7C3CF;--grey-3:#B8C0C8;
+ --warning:#E67E22;--critical:#C0392B;--good:#0B6E3A;--accent:#0B6E3A;
+ --panel:#FAFBF9;--divider:#D8DEE0;--bar-bg:#EEF1F4;
+ --heat-1:#E1EBE3;--heat-2:#C2D8C7;--heat-3:#A3C5AB;--heat-4:#84B28F;
+ --heat-5:#659F73;--heat-6:#468C57;--heat-7:#27793B;--heat-8:#0B5C2C;
+ --heat-ink:#243B4A;
+ --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color-scheme:light}
+body{margin:0;background:var(--plane);color:var(--text-primary);
+ font-family:var(--font-body);font-size:13px;line-height:1.45}
+.wrap{max-width:1800px;margin:0 auto;padding:18px 20px 48px}
+
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);color:#fff;
+ padding:1.6rem 20px 1.4rem; line-height: 1.45;}
+.cover-inner{max-width:1800px;margin:0 auto; min-height: 60px;}
+header{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+h1{font-size:1.55rem;font-weight:700;margin:0 0 .25rem;letter-spacing:-0.01em}
+.sub{color:var(--light-green);font-size:.86rem;margin:0;max-width:70ch}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctl-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+ color:var(--light-green);width:100%;margin:.5rem 0 -.2rem}
+.seg{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+ border-radius:20px;padding:2px}
+.seg button{appearance:none;border:0;background:transparent;color:#fff;font:inherit;font-weight:600;
+ font-size:12px;padding:5px 13px;border-radius:18px;cursor:pointer;white-space:nowrap}
+.seg button:hover{background:rgba(255,255,255,.16)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:700}
+.iconbtn{appearance:none;border:1.5px solid rgba(255,255,255,.6);background:rgba(255,255,255,.1);
+ color:#fff;font:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:20px;cursor:pointer}
+.iconbtn:hover{background:#fff;color:var(--dark-green)}
+.iconbtn[aria-pressed="true"]{background:#fff;color:var(--dark-green)}
+/* A control that cannot change anything says so, rather than looking live and
+   doing nothing when clicked. */
+.iconbtn[disabled]{opacity:.45;cursor:not-allowed;border-style:dashed}
+.iconbtn[disabled]:hover{background:rgba(255,255,255,.1);color:#fff}
+select.iconbtn{padding-right:8px}
+select.iconbtn option{color:var(--navy);background:#fff}
+
+h2{font-size:.95rem;font-weight:700;margin:0;letter-spacing:.01em;color:var(--navy)}
+.card{background:var(--surface-1);border-radius:8px;margin-top:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.chead{display:flex;align-items:center;gap:9px;background:var(--surface-1);color:var(--navy);
+ border-radius:8px 8px 0 0;padding:.7rem .9rem .6rem;border-bottom:1px solid var(--border)}
+.chead .filters{margin-left:auto;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.02em}
+.cbody{padding:.6rem .9rem 1rem}
+.note{font-size:11.5px;color:var(--muted);margin:.1rem 0 .7rem;max-width:110ch;line-height:1.5}
+.seg.dark{background:var(--plane);border:1px solid var(--border);margin-left:14px}
+.seg.dark button{color:var(--slate);font-size:11px;padding:4px 11px}
+.seg.dark button:hover{background:var(--band)}
+.seg.dark button[aria-pressed="true"]{background:var(--dark-green);color:#fff}
+
+/* the one scroll container the players table still needs */
+.mxbox{width:100%;overflow-x:auto}
+.selhdr{font-size:12px;color:var(--navy);font-weight:650;margin:0 0 .5rem}
+.selhdr .q{color:var(--muted);font-weight:500}
+
+table.tb{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+table.tb th,table.tb td{padding:.24rem .5rem;text-align:right;white-space:nowrap;
+ border-bottom:1px solid var(--border)}
+table.tb th:first-child,table.tb td:first-child{text-align:left}
+table.tb thead th{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--slate);
+ font-weight:650;border-bottom:1.5px solid var(--axis)}
+table.tb tbody tr:hover{background:var(--band)}
+table.tb tfoot td{font-weight:700;border-top:1.5px solid var(--axis);border-bottom:0}
+/* every column sorts; the active one says which way */
+table.tb thead th{cursor:pointer;user-select:none}
+table.tb thead th:hover{color:var(--dark-green)}
+table.tb thead th[aria-sort]{color:var(--dark-green)}
+table.tb thead th .arr{font-size:9px;margin-left:3px}
+/* the tie-break column is ordering too, just second */
+table.tb thead th .arr.tie{opacity:.42}
+.lim{font-size:11px;color:var(--muted);font-weight:500;display:inline-flex;align-items:center;gap:5px}
+.lim input{width:64px;font:inherit;font-size:11px;font-variant-numeric:tabular-nums;text-align:right;
+ border:1px solid var(--axis);border-radius:4px;padding:2px 5px;color:var(--navy);background:var(--surface-1)}
+.lim input:focus{outline:2px solid var(--sage);outline-offset:-1px}
+td.neg{color:var(--critical)}
+
+.foot{font-size:11px;color:var(--muted);margin-top:22px;line-height:1.6}
+.foot b{color:var(--navy)}
+
+/* cover band pinned to the business-overview benchmark */
+.cover h1{margin:0 0 .25rem;line-height:1.45}
+.cover .sub,.cover p{line-height:1.45}
+
+
+/* --- cover band: fixed height, see theme.css --cover-* ------------------- */
+.cover-inner{height:60px;min-height:60px;display:flex;align-items:center;
+  flex-wrap:nowrap;overflow:hidden;gap:14px}
+.cover-inner>*{min-width:0}
+.cover header{display:flex;flex-wrap:nowrap;align-items:center;gap:14px;
+  width:100%;justify-content:space-between;min-width:0;border:0;padding:0;margin:0}
+.cover h1,.cover p,.cover .sub,.cover .meta{white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%}
+.cover .controls,.cover .seg{flex:0 0 auto}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="cover-inner">
+<header>
+  <div>
+    <h1>Reactivation</h1>
+    <p class="sub" id="subline"></p>
+  </div>
+  <div class="controls">
+    <div class="ctl-label">Has not deposited in</div>
+    <div class="seg" id="segWin"></div>
+    <select class="iconbtn" id="selWin" aria-label="Has not deposited in"></select>
+    <div class="ctl-label">Blocked accounts</div>
+    <div class="seg" id="segBlocked">
+      <button data-b="0" aria-pressed="true">Excluded</button>
+      <button data-b="1" aria-pressed="false">Included</button>
+    </div>
+    <button class="iconbtn" id="bWhale" aria-pressed="false">Include whale</button>
+  </div>
+</header>
+</div></div>
+
+<div class="wrap">
+
+  <div class="card">
+    <div class="chead"><h2>Players</h2>
+      <div class="filters">
+        <label class="lim">Rows
+          <input id="rowLim" type="number" min="1" max="20000" step="50" value="50"
+                 title="How many rows to draw. The totals row always covers every player in the selection, drawn or not.">
+        </label>
+        <span id="topFilters"></span>
+      </div></div>
+    <div class="cbody">
+      <div class="mxbox"><table class="tb" id="top"></table></div>
+    </div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+const DATA = __DATA__;
+</script>
+
+<script>
+(function(){
+"use strict";
+const M = DATA.meta, AB = DATA.adpuBands, FB = DATA.freqBands, LK = DATA.lookups;
+const P = DATA.players, RATES = DATA.rates;
+
+// column indices into a player record
+const ID=0,NAME=1,CTRY=2,PROD=3,AFF=4,STAT=5,ADPU=6,DAYS=7,DEP=8,NET=9,DSD=10,
+      DMON=11,NGR=12,BC=13,WD=14,LD=15,WHALE=16,DEP90=17,ADJ=18,FTD=19,LBET=20,DSB=21;
+/* Long lists are capped for DRAWING only -- the footer totals always cover the
+   whole selection, or a cap would silently understate every figure. */
+const ROW_CAP = 2000;
+
+const BLOCKED = LK.status.indexOf("Blocked");
+/* More than one player can be carved out, so this is a list. The toggle is
+   live when ANY of them has gone quiet — asking about "the whale" made sense
+   while there was exactly one and stopped meaning anything the moment there
+   were two. */
+let _whaleRows;
+function whaleRows(){
+  if (_whaleRows === undefined) _whaleRows = P.filter(r => r[16] === 1);
+  return _whaleRows;
+}
+
+const state = { win:28, blocked:false, whale:false,
+                sortKey:"dsd", sortDir:1, limit:50 };
+
+/* ---------- formatting: one helper each, used everywhere ---------- */
+function money(v){
+  const n = Math.round(Math.abs(v));
+  const s = "$" + n.toLocaleString("en-US");
+  return v < 0 ? "-" + s : s;            // sign BEFORE the symbol
+}
+function moneyShort(v){
+  const a = Math.abs(v), sign = v < 0 ? "-" : "";
+  if (a >= 1e6) return sign + "$" + (a/1e6).toFixed(a >= 1e7 ? 0 : 1) + "m";
+  if (a >= 1e3) return sign + "$" + Math.round(a/1e3) + "k";
+  return sign + "$" + Math.round(a);
+}
+function num(v){ return Math.round(v).toLocaleString("en-US"); }
+/* Percentages are whole numbers, with <1% rather than 0% for a real small value. */
+function pct(v){
+  if (v === 0) return "0%";
+  if (v > 0 && v < 0.005) return "<1%";
+  return Math.round(v*100) + "%";
+}
+/* P(return) is the one place precision is the point: 2.0% and 0.6% are a
+   different decision, and both round to the same whole number. */
+function pct1(v){ return (v*100).toFixed(1) + "%"; }
+
+/* Probability a player this silent ever deposits again, from the measured
+   curve. Months, because the curve is measured at month granularity. */
+function pReturn(days){
+  const m = Math.max(1, Math.round(days/30.44));
+  if (RATES[m] !== undefined) return RATES[m];
+  const keys = Object.keys(RATES).map(Number);
+  const hi = Math.max.apply(null, keys), lo = Math.min.apply(null, keys);
+  return m > hi ? RATES[hi] : RATES[lo];
+}
+
+/* ---------- the cohort: one filter every panel reads from ---------- */
+function cohort(){
+  const w = state.win;              // 0 = every depositor, no lapse filter
+  const out = [];
+  for (let i=0;i<P.length;i++){
+    const r = P[i];
+    if (w > 0 && r[DSD] < w) continue;                 // still depositing
+    if (!state.whale && r[WHALE]) continue;
+    if (!state.blocked && r[STAT] === BLOCKED) continue;
+    out.push(r);
+  }
+  return out;
+}
+
+function bandOf(v, bands){
+  for (let i=0;i<bands.length;i++) if (v >= bands[i][0] && v < bands[i][1]) return i;
+  return -1;
+}
+
+
+
+/* ---------- the player list ---------- */
+/* bc / adj GGR: bonus cost as a share of adjusted GGR. Adjusted GGR sits on far
+   fewer rows than the other measures and can be zero or negative, so the ratio
+   only means anything when it is positive -- otherwise show a dash rather than
+   a number that looks real. */
+function bcRatio(r){
+  return r[ADJ] > 0 ? r[BC] / r[ADJ] : null;
+}
+
+/* One definition per column: label, how to read it, how to draw it, and whether
+   it is numeric. The header, the body and the sort all read from this, so a
+   column cannot end up sorting on one thing and displaying another. */
+const COLS = [
+  {k:"name",  label:"Player",            num:false, get:r=>r[NAME]||"",
+   cell:r=>r[NAME]||"&mdash;"},
+  {k:"id",    label:"ID",                num:true,  get:r=>Number(r[ID])||0,
+   cell:r=>r[ID]},
+  {k:"ctry",  label:"Country",           num:false, get:r=>r[CTRY]>=0?LK.country[r[CTRY]]:"",
+   cell:r=>r[CTRY]>=0?LK.country[r[CTRY]]:"&mdash;"},
+  {k:"stat",  label:"Status",            num:false, get:r=>r[STAT]>=0?LK.status[r[STAT]]:"",
+   cell:r=>{
+     if (r[STAT] < 0) return '<span style="color:var(--grey-3)">&mdash;</span>';
+     const v = LK.status[r[STAT]];
+     return v === "Blocked" ? '<span class="neg">Blocked</span>' : v;
+   }},
+  {k:"ftd",   label:"FTD date",          num:false, get:r=>r[FTD]||"",
+   cell:r=>r[FTD]||"&mdash;"},
+  {k:"ld",    label:"Last deposit",      num:false, get:r=>r[LD]||"",
+   cell:r=>r[LD]},
+  /* Last BET, not last deposit. A player can keep betting from a balance for
+     weeks after their last deposit -- still engaged, just not funding. The two
+     dates apart is the signal; only one of them is "gone quiet". */
+  {k:"lbet",  label:"Last bet",          num:false, get:r=>r[LBET]||"",
+   cell:r=>r[LBET] || '<span style="color:var(--grey-3)">&mdash;</span>'},
+  {k:"dep",   label:"Deposits (all)",    num:true,  get:r=>r[DEP],
+   cell:r=>money(r[DEP])},
+  {k:"adj",   label:"Adj GGR (all)",     num:true,  get:r=>r[ADJ],
+   cell:r=>'<span class="'+(r[ADJ]<0?'neg':'')+'">'+money(r[ADJ])+'</span>'},
+  {k:"bcr",   label:"BC / Adj GGR",      num:true,  get:r=>bcRatio(r),
+   cell:r=>{const b=bcRatio(r); return b===null?'<span style="color:var(--grey-3)">&mdash;</span>':pct(b);}},
+  {k:"days",  label:"Deposit days",      num:true,  get:r=>r[DAYS],
+   cell:r=>num(r[DAYS])},
+  /* "Days silent" was ambiguous once last-bet arrived -- silent on deposits or
+     on bets? Both are here now, named for what they actually measure. */
+  {k:"dsd",   label:"Days since deposit", num:true,  get:r=>r[DSD],
+   cell:r=>num(r[DSD])},
+  {k:"dsb",   label:"Days since bet",     num:true,  get:r=>r[DSB],
+   cell:r=>r[DSB]===null||r[DSB]===undefined
+     ? '<span style="color:var(--grey-3)">&mdash;</span>' : num(r[DSB])},
+  {k:"prod",  label:"Favourite product", num:false, get:r=>r[PROD]>=0?LK.product[r[PROD]]:"",
+   cell:r=>r[PROD]>=0?LK.product[r[PROD]]:"&mdash;"}
+];
+
+/* Days since deposit is a whole number, so hundreds of players tie on it. The
+   tie-break is what decides what you actually see: adjusted GGR descending puts
+   the most valuable player first inside each "silent N days" group. Without it
+   the order inside a tie is whatever the array happened to hold. */
+const TIEBREAK = "adj";
+
+function cmpBy(c, dir, a, b){
+  const va = c.get(a), vb = c.get(b);
+  // a missing value is not "zero" -- park those last whichever way we sort,
+  // or ascending fills the top with players who have no value at all
+  if ((va === null || va === undefined) && (vb === null || vb === undefined)) return 0;
+  if (va === null || va === undefined) return 1;
+  if (vb === null || vb === undefined) return -1;
+  if (c.num) return (va - vb) * dir;
+  return String(va).localeCompare(String(vb)) * dir;
+}
+
+function sortRows(rows){
+  const c = COLS.find(x=>x.k === state.sortKey) || COLS.find(x=>x.k === "dsd");
+  const t = COLS.find(x=>x.k === (c.k === TIEBREAK ? "dsd" : TIEBREAK));
+  const tDir = (c.k === TIEBREAK) ? 1 : -1;      // dsd ascending, adj descending
+  return rows.slice().sort((a,b)=>
+    cmpBy(c, state.sortDir, a, b) || cmpBy(t, tDir, a, b));
+}
+
+function renderTop(cohortRows){
+  const rows = cohortRows;
+  const sorted = sortRows(rows);
+  const limit = Math.max(1, state.limit|0);
+  const drawn = sorted.slice(0, limit);
+
+  let h = '<thead><tr>' + COLS.map(c=>{
+    const on = c.k === state.sortKey;
+    const tieKey = state.sortKey === TIEBREAK ? "dsd" : TIEBREAK;
+    const isTie = !on && c.k === tieKey;
+    const arrow = on
+      ? '<span class="arr">' + (state.sortDir < 0 ? "\u25bc" : "\u25b2") + '</span>'
+      : (isTie ? '<span class="arr tie">' + (tieKey === TIEBREAK ? "\u25bc" : "\u25b2") + '</span>' : '');
+    const tip = on ? 'Sorted by ' + c.label + '. Click to reverse.'
+              : isTie ? 'Breaking ties within ' + (COLS.find(x=>x.k===state.sortKey)||{}).label
+                        + '. Click to sort by ' + c.label + '.'
+              : 'Click to sort by ' + c.label;
+    return '<th data-k="'+c.k+'"' + (on ? ' aria-sort="'+(state.sortDir<0?'descending':'ascending')+'"' : '')
+         + ' title="'+tip+'">' + c.label + arrow + '</th>';
+  }).join("") + '</tr></thead><tbody>';
+
+  drawn.forEach(r=>{
+    h += '<tr>' + COLS.map(c=>'<td>'+c.cell(r)+'</td>').join("") + '</tr>';
+  });
+  h += '</tbody>';
+
+  // Totals cover the WHOLE selection, never only the drawn rows. The ratio is
+  // the WEIGHTED one (total bc / total adj), not the mean of the row ratios --
+  // averaging ratios would let a handful of tiny players outvote the big ones.
+  const tDep = rows.reduce((s,r)=>s+r[DEP],0);
+  const tAdj = rows.reduce((s,r)=>s+r[ADJ],0);
+  const tBc  = rows.reduce((s,r)=>s+r[BC],0);
+  const tRatio = tAdj > 0 ? tBc / tAdj : null;
+  // built from COLS so the footer can never drift out of step with the header
+  const FOOT = {dep: money(tDep),
+                adj: '<span class="'+(tAdj<0?'neg':'')+'">'+money(tAdj)+'</span>',
+                bcr: tRatio===null?'&mdash;':pct(tRatio),
+                name: num(rows.length)+' players'};
+  h += '<tfoot><tr>' + COLS.map(c=>'<td>'+(FOOT[c.k]||'')+'</td>').join("") + '</tr></tfoot>';
+
+  const el = document.getElementById("top");
+  el.innerHTML = h;
+
+  // clicking a header sorts by it; clicking the active one reverses.
+  // First click on a number is descending (biggest first), on text ascending.
+  el.querySelectorAll("thead th").forEach(th=>{
+    th.onclick = ()=>{
+      const k = th.dataset.k;
+      const c = COLS.find(x=>x.k === k);
+      if (state.sortKey === k) state.sortDir = -state.sortDir;
+      else { state.sortKey = k; state.sortDir = c.num ? -1 : 1; }
+      render();
+    };
+  });
+
+  const capped = rows.length > limit;
+  /* What the cohort IS used to sit on the matrix card's caption. With that card
+     gone the sentence has to live here, or the reader is looking at a player
+     count with nothing saying which players. */
+  const bits = [state.win === 0 ? "all depositors, no lapse filter"
+                                : state.win + "+ days silent",
+                state.blocked ? "blocked included" : "blocked excluded",
+                state.whale ? "whale included" : "whale excluded"];
+  document.getElementById("topFilters").innerHTML =
+    (capped ? "showing " + num(limit) + " of " + num(rows.length)
+            : num(rows.length) + " players")
+    + " &middot; " + bits.join(" &middot; ");
+}
+
+/* ---------- render ---------- */
+function render(){
+  const rows = cohort();
+  renderTop(rows);
+
+  /* A carved-out player can only be in a lapsed cohort if they have actually
+     gone quiet. The top depositor deposits most days, so the toggle is often
+     inert -- say that on the control instead of leaving a live-looking button
+     that does nothing. */
+  const wrs = whaleRows();
+  const lapsed = wrs.filter(r => r[DSD] >= state.win);
+  const wb = document.getElementById("bWhale");
+  wb.disabled = !lapsed.length;
+  const naming = rows => rows.map(r => r[NAME] || r[ID]).join(", ");
+  if (!lapsed.length){
+    wb.textContent = "Not lapsed";
+    wb.title = wrs.length
+      ? "Carved out: " + M.whale + ". None has gone quiet for " + state.win
+        + " days" + (wrs.length === 1 ? " (last deposit " + wrs[0][LD] + ")" : "")
+        + ", so there is nothing to include at this window."
+      : M.whale + " is not in the cache.";
+  } else {
+    wb.textContent = state.whale ? "Carved-out included" : "Include carved-out";
+    wb.title = naming(lapsed) + " " + (lapsed.length === 1 ? "is" : "are")
+             + " silent long enough to qualify at a " + state.win + "-day window.";
+  }
+
+}
+
+/* ---------- controls ---------- */
+function syncWin(){
+  [...document.querySelectorAll("#segWin button")].forEach(b=>
+    b.setAttribute("aria-pressed", String(Number(b.dataset.w) === state.win)));
+  document.getElementById("selWin").value = String(state.win);
+}
+function setWin(w){ state.win = w; syncWin(); render(); }
+
+DATA.windows.forEach(w=>{
+  const b = document.createElement("button");
+  b.dataset.w = w; b.textContent = w === 0 ? "All" : w + "d";
+  b.setAttribute("aria-pressed", String(w === state.win));
+  b.onclick = ()=> setWin(w);
+  document.getElementById("segWin").appendChild(b);
+});
+const sel = document.getElementById("selWin");
+DATA.windows.forEach(w=>{
+  const o = document.createElement("option");
+  o.value = String(w);
+  o.textContent = w === 0 ? "All depositors (no lapse filter)"
+                          : "Not deposited in " + w + " days";
+  sel.appendChild(o);
+});
+sel.onchange = ()=> setWin(Number(sel.value));
+
+/* The limit only trims what is DRAWN. The totals row always covers the whole
+   selection, or raising the limit would appear to change the totals. */
+const lim = document.getElementById("rowLim");
+lim.value = String(state.limit);
+lim.onchange = lim.oninput = ()=>{
+  const v = parseInt(lim.value, 10);
+  if (!isFinite(v) || v < 1) return;
+  state.limit = Math.min(v, 20000);
+  render();
+};
+
+function toggle(id, key, onLabel, offLabel){
+  const el = document.getElementById(id);
+  el.onclick = ()=>{
+    if (el.disabled) return;
+    state[key] = !state[key];
+    el.setAttribute("aria-pressed", String(state[key]));
+    if (onLabel) el.textContent = state[key] ? onLabel : offLabel;
+    render();
+  };
+}
+document.querySelectorAll("#segBlocked button").forEach(b=>{
+  b.onclick = ()=>{
+    state.blocked = b.dataset.b === "1";
+    document.querySelectorAll("#segBlocked button").forEach(o=>
+      o.setAttribute("aria-pressed", String(o === b)));
+    render();
+  };
+});
+toggle("bWhale","whale",null,null);   // label is set by render(), which knows if he qualifies
+
+document.getElementById("subline").textContent =
+  "Lapsed depositors from " + M.first_day + " to " + M.last_day + " · "
++ num(M.depositors) + " players who ever deposited · built " + M.generated;
+
+document.getElementById("foot").innerHTML =
+  "<b>ADPU</b> is average deposit per <b>deposit-day</b> (total deposits &divide; distinct days with a deposit); "
++ "columns count deposit days, not individual deposits. <b>deposit_count exists in only " + M.cal_months.length
++ " of " + M.months + " cached months</b>, so days is the only frequency measure spanning the history &mdash; where "
++ "both exist the ratio is <b>" + M.cal_tx_per_day + " transactions per deposit-day</b>, so read a &lsquo;1&rsquo; as "
++ "roughly " + M.cal_tx_per_day + " actual deposits and shift ADPU about one band lower for a true per-transaction figure. "
++ "&nbsp;<b>Adjusted GGR carries only " + M.adj_coverage + "% of the rows NGR does</b>, so that panel covers fewer "
++ "players than the others; it is summed exactly as query 1732 reports it and is <b>not</b> GGR minus bonus cost, "
++ "which is a different figure computed over a different scope. "
++ "&nbsp;<b>Net value</b> = lifetime NGR minus lifetime bonus cost. NGR is house-positive, so a positive figure "
++ "means the player was profitable to us. &nbsp;<b>Lapsed</b> is measured against " + M.last_day
++ ", the last day in the cache. &nbsp;<b>Lifetime means within these " + M.months + " months</b> &mdash; players "
++ "who deposited before " + M.first_day + " have their earlier history truncated, so these values are a floor. "
++ "&nbsp;<b>" + M.whale + "</b> excluded by default, per house convention. "
++ "&nbsp;Blocked accounts are excluded by default and need compliance sign-off before any outreach. "
++ "&nbsp;Source: query 1732 month caches in ftd-report/cache. Rebuild with build_reactivation.py "
++ "then make_reactivation_html.py &mdash; never edit the built HTML.";
+
+syncWin();
+render();
+
+// const is script-scoped and never reaches window -- hand it over explicitly
+window.OV = { DATA, state, cohort, render, setWin, whaleRows,
+              bcRatio, sortRows, cmpBy, COLS, TIEBREAK, ROW_CAP,
+              money, moneyShort, num, pct, pct1, pReturn, bandOf,
+              AB, FB, LK, BLOCKED,
+              cols:{ID,NAME,CTRY,PROD,AFF,STAT,ADPU,DAYS,DEP,NET,DSD,DMON,WHALE,DEP90,ADJ,NGR,BC,FTD,LBET,LD,DSB} };
+})();
+</script>
+</body>
+</html>

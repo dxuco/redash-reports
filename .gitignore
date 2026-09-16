@@ -1,0 +1,54 @@
+# Secrets & Configuration
+config.env
+config.env.local
+*.key
+*.pem
+
+# Sensitive Data
+bonus-groups.json
+data-exclusions.json
+affiliate-overrides.json
+
+# Generated Output
+output/data/
+output/cache/
+output/reports/*.html
+
+# Logs
+logs/
+*.log
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Backups & Temp
+*.bak
+*.tmp
+*.backup
+_to_delete/
+_cover-backup/
+_excluded-rows/
+_offline/
+_mcp-exports/
+_artifact/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large Files
+*.gz
+*.tar
+*.zip
+cloudflared.exe
+

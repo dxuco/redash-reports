@@ -1,0 +1,1218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIP Transfer — Manager View</title>
+<style>
+:root{
+  --bg:#f4f8f5; --panel:#ffffff; --ink:#12211a; --muted:#5a6f63; --line:#dce8e0;
+  --pre:#9db3a6; --post:#1f6f4a; --neg:#b3352c; --accent:#1f6f4a; --warn:#8a6d1f;
+  --chip:#e8f1eb; --colline:#e9f0eb; --shadow:0 1px 2px rgba(18,33,26,.06),0 1px 3px rgba(18,33,26,.05);
+}
+:root:not([data-theme="light"]) {}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e1512; --panel:#141d18; --ink:#e4efe8; --muted:#8fa79a; --line:#213029;
+  --pre:#5a7268; --post:#4fbf8b; --neg:#e0685c; --accent:#5fc99a; --warn:#c9a24e;
+  --chip:#1a2620; --colline:#1c2822; --shadow:none;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1512; --panel:#141d18; --ink:#e4efe8; --muted:#8fa79a; --line:#213029;
+  --pre:#5a7268; --post:#4fbf8b; --neg:#e0685c; --accent:#5fc99a; --warn:#c9a24e;
+  --chip:#1a2620; --colline:#1c2822; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:26px;margin:0 0 18px;letter-spacing:-.02em;color:var(--accent)}
+h2{font-size:16px;margin:34px 0 12px;letter-spacing:-.01em;color:var(--accent)}
+h2::before{content:'';display:inline-block;width:3px;height:13px;background:var(--accent);border-radius:2px;margin-right:9px;vertical-align:-1px}
+h2 .sub{font-weight:400;color:var(--muted);font-size:13px;margin-left:8px}
+/* The number sits in the accent bar's place, so a numbered heading lines up
+   with an unnumbered one. */
+h2 .num{display:inline-block;min-width:1.35em;color:var(--muted);font-weight:600}
+h2.fold{cursor:pointer;user-select:none}
+h2.fold:hover{opacity:.82}
+h2 .caretf{display:inline-block;width:9px;margin-left:9px;color:var(--muted);font-size:11px;
+           transform:rotate(90deg);transition:transform .15s}
+h2.shut .caretf{transform:rotate(0deg)}
+h2.shut{margin-bottom:10px}
+.sect{overflow:hidden}
+.sect[hidden]{display:none}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:16px 18px}
+.neg{color:var(--neg)}
+.mut{color:var(--muted)}
+.pos{color:var(--post)}
+tr.bench td{color:var(--muted);font-style:italic}
+.flash{border:1px solid var(--post);border-radius:9px;padding:11px 14px;margin:0 2px 14px;
+       background:var(--panel);font-size:13px}
+.flash.bad{border-color:var(--neg)}
+.addbox{margin:0 2px 18px}
+.addbox .mine{margin:9px 2px 0;font-size:12px;color:var(--muted);line-height:1.9}
+.addbox .pill{font-size:10.5px;border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--warn)}
+.addbox .mine form{display:inline}
+.addbox .mine button{background:none;border:0;color:var(--muted);text-decoration:underline;
+  padding:2px 5px;cursor:pointer;font:inherit;font-size:12px}
+.addbox .mine button:hover{color:var(--neg)}
+button.newp{font:inherit;font-size:13px;padding:8px 15px;border:0;border-radius:8px;
+  background:var(--accent);color:#fff;cursor:pointer}
+button.newp:hover{filter:brightness(1.08)}
+/* the new-player dialog reuses the drill-down modal's backdrop and sheet */
+#newModal .sheet{max-width:520px}
+.fgrid{display:grid;grid-template-columns:150px 1fr;gap:11px 14px;align-items:center;
+       padding:16px 20px 4px}
+.fgrid label{font-size:12.5px;color:var(--muted)}
+.fgrid input,.fgrid select{font:inherit;font-size:13px;padding:8px 10px;width:100%;
+  border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink)}
+.fgrid .hint{grid-column:2;font-size:11.5px;color:var(--muted);margin:-6px 0 2px}
+.factions{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px 18px}
+.factions button{font:inherit;font-size:13px;padding:8px 15px;border:0;border-radius:8px;cursor:pointer}
+.factions .go{background:var(--accent);color:#fff}
+.factions .cancel{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.card .v .of{font-size:13px;font-weight:400;color:var(--muted);letter-spacing:0}
+/* Rows belonging to one of the 25 VIP-transfer offers. The rail carries the
+   signal; the tint stays faint so the numbers keep their contrast in both
+   themes, and the code is boxed so it can be read off at a glance. */
+tr.vipb td{background:color-mix(in srgb, var(--post) 9%, transparent)}
+tr.vipb td:first-child{box-shadow:inset 3px 0 0 var(--post)}
+tr.vipb td.code{font-weight:700;color:var(--post)}
+.vipkey{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--post);
+        vertical-align:-1px;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12.5px;table-layout:auto}
+th,td{padding:6px 7px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+/* headers and the free-text columns wrap so the table fits without sideways scrolling */
+thead th{white-space:normal;line-height:1.25}
+tfoot td{font-weight:600;position:sticky;bottom:0;background:var(--panel);border-top:2px solid var(--line)}
+td.txt{white-space:normal;overflow-wrap:normal}
+/* rule only where one block of columns ends and the next begins */
+th.grp, td.grp{border-left:1px solid var(--colline)}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);font-weight:600;position:sticky;top:0;background:var(--panel);cursor:pointer;user-select:none}
+thead th.g{border-bottom:2px solid var(--line)}
+tbody tr:hover{background:var(--chip)}
+tr.pick{cursor:pointer}
+tr.pick.on{background:var(--chip);box-shadow:inset 3px 0 0 var(--accent)}
+tr.pick.on td:first-child{font-weight:600}
+.scroll{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.scroll table{width:100%}
+.tall{max-height:640px;overflow-y:auto}
+/* compact geometry for the long table */
+#tPlayers{font-size:12px}
+#tPlayers th,#tPlayers td{padding:3px 6px;line-height:1.25}
+#tPlayers thead th{font-size:10px;letter-spacing:.03em}
+.bar{height:6px;border-radius:3px;background:var(--post);display:inline-block;vertical-align:middle}
+.chip{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--chip);font-size:11px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px;align-items:center}
+select,input{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink)}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.note{color:var(--muted);font-size:12.5px;margin-top:10px;max-width:90ch}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin:2px 0 10px;flex-wrap:wrap}
+.sw{width:11px;height:11px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+svg{display:block;width:100%;height:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:12.5px}
+
+.switch{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:0 0 6px}
+.switch button{font:inherit;font-weight:600;font-size:12.5px;padding:7px 15px;border:0;background:var(--panel);color:var(--muted);cursor:pointer}
+.switch button.on{background:var(--accent);color:#fff}
+.switch button + button{border-left:1px solid var(--line)}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:18px 0 4px}
+.score .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.score .card.lead{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.score .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.score .v{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:3px;font-variant-numeric:tabular-nums}
+.score .d{font-size:12px;color:var(--muted);margin-top:3px}
+.checks{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 2px}
+.checks .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:2px}
+.dd{position:relative;display:inline-block}
+.dd > button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;cursor:pointer;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);
+  display:inline-flex;align-items:center;gap:8px}
+.dd > button:hover{border-color:var(--accent)}
+.dd.active > button{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dd .caret{opacity:.7;font-size:10px}
+.ddmenu{position:absolute;top:calc(100% + 4px);left:0;z-index:40;min-width:210px;max-height:320px;
+  overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);padding:4px}
+.ddmenu[hidden]{display:none}
+.ddmenu label{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:6px 9px;border-radius:7px;
+  cursor:pointer;user-select:none;color:var(--ink)}
+.ddmenu label:hover{background:var(--chip)}
+.ddmenu label.on{font-weight:600;color:var(--accent)}
+.ddmenu label span:first-of-type{flex:1}
+.ddmenu input{margin:0;accent-color:var(--accent)}
+.ddmenu .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.checks button{font:inherit;font-size:12px;font-weight:600;padding:5px 10px;border:1px solid var(--line);
+  border-radius:999px;background:transparent;color:var(--muted);cursor:pointer}
+.expo{font:inherit;font-size:12px;font-weight:600;padding:5px 12px;margin-left:12px;vertical-align:2px;
+  border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--accent);cursor:pointer}
+.expo:hover{border-color:var(--accent)}
+.modal{position:fixed;inset:0;background:rgba(8,16,12,.55);display:flex;align-items:center;
+  justify-content:center;padding:24px;z-index:50}
+.modal[hidden]{display:none}
+.sheet{background:var(--bg);border:1px solid var(--line);border-radius:12px;width:min(1120px,100%);
+  max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.mhead{display:flex;align-items:flex-start;gap:16px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.mhead h3{margin:0;font-size:17px;color:var(--accent);letter-spacing:-.01em}
+.msub{color:var(--muted);font-size:12.5px;margin-top:3px}
+.mhead button{margin-left:auto;font:inherit;font-size:22px;line-height:1;padding:2px 9px;cursor:pointer;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--muted)}
+.mhead button:hover{border-color:var(--accent);color:var(--accent)}
+.mbody{overflow:auto;padding:16px 20px 22px}
+.mbody h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  margin:20px 0 8px;font-weight:600}
+.mbody h4:first-of-type{margin-top:0}
+.mkpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:4px}
+.mkpi div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 11px}
+.mkpi .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.mkpi .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+#tPlayers tbody tr{cursor:pointer}
+tr.split td{border-top:2px solid var(--accent)}
+.pill2{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;background:var(--chip);color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<h1 id="pageTitle">VIP Transfer Performance</h1>
+<p class="note" id="asof" style="margin:-10px 2px 10px"></p>
+<p class="note" id="whoami" style="margin:0 2px 12px"></p>
+<div id="flash" class="flash" hidden></div>
+<div id="addPlayer" class="addbox" hidden></div>
+<div id="newModal" class="modal" hidden></div>
+
+
+<div class="switch" id="periodSwitch" style="margin-left:10px">
+  <button data-period="jul" class="on">requested since 1 Jul 2026</button>
+  <button data-period="all">all requests</button>
+</div>
+<div class="switch" id="basisSwitch" style="margin-left:10px">
+  <button data-basis="req" class="on">measure from the request</button>
+  <button data-basis="onb">measure from onboarding</button>
+</div>
+<div id="segFilter" class="checks"></div>
+
+<div id="score" class="score"></div>
+
+<p class="note" id="basisNote" style="margin:14px 2px -6px"></p>
+
+<h2>By manager<span class="sub">before and after cover the same number of days &mdash; a player who requested 10 days ago is measured on 10 days against 10</span></h2>
+<div class="scroll"><table id="tVA"></table></div>
+
+<h2>By segment<span class="sub">click a row to filter the player list</span></h2>
+<div class="scroll"><table id="tSeg"></table></div>
+
+<h2>Who deposited, and what they got<span class="sub">four offers in scope &mdash; 1925 cashback, 1941, 2034 and the wheel tiers &middot; deposit size, then free spins, then cashback &middot; click any box to list those players</span></h2>
+<div class="panel"><div id="tree"></div>
+</div>
+<h2>Bonus distribution<span class="sub">the 25 VIP-transfer offers only &mdash; a player can appear under several, so rows do not sum</span></h2>
+<div class="scroll" style="margin-top:14px"><table id="tBonusDist"></table></div>
+
+<h2>Contactable, by segment<span class="sub">Telegram linked, or a phone number on file &mdash; the warehouse has no WhatsApp flag</span></h2>
+<div class="scroll"><table id="tContact"></table></div>
+
+<h2>Player detail<span class="sub" id="playerNote"></span><span class="sub"> · click a row for full history</span><button id="csv" class="expo">Export CSV</button></h2>
+<div class="scroll tall"><table id="tPlayers"></table></div>
+
+<div id="modal" class="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mhead">
+      <div><h3 id="mTitle"></h3><div class="msub" id="mSub"></div></div>
+      <button id="mClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="mbody">
+      <div id="mKpi" class="mkpi"></div>
+      <h4>Bonuses received<span class="sub"> · code is the reward_config_family_id · <span class="vipkey"></span>VIP-transfer offer · newest 150</span></h4>
+      <div class="scroll" id="mBonusWrap"><table id="mBonus"></table></div>
+      <h4>Daily history</h4>
+      <div class="scroll tall"><table id="mDaily"></table></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const D = __DATA__;
+const eur = n => (n<0?'-':'') + '€' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const pct = n => (Math.abs(n)<1 && n!==0 ? '<1%' : Math.round(n)+'%');
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PROD = { 'Provably Fair':'PF', 'Live Casino':'LC' };
+/* VA names are the widest column in the summary tables, so show them as
+   Firstname_Initial. Two Giorgis share an initial, so the surname part grows
+   until every label is distinct. Bucket rows ("Not. Onb") keep their
+   wording. Built per render, since the VA list changes with the cohort. */
+function initialsMap(names){
+  const out = {}, byLabel = {};
+  const plain = n => /onboard|^Not\. Onb$|^Every other|^—/i.test(n)
+                     || String(n).trim().split(/\s+/).length < 2;
+  for(const n of names){
+    if(plain(n)) { out[n] = n; continue; }
+    const [first, ...rest] = String(n).trim().split(/\s+/);
+    const sur = rest.join('');
+    let len = 1, label;
+    do {
+      label = first + '_' + sur.slice(0, len).replace(/^./, c=>c.toUpperCase());
+      len++;
+    } while (byLabel[label] && byLabel[label] !== n && len <= sur.length);
+    byLabel[label] = n; out[n] = label;
+  }
+  return n => out[n] || n;
+}
+
+/* The population switcher is gone: the page always covers every transfer
+   requester, split on the request date. The onboarded-only and never-onboarded
+   views, and with them the onboarding-date split, are still built by the
+   builder (cohorts onb / non / onb_o) if they are ever wanted back. */
+const POP = 'all';
+const DEFAULT_PERIOD = 'jul';
+// Empty means every segment. Naming them froze the page at whatever segments
+// existed the day this was written -- 8 players had already fallen outside the
+// list, so the tree said 583 and the player table said 575.
+const DEFAULT_SEGMENTS = [];
+let PERIOD = DEFAULT_PERIOD;
+/* Which event the before/after windows hang off.
+
+   "req"  every requester, measured either side of the day they asked.
+   "onb"  only the players a VA actually onboarded, measured either side of the
+          onboarding date. It cannot include anyone else: a player no VA touched
+          has no onboarding date to split on, and silently falling back to the
+          request date would put two different events in one column. So the
+          onboarding view is a smaller cohort as well as a different split, and
+          the page says so next to the switch. */
+let BASIS = 'req';
+
+/* ---------- who is looking ----------
+
+   The Cloudflare Worker already checks a username and password before it serves
+   anything, so the page does not do authentication -- it only needs to know WHO
+   got through. The Worker will inject that as window.__VIEWER; until it does,
+   ?as=<name> stands in, which is also how you check what a manager sees.
+
+   IMPORTANT: this scopes the VIEW, not the DATA. The whole cohort is still in
+   the file, so a determined viewer can read every player out of it. It keeps a
+   manager on their own book; it does not keep them out of anyone else's. Real
+   separation means the Worker serving each manager a different, smaller file.
+
+   An account maps to a VA by first name, case-insensitively: the login list uses
+   "Lizi" and the tracker sheet says "Lizi Utiashvili". A name that matches no VA
+   -- Davit, viewer, spare -- sees everything, which is what the office accounts
+   need. */
+const VIEWER = (function(){
+  const q = new URLSearchParams(location.search).get('as');
+  return (q || window.__VIEWER || '').trim();
+})();
+function viewerVA(){
+  /* An explicit scope, set on the admin page and handed over as
+     __VIEWER_SCOPE, is the answer whenever there is one. The first-name guess
+     below only covers accounts created before scopes existed -- and it refuses
+     to guess when a first name matches two VAs, because showing one Giorgi the
+     other Giorgi's book would be worse than showing nothing. */
+  const set = (window.__VIEWER_SCOPE || '').trim();
+  if(set) return set;
+  if(!VIEWER) return '';
+  const first = VIEWER.toLowerCase().split(/[\s_]+/)[0];
+  const names = [...new Set(D.rows.map(r => r.va).filter(Boolean))];
+  const hit = names.filter(n => String(n).toLowerCase().split(/\s+/)[0] === first);
+  return hit.length === 1 ? hit[0] : '';
+}
+let SCOPE = '';        // the VA this session is locked to, '' for the full book
+const KEY = () => BASIS === 'onb' ? 'onb_o' : 'all';
+const P   = () => D.periods[PERIOD];
+const C   = () => P()[KEY()];
+const TAG = () => C().tag;
+
+/* A percentage off a base of near-zero is arithmetically true and practically
+   meaningless, so anything under EUR 10/month counts as coming from nothing. */
+const BASE_FLOOR = 10;
+function delta(before, after){
+  if(before <= 0 && after === 0) return {t:'—', c:'', v:-Infinity};
+  if(before <= 0) return before < 0 ? {t:'n/m', c:'mut', v:-Infinity}
+                                    : {t:'new', c:after>0?'pos':'neg', v:Infinity};
+  if(before < BASE_FLOOR && after > before)
+    return {t:'new', c:'pos', v:Infinity, title:`from only ${eur(before)}/mo`};
+  const p = 100*(after-before)/before, capped = Math.abs(p) > 999;
+  return {t:(capped ? (p>0?'>+999%':'<-999%') : (p>=0?'+':'')+pct(p)), c:p<0?'neg':'pos', v:p,
+          title: capped ? `exactly ${(p>=0?'+':'')+Math.round(p).toLocaleString('en-US')}%` : ''};
+}
+/* Bonus cost against adjusted GGR. Meaningless when the house is behind. */
+const bcRatio = (bc, adj) => adj > 0 ? pct(100*bc/adj) : 'n/m';
+/* Never project. The /mo columns divide by the months of exposure, but the
+   divisor is floored at one month -- so a player 17 days in reports what they
+   actually deposited, not what a full month would have looked like. Once past a
+   month the figure becomes a true monthly average. */
+const MONTH_FLOOR = 1;
+/* Dates as "11 Aug", with a 2-digit year only when it is not the current one.
+   The year cannot simply be dropped: FTD dates reach back to 2015 and requests
+   start in Aug 2025, so a bare "11 Aug" would silently claim this year. */
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const THIS_YEAR = String(D.today).slice(0, 4);
+function shortDate(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ''));
+  if(!m) return s || '';
+  const [ , y, mo, dd ] = m;
+  return (+dd) + ' ' + MON[+mo - 1] + (y === THIS_YEAR ? '' : ' ' + y.slice(2));
+}
+/* The player table is 18 columns wide, so money is abbreviated there and the
+   exact figure moves to the tooltip. Summary tables keep full numbers -- they
+   have ten rows, not four hundred, and the precision is worth the width. */
+function shortEur(n){
+  const a = Math.abs(n), s = n < 0 ? '-' : '';
+  if(a === 0)      return '—';
+  if(a >= 1e6)     return s + '€' + (a/1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M';
+  if(a >= 1e4)     return s + '€' + Math.round(a/1e3) + 'k';
+  if(a >= 1e3)     return s + '€' + (a/1e3).toFixed(1) + 'k';
+  return s + '€' + Math.round(a);
+}
+const rate = (v, mo) => mo > 0 ? v/Math.max(mo, MONTH_FLOOR) : 0;
+
+/* ---------- summary tables ----------
+
+   The published page reads pre-aggregated groups out of the data file. This one
+   recomputes them in the browser from the rows currently visible, so a manager's
+   By segment and By month tables cover their players and nobody else's -- and so
+   the segment picker and the tree filter reach the summaries too, which on the
+   published page they never did. Mirrors agg()/group() in build_vip_transfer.py:
+   totals are sums, the /user columns are those totals over head count. */
+const MONEY = ['dep','ggr','ngr','bc','adj'];
+function aggRows(rs, tag){
+  const n = rs.length || 1;
+  const o = { players: rs.length,
+              depositors: rs.filter(r => r[tag+'_aft_dep'] > 0).length,
+              silent: rs.filter(r => r[tag+'_aft_dep'] === 0 && r[tag+'_aft_ggr'] === 0).length };
+  for(const m of MONEY){
+    const b = rs.reduce((a,r)=>a + (r[tag+'_bef_'+m]||0), 0);
+    const a2 = rs.reduce((a,r)=>a + (r[tag+'_aft_'+m]||0), 0);
+    o['t_bef_'+m] = b;  o['t_aft_'+m] = a2;
+    o['bef_'+m]   = b/n; o['aft_'+m]  = a2/n;
+  }
+  return o;
+}
+function groupRows(rs, key, tag){
+  const by = new Map();
+  for(const r of rs){ const k = r[key] || '—'; (by.get(k) || by.set(k, []).get(k)).push(r); }
+  return [...by].map(([name, v]) => Object.assign({ name }, aggRows(v, tag)))
+                .sort((x, y) => y.t_aft_dep - x.t_aft_dep);
+}
+
+/* ---------- summary tables ---------- */
+function summaryTable(id, list, firstHead, shortName){
+  /* The /user columns are the group total over its head count. With before and
+     after spanning the same days for everyone, that is the only division that
+     adds anything: it separates a VA with a few big players from one with many
+     small ones. */
+  const head = `<thead><tr><th class="l">${firstHead}</th><th>Players</th><th>Deposited</th>
+    <th class="grp">Dep. Bef</th><th>Dep. Aft</th>
+    <th class="grp">Dep. Bef /user</th><th>Dep. Aft /user</th><th>Δ Dep</th>
+    <th class="grp">GGR Bef</th><th>GGR Aft</th>
+    <th class="grp">GGR Bef /user</th><th>GGR Aft /user</th><th>Δ GGR</th>
+    <th class="grp">BC / adj GGR Bef</th><th>BC / adj GGR Aft</th></tr></thead>`;
+  const money = (x,sign,g)=>`<td class="${sign&&x<0?'neg':''}${g?' grp':''}">${eur(x)}</td>`;
+  const row = (v, bold) => {
+    const dd = delta(v.bef_dep, v.aft_dep), dg = delta(v.bef_ggr, v.aft_ggr);
+    // the benchmark line is context, not something to filter the page by
+    return `<tr${bold ? ' style="font-weight:600"'
+              : v.benchmark ? ' class="bench"'
+              : ` class="pick" data-name="${esc(v.name)}"`}>`
+      + `<td class="l txt"${shortName?` title="${esc(v.name)}"`:''}>${esc(shortName ? shortName(v.name) : v.name)}</td><td>${v.players}</td><td>${v.depositors}</td>`
+      + money(v.t_bef_dep,false,1) + money(v.t_aft_dep,false)
+      + money(v.bef_dep,false,1) + money(v.aft_dep,false)
+      + `<td class="${dd.c}" title="${dd.title||''}">${dd.t}</td>`
+      + money(v.t_bef_ggr,true,1) + money(v.t_aft_ggr,true)
+      + money(v.bef_ggr,true,1) + money(v.aft_ggr,true)
+      + `<td class="${dg.c}" title="${dg.title||''}">${dg.t}</td>`
+      + `<td class="grp">${bcRatio(v.bef_bc, v.bef_adj)}</td><td>${bcRatio(v.aft_bc, v.aft_adj)}</td></tr>`;
+  };
+  // sum the rows on show, not the packed cohort total: with the page scoped to
+  // one manager the packed figure is the whole book and the footer would
+  // contradict every row above it
+  const tot = Object.assign({name:'Total'}, aggRows(visibleRowsForSummaries(), TAG()));
+  document.getElementById(id).innerHTML = head + '<tbody>' + list.map(v=>row(v,false)).join('') + '</tbody>'
+    + '<tfoot>' + row(tot, true) + '</tfoot>';
+}
+
+/* ---------- player table ---------- */
+const PCOLS = [
+  ['username','Player','l'],['player_id','ID',''],['ftd_date','FTD date','l'],['first_req','Requested','l'],
+  ['onboard','Onboarded','l'],['last_active','Last active','l'],['aff','Affiliate','l'],
+  ['days_aft','Days after',''],   // label rewritten per basis in renderPlayers
+  // One row is one player, so a per-player column would just repeat the total.
+  ['t_bef_dep','Dep. Bef','t'],['t_aft_dep','Dep. Aft','t'],['d_dep','Δ Dep','d'],
+  ['t_bef_ggr','GGR Bef','t'],['t_aft_ggr','GGR Aft','t'],['d_ggr','Δ GGR','d'],
+  ['bc_ratio','BC/adjGGR','r']
+];
+const GRP = new Set(['t_bef_dep','t_bef_ggr','bc_ratio']);
+const F = { va:'', month:'', offer:'', tree:null, treeLabel:'',
+            segments:new Set(DEFAULT_SEGMENTS) };
+let KEEP_SEG_OPEN = false;
+let sortKey='t_aft_dep', sortDir=-1;
+let LAST = { rows: [], cols: [] };   // what the table is currently showing, for the CSV
+
+const val = (r,k) => {              // resolve a display key against the active basis
+  const g = TAG();
+  if(k === 'days_aft') return r[g + '_days_aft'];
+  if(k.startsWith('t_')) return r[g + '_' + k.slice(2)];
+  if(k.startsWith('bef_')||k.startsWith('aft_')) {
+    const side = k.slice(0,3), m = k.slice(4);
+    return rate(r[g+'_'+side+'_'+m], r[g+'_mo_'+(side==='bef'?'bef':'aft')]);
+  }
+  return r[k];
+};
+
+/* The tree's boxes are cuts of the player list, so clicking one has to
+   reproduce the same cut here. Kept next to visibleRows on purpose: if a bucket
+   in the builder changes, this is the other half that must change with it. */
+function treeMatch(r, q){
+  if('onb' in q && !!r.tracked !== !!q.onb) return false;
+  if('dep' in q && !!r.dep1  !== !!q.dep) return false;
+  if('big' in q && !!r.big   !== !!q.big) return false;
+  if('tfs' in q && !!r.tfs   !== !!q.tfs) return false;
+  if(q.src){
+    const wheel = !!r.fswheel, o1941 = !wheel && !!r.fs1941;
+    if(q.src === 'wheel' && !wheel) return false;
+    if(q.src === 'o1941' && !o1941) return false;
+    if(q.src === 'o2034' && (wheel || o1941)) return false;
+  }
+  if(q.nof){
+    const held = !!r.hd1941 || !!r.hd2034;
+    if(q.nof === 'held' && !held) return false;
+    if(q.nof === 'none' &&  held) return false;
+  }
+  if(q.cb){
+    const got = !!r.cb, held = !got && !!r.hdcb;
+    if(q.cb === 'got'  && !got)  return false;
+    if(q.cb === 'held' && !held) return false;
+    if(q.cb === 'none' && (got || held)) return false;
+  }
+  return true;
+}
+
+function visibleRows(){
+  let rs = D.rows;
+  if(PERIOD==='jul') rs = rs.filter(r => r.first_req >= D.since);
+  if(BASIS==='onb')  rs = rs.filter(r => r.tracked && r.onboard);
+  if(SCOPE)          rs = rs.filter(r => r.va === SCOPE);
+  if(F.segments.size) rs = rs.filter(r=>F.segments.has(r.segment||'—'));
+  if(F.va)     rs = rs.filter(r=>r.va_group===F.va);
+  if(F.month)  rs = rs.filter(r=>r.req_month===F.month);
+  if(F.offer)  rs = rs.filter(r=>(r.tbf||[]).some(f => D.tb_names[f[0]] === F.offer));
+  if(F.tree)   rs = rs.filter(r=>treeMatch(r, F.tree));
+  return rs;
+}
+
+/* The summaries answer "how do the groups compare", so they ignore the VA and
+   month row-clicks that narrow the player list below -- otherwise clicking a VA
+   would leave the By VA table showing that one row. The scope lock, the period,
+   the basis and the segment picker do apply. */
+function visibleRowsForSummaries(){
+  const keep = { va: F.va, month: F.month, tree: F.tree, treeLabel: F.treeLabel };
+  F.va = ''; F.month = ''; F.tree = null;
+  const rs = visibleRows();
+  Object.assign(F, keep);
+  return rs;
+}
+
+function renderPlayers(){
+  const g = TAG();
+  // no untracked player has an onboarding date, so the column is dead weight there
+  const cols = PCOLS.filter(([k]) => !(k === 'onboard' && BASIS === 'non'));
+  let rs = visibleRows().slice();
+  if(!cols.some(c=>c[0]===sortKey)) sortKey = 'aft_dep';   // sorted column may have just been hidden
+  const kind = (cols.find(c=>c[0]===sortKey)||[])[2];
+  const sv = r => {
+    if(kind==='d'){ const b = sortKey==='d_dep'?'t_bef_dep':'t_bef_ggr', a = sortKey==='d_dep'?'t_aft_dep':'t_aft_ggr';
+                    return delta(val(r,b), val(r,a)).v; }
+    if(kind==='r'){ const adj = r[g+'_aft_adj']; return adj>0 ? r[g+'_aft_bc']/adj : -Infinity; }
+    return val(r, sortKey);
+  };
+  rs.sort((a,b)=>{
+    const x=sv(a), y=sv(b);
+    if(typeof x==='number'&&typeof y==='number') return (x-y)*sortDir;
+    return String(x||'').localeCompare(String(y||''))*sortDir;
+  });
+  const dayLabel = BASIS==='onb' ? 'Days since onboarding' : 'Days since request';
+  const head = '<thead><tr>' + cols.map(([k,l,c])=>
+    (k==='days_aft' ? [k, dayLabel, c] : [k,l,c])).map(([k,l,c])=>
+    `<th class="${c==='l'?'l':''}${GRP.has(k)?' grp':''}" data-k="${k}">${l}${sortKey===k?(sortDir<0?' ▾':' ▴'):''}</th>`).join('') + '</tr></thead>';
+  const body = rs.map(r=>'<tr>' + cols.map(([k,l,c])=>{
+    const gc = GRP.has(k) ? ' grp' : '';
+    if(c==='d'){
+      const b = k==='d_dep'?'t_bef_dep':'t_bef_ggr', a = k==='d_dep'?'t_aft_dep':'t_aft_ggr';
+      const x = delta(val(r,b), val(r,a));
+      return `<td class="${x.c}${gc}" title="${x.title||''}">${x.t}</td>`;
+    }
+    if(c==='r'){ const adj=r[g+'_aft_adj']; return `<td class="${gc.trim()}">${bcRatio(r[g+'_aft_bc'], adj)}</td>`; }
+    if(c==='m'||c==='t'){
+      const v = val(r,k), sign = k.includes('ggr');
+      const days = k.includes('bef') ? r[g+'_days_bef'] : r[g+'_days_aft'];
+      const note = (c==='m' && days < 30) ? ` — under a month, so this is the total for ${days} day${days===1?'':'s'}` : '';
+      return `<td class="${sign&&v<0?'neg':''}${gc}" title="${eur(v)} over ${days} days${note}">${shortEur(v)}</td>`;
+    }
+    let v = (k === 'days_aft') ? val(r, k) : r[k];
+    if(k==='ftd_date'||k==='first_req'||k==='onboard'||k==='last_active')
+      return `<td class="l${gc}" title="${esc(v||'')}">${esc(v ? shortDate(v) : '—')}</td>`;
+    if(k==='fav_product') return `<td class="l txt${gc}" title="${esc(v)}">${esc(PROD[v]||v)||'—'}</td>`;
+    if(k==='username')    return `<td class="l${gc}">${esc(v)}</td>`;
+    return `<td class="${c==='l'?'l':''}${gc}">${esc(v===''||v==null?'—':v)}</td>`;
+  }).join('') + '</tr>').join('');
+  /* Footer totals the rows actually on screen, so it moves with the filters.
+     Deltas and the bonus ratio are recomputed from the summed totals rather
+     than averaged across players -- averaging ratios would be wrong. */
+  const sum = k => rs.reduce((a, r) => a + (val(r, k) || 0), 0);
+  const tDepB = sum('t_bef_dep'), tDepA = sum('t_aft_dep');
+  const tGgrB = sum('t_bef_ggr'), tGgrA = sum('t_aft_ggr');
+  const tBc   = rs.reduce((a,r)=>a + (r[g+'_aft_bc']  || 0), 0);
+  const tAdj  = rs.reduce((a,r)=>a + (r[g+'_aft_adj'] || 0), 0);
+  const avgDays = rs.length ? Math.round(rs.reduce((a,r)=>a + (val(r,'days_aft')||0), 0) / rs.length) : 0;
+  const dD = delta(tDepB, tDepA), dG = delta(tGgrB, tGgrA);
+  const foot = '<tfoot><tr>' + cols.map(([k,l,c])=>{
+    const gc = GRP.has(k) ? ' grp' : '';
+    if(k==='username')  return `<td class="l${gc}">Total</td>`;
+    if(k==='player_id') return `<td class="${gc.trim()}">${rs.length}</td>`;
+    if(k==='days_aft')  return `<td class="${gc.trim()}" title="average across the ${rs.length} rows shown">${avgDays || '—'}</td>`;
+    if(k==='t_bef_dep') return `<td class="${gc}">${shortEur(tDepB)}</td>`;
+    if(k==='t_aft_dep') return `<td class="${gc}">${shortEur(tDepA)}</td>`;
+    if(k==='t_bef_ggr') return `<td class="${tGgrB<0?'neg':''}${gc}">${shortEur(tGgrB)}</td>`;
+    if(k==='t_aft_ggr') return `<td class="${tGgrA<0?'neg':''}${gc}">${shortEur(tGgrA)}</td>`;
+    if(k==='d_dep')     return `<td class="${dD.c}${gc}">${dD.t}</td>`;
+    if(k==='d_ggr')     return `<td class="${dG.c}${gc}">${dG.t}</td>`;
+    if(k==='bc_ratio')  return `<td class="${gc.trim()}">${bcRatio(tBc, tAdj)}</td>`;
+    return `<td class="${c==='l'?'l':''}${gc}"></td>`;
+  }).join('') + '</tr></tfoot>';
+  document.getElementById('tPlayers').innerHTML = head + '<tbody>' + body + '</tbody>' + foot;
+  document.querySelectorAll('#tPlayers tbody tr').forEach((tr, i) => {
+    if(rs[i]) tr.onclick = () => openPlayer(rs[i]);
+  });
+  LAST = { rows: rs, cols: cols };
+  const bits = [];
+  if(F.va)            bits.push(F.va);
+  if(F.month)         bits.push(F.month);
+  if(F.offer)         bits.push(F.offer);
+  if(F.treeLabel)     bits.push(F.treeLabel);
+  if(F.segments.size) bits.push([...F.segments].join(' + '));
+  document.getElementById('playerNote').textContent =
+    rs.length.toLocaleString('en-US') + ' of ' + (SCOPE ? scopeSize() : C().n).toLocaleString('en-US') + ' players'
+    + (bits.length ? ' — ' + bits.join(' · ') : '');
+  if(!rs.length) document.getElementById('tPlayers').innerHTML =
+    head + '<tbody><tr><td class="l mut" colspan="' + cols.length + '">No players match this combination of filters.</td></tr></tbody>';
+  document.querySelectorAll('#tPlayers thead th').forEach(th=>th.onclick=()=>{
+    const k = th.dataset.k;
+    if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=-1; }
+    renderPlayers();
+  });
+}
+
+/* Per-player drill-down. The history is packed as arrays keyed off a day
+   number from D.day0, so 65k daily rows do not triple the size of the page. */
+const DAY0 = new Date(D.day0 + 'T00:00:00Z');
+const dayStr = n => new Date(DAY0.getTime() + n * 86400000).toISOString().slice(0, 10);
+
+function openPlayer(r){
+  const g = TAG();
+  const split = g === 'o' ? r.onboard : r.first_req;
+  document.getElementById('mTitle').textContent = r.username + '  ·  ' + r.player_id;
+  document.getElementById('mSub').innerHTML =
+    [r.country, r.segment, r.aff ? 'aff ' + esc(r.aff) : '', r.va ? 'VA ' + esc(r.va) : '',
+     r.casino ? 'from ' + r.casino : '']
+      .filter(Boolean).map(esc).join(' · ')
+    + '<br>' + 'registered ' + esc(r.reg_date) + ' · requested ' + esc(r.first_req)
+    + (r.onboard ? ' · onboarded ' + esc(r.onboard) : ' · never onboarded')
+    + ' · <b>' + (g === 'o' ? 'onboarding' : 'request') + ' date is the split</b>';
+
+  const k = [['Dep. before', r[g+'_bef_dep']], ['Dep. after', r[g+'_aft_dep']],
+             ['GGR before',  r[g+'_bef_ggr']], ['GGR after',  r[g+'_aft_ggr']],
+             ['NGR after',   r[g+'_aft_ngr']], ['Bonus after',r[g+'_aft_bc']]];
+  document.getElementById('mKpi').innerHTML = k.map(([l,v])=>
+    `<div><div class="l">${l}</div><div class="v${v<0?' neg':''}">${eur(v)}</div></div>`).join('');
+
+  // bonuses
+  const bons = r.bon || [];
+  const STATUS_HELP = {
+    'completed'      : 'played through to the end',
+    'voided after use': 'the player activated it, then it was cancelled — usually with balance still on it',
+    'not taken'      : 'offered and cancelled without the player ever activating it',
+    'active'         : 'activated and still running',
+    'expired'        : 'never activated, and the offer ran out',
+    'offered'        : 'sitting in the account, not yet taken',
+    'never opened'   : 'the ticket was minted and never made available — the player could not use it',
+  };
+  document.getElementById('mBonus').innerHTML = bons.length
+    ? '<thead><tr><th class="l">Date</th><th>Code</th><th class="l">Bonus</th><th class="l">Type</th><th>Amount</th>'
+      + '<th>Spins</th><th class="l">Status</th><th class="l">Granted by</th></tr></thead><tbody>'
+      + bons.map(([dn, bi, amt, st, src, ki, sp, tk, code, vip]) => {
+          const ds = dayStr(dn);
+          const cls = [ds >= split ? 'aft' : '', vip ? 'vipb' : ''].filter(Boolean).join(' ');
+          return `<tr${cls ? ` class="${cls}"` : ''}><td class="l">${esc(ds)}</td>`
+               + `<td class="${vip ? 'code' : 'mut'}">${code || '—'}</td>`
+               + `<td class="l txt">${esc(D.bonus_names[bi])}`
+               + `${tk > 1 ? ` <span class="mut">×${tk}</span>` : ''}</td>`
+               + `<td class="l mut">${esc((D.bonus_kinds||[])[ki] || '—')}</td>`
+               + `<td>${amt ? eur(amt) : '—'}</td>`
+               + `<td>${sp ? sp.toLocaleString('en-US') : '—'}</td>`
+               + `<td class="l"><span class="pill2" title="${esc(STATUS_HELP[st]||'')}">${esc(st)}</span></td>`
+               + `<td class="l txt mut">${esc(src||'—')}</td></tr>`; }).join('')
+      + '</tbody>'
+    : '<tbody><tr><td class="l mut">No bonuses on record.</td></tr></tbody>';
+
+  // daily history, newest first, with a rule where the split falls
+  const h = (r.hist || []).slice().reverse();
+  let marked = false;
+  document.getElementById('mDaily').innerHTML =
+    '<thead><tr><th class="l">Date</th><th>Deposits</th><th>#</th><th>Withdrawn</th>'
+    + '<th>Bet</th><th>GGR</th><th>NGR</th><th>Bonus</th></tr></thead><tbody>'
+    + (h.length ? h.map(([dn, dep, dc, wd, bet, ggr, ngr, bc]) => {
+        const ds = dayStr(dn);
+        const first = !marked && ds < split;      // first row on the "before" side
+        if (first) marked = true;
+        return `<tr${first ? ' class="split"' : ''}><td class="l">${esc(ds)}</td>`
+             + `<td>${dep ? eur(dep) : '—'}</td><td>${dc || '—'}</td>`
+             + `<td>${wd ? eur(wd) : '—'}</td><td>${bet ? eur(bet) : '—'}</td>`
+             + `<td class="${ggr<0?'neg':''}">${ggr ? eur(ggr) : '—'}</td>`
+             + `<td class="${ngr<0?'neg':''}">${ngr ? eur(ngr) : '—'}</td>`
+             + `<td>${bc ? eur(bc) : '—'}</td></tr>`; }).join('')
+      : '<tr><td class="l mut" colspan="8">No activity on record.</td></tr>')
+    + '</tbody>';
+  document.getElementById('modal').hidden = false;
+}
+function closeModal(){ document.getElementById('modal').hidden = true; }
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('modal').onclick = e => { if(e.target.id === 'modal') closeModal(); };
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+
+function bindPick(tableId, key){
+  document.querySelectorAll('#'+tableId+' tr.pick').forEach(tr=>{
+    const name = tr.dataset.name;
+    const sel = key==='segments' ? F.segments.has(name) : F[key] === name;
+    if(sel) tr.classList.add('on');
+    tr.onclick = () => {
+      const already = key==='segments' ? F.segments.has(name) : F[key] === name;
+      // filters stack: picking a VA keeps whatever segment or month is already set
+      if(key==='segments'){ already ? F.segments.delete(name) : F.segments.add(name); }
+      else { F[key] = already ? '' : name; }
+      render();
+      const tp = document.getElementById('tPlayers');
+      if(!already && tp.scrollIntoView) tp.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+  });
+}
+
+function fillSegments(){
+  const box = document.getElementById('segFilter');
+  const segs = C().by_segment;
+  // a segment can vanish when the cohort narrows; drop it rather than filter to nothing
+  [...F.segments].forEach(s => { if(!segs.some(x=>x.name===s)) F.segments.delete(s); });
+  const anyFilter = F.va || F.month || F.offer || F.tree || F.segments.size;
+  const label = !F.segments.size ? 'All segments'
+              : F.segments.size === 1 ? [...F.segments][0]
+              : F.segments.size + ' segments';
+  box.innerHTML =
+    '<span class="lbl">Segment</span>'
+    + `<div class="dd${F.segments.size ? ' active' : ''}">`
+    +   `<button id="segBtn" aria-expanded="false">${esc(label)}<span class="caret">▾</span></button>`
+    +   '<div class="ddmenu" id="segMenu" hidden>'
+    +     segs.map(s => {
+            const on = F.segments.has(s.name);
+            return `<label class="${on?'on':''}"><input type="checkbox" value="${esc(s.name)}"${on?' checked':''}>`
+                 + `<span>${esc(s.name)}</span><span class="n">${s.players}</span></label>`;
+          }).join('')
+    +   '</div>'
+    + '</div>'
+    + (anyFilter ? '<button id="segClear">Clear all filters</button>' : '');
+
+  const menu = document.getElementById('segMenu'), btn = document.getElementById('segBtn');
+  btn.onclick = e => {
+    e.stopPropagation();
+    const open = menu.hidden;
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  };
+  menu.onclick = e => e.stopPropagation();
+  /* Close on an outside click, but only while the menu is open, and remove the
+     listener again — otherwise every render leaves another one behind. */
+  document.addEventListener('click', function close(){ menu.hidden = true;
+    btn.setAttribute('aria-expanded','false');
+    document.removeEventListener('click', close); });
+  menu.querySelectorAll('input').forEach(cb => cb.onchange = () => {
+    cb.checked ? F.segments.add(cb.value) : F.segments.delete(cb.value);
+    KEEP_SEG_OPEN = true;          // stay open so several can be ticked in a row
+    render();
+  });
+  if(KEEP_SEG_OPEN){ menu.hidden = false; btn.setAttribute('aria-expanded','true'); KEEP_SEG_OPEN = false; }
+  const clr = document.getElementById('segClear');
+  if(clr) clr.onclick = () => { F.va=''; F.month=''; F.offer='';
+                               F.tree=null; F.treeLabel=''; F.segments.clear(); render(); };
+}
+
+/* Lock the page to one manager's book, and say so. */
+function scopeSize(){
+  if(!SCOPE) return 0;
+  return D.rows.filter(r => r.va === SCOPE
+      && (PERIOD !== 'jul' || r.first_req >= D.since)
+      && (BASIS  !== 'onb' || (r.tracked && r.onboard))).length;
+}
+
+/* A manager attaching a player to their own book.
+   Only players already in loyalty_transfer_request can be added -- the panel
+   says so, because "player not found" on its own reads as a bug rather than as
+   "they have not asked to transfer yet". */
+function addPlayerBox(){
+  const box = document.getElementById('addPlayer'), f = document.getElementById('flash');
+  if(f){
+    f.innerHTML = window.__FLASH || '';
+    f.hidden = !window.__FLASH;
+    f.classList.toggle('bad', !!window.__FLASH_BAD);
+  }
+  if(!box) return;
+  const isAdmin = !!window.__IS_ADMIN;
+  /* __CAN_EDIT is set by the local dev server and by nothing else. Adding a
+     player writes a file, and the hosted Worker serves static assets — it has
+     nowhere to write. Showing the button there would offer an action that 404s,
+     so the whole box stays hidden and the page is read-only when hosted. */
+  if(!window.__CAN_EDIT || !VIEWER || (!SCOPE && !isAdmin)){ box.hidden = true; return; }
+  box.hidden = false;
+  const vaPicker = isAdmin && !SCOPE
+    ? `<select name="va" required><option value="">— which VA? —</option>`
+      + (window.__VAS || []).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')
+      + `</select>`
+    : '';
+  const mine = (window.__ADDED || []);
+  box.innerHTML =
+      `<button class="newp" id="newBtn">+ New player</button>`
+    + `<div class="mine">`
+    +   (mine.length
+        ? `Added from this page: ` + mine.map(m =>
+            `${esc(m.username || m.id)}${m.pending ? ' <span class="pill">waiting for the warehouse</span>' : ''}`
+            + ` <span class="mut">(${esc(m.by)}, ${esc(String(m.at).slice(0,10))})</span>`
+            + ` <form method="post" action="/player/remove"`
+            + ` onsubmit="return confirm('Remove ${esc(m.username || m.id)} from the book?')">`
+            + `<input type="hidden" name="id" value="${esc(m.id)}"><button>remove</button></form>`
+          ).join(' \u00b7 ')
+        : `No players added from this page yet.`)
+    + `</div>`;
+  document.getElementById('newBtn').onclick = openNewPlayer;
+}
+
+/* The new-player dialog. Five fields, because that is what a manager knows at
+   the moment they onboard someone: who, their id, where from, when they asked,
+   when it was done. */
+function openNewPlayer(){
+  const m = document.getElementById('newModal');
+  const today = String(D.today).slice(0, 10);
+  const vaPicker = (window.__IS_ADMIN && !SCOPE)
+    ? `<label for="f_va">VA</label><select id="f_va" name="va" required>`
+      + `<option value="">— choose —</option>`
+      + (window.__VAS || []).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')
+      + `</select>`
+    : '';
+  m.innerHTML =
+      `<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="npTitle">`
+    +   `<div class="mhead"><div><h3 id="npTitle">New player</h3>`
+    +     `<div class="msub">${SCOPE ? esc(SCOPE) + '\u2019s book' : 'pick whose book this is'}</div></div>`
+    +     `<button id="npClose" aria-label="Close">&times;</button></div>`
+    +   `<form method="post" action="/player/add">`
+    +     `<div class="fgrid">`
+    +       `<label for="f_user">Username</label>`
+    +       `<input id="f_user" name="username" autocomplete="off" autofocus>`
+    +       `<label for="f_id">User ID</label>`
+    +       `<input id="f_id" name="id" inputmode="numeric" autocomplete="off">`
+    +       `<div class="hint">Either will do if the player already asked to transfer. `
+    +         `If they have not, the ID is what lets them be matched up later.</div>`
+    +       `<label for="f_casino">From which casino</label>`
+    +       `<input id="f_casino" name="casino" autocomplete="off" placeholder="Stake, BC Game, \u2026">`
+    +       `<label for="f_req">Request date</label>`
+    +       `<input id="f_req" name="requested" type="date" max="${today}">`
+    +       `<div class="hint">Used only until the warehouse has its own request date, `
+    +         `which then takes over.</div>`
+    +       `<label for="f_onb">Onboarding date</label>`
+    +       `<input id="f_onb" name="onboard" type="date" max="${today}" value="${today}">`
+    +       vaPicker
+    +     `</div>`
+    +     `<div class="factions">`
+    +       `<button type="button" class="cancel" id="npCancel">Cancel</button>`
+    +       `<button class="go">Add player</button>`
+    +     `</div>`
+    +   `</form>`
+    + `</div>`;
+  m.hidden = false;
+  const close = () => { m.hidden = true; };
+  document.getElementById('npClose').onclick = close;
+  document.getElementById('npCancel').onclick = close;
+  m.onclick = e => { if(e.target === m) close(); };
+  document.addEventListener('keydown', function esc2(e){
+    if(e.key === 'Escape'){ close(); document.removeEventListener('keydown', esc2); }
+  });
+  const u = document.getElementById('f_user'), id = document.getElementById('f_id');
+  // one of the two is enough, but not neither
+  const need = () => { const ok = u.value.trim() || id.value.trim();
+                       u.required = id.required = !ok; };
+  u.oninput = id.oninput = need; need();
+  setTimeout(() => u.focus(), 30);
+}
+
+function applyScope(){
+  const el = document.getElementById('whoami');
+  // count within the period on show, or the banner says 36 while the table
+  // below says 30 and the reader is left wondering which is wrong
+  const mine = scopeSize();
+  if(el) el.innerHTML = SCOPE
+    ? `Signed in as <b>${esc(VIEWER)}</b> \u2014 showing <b>${esc(SCOPE)}</b>'s `
+      + `${mine.toLocaleString('en-US')} players only.`
+    : (VIEWER ? `Signed in as <b>${esc(VIEWER)}</b> \u2014 full book, every VA.`
+                + (window.__IS_ADMIN && window.__CAN_EDIT
+                     ? ' <a href="/admin">Manage accounts</a>' : '')
+              : 'Full book, every VA. Add <code>?as=Lizi</code> to see it as that manager does.');
+  const t = document.getElementById('pageTitle');
+  if(t) t.textContent = SCOPE ? SCOPE.split(/\s+/)[0] + '\u2019s transfer players' : 'VIP Transfer Performance';
+}
+
+/* Number the sections as they are actually shown. Done in script rather than
+   written into the markup because By VA disappears for a scoped manager, and
+   hard-coded numbers would then run 1, 3, 4. */
+function numberSections(){
+  let n = 0;
+  document.querySelectorAll('.wrap > h2').forEach(h => {
+    let tag = h.querySelector('.num');
+    if(!tag){ tag = document.createElement('span'); tag.className = 'num'; h.prepend(tag); }
+    tag.textContent = h.hidden ? '' : (++n) + '.';
+  });
+}
+
+function basisNote(){
+  const el = document.getElementById('basisNote');
+  if(!el) return;
+  el.innerHTML = BASIS === 'onb'
+    ? 'Measuring from the <b>VA onboarding date</b>. Only the '
+      + C().n.toLocaleString('en-US') + ' players a VA actually onboarded appear below &mdash; '
+      + 'the rest have no onboarding date to split on. Sheet dates average 52 days after the request '
+      + 'and a few precede it, so treat this basis as a read on the VA programme rather than on the player.'
+    : 'Measuring from the <b>transfer request date</b>, every requester included.';
+}
+
+function renderScore(){
+  const f = P().funnel, s = P().scope, win = PERIOD === 'jul' ? 'since 1 Jul 2026' : 'all time';
+  // "Received" means the ticket opened. Holding one is not the same thing, and
+  // for 1941 and 1925 the gap between the two is the whole story.
+  const got = (r, g) => r.toLocaleString('en-US')
+      + ' <span class="of">of ' + g.toLocaleString('en-US') + ' given</span>';
+  const cards = [
+    ['Transfer requests', f.requested.toLocaleString('en-US'), win, true],
+    ['Onboarded', f.onboarded.toLocaleString('en-US'),
+     pct(f.onboarded_pct) + ' of requests · median ' + f.lag_median + 'd after requesting', true],
+    ['Pending', f.pending.toLocaleString('en-US'),
+     'no VA has onboarded them', true],
+    ['Waiting over 30 days', f.pending_over_30.toLocaleString('en-US'),
+     'of the ' + f.pending.toLocaleString('en-US') + ' pending', false],
+    ['Median wait', f.wait_median + 'd', 'how long the pending have waited', false],
+    ['Deposited after requesting', f.deposited_after.toLocaleString('en-US'),
+     pct(100 * f.deposited_after / (f.requested || 1)) + ' of requests', false],
+    ['Transfer bonus given', f.tb_got.toLocaleString('en-US'),
+     pct(100 * f.tb_got / (f.requested || 1)) + ' of requests', true],
+    ['Transfer bonus completed', f.tb_done.toLocaleString('en-US'),
+     f.tb_act.toLocaleString('en-US') + ' activated it · ' +
+     pct(100 * f.tb_done / (f.tb_got || 1)) + ' of those given it', true],
+    ['1941 $1,000 deposit bonus', got(s.r1941, s.g1941),
+     s.r1941 ? pct(100 * s.r1941 / (s.g1941 || 1)) + ' received the free spins'
+             : 'not one ticket has opened', true],
+    ['Wheel free spins', got(s.rwheel, s.gwheel),
+     s.spins.toLocaleString('en-US') + ' spins delivered', true],
+    ['1925 cashback', got(s.rcb, s.gcb),
+     s.rcb ? eur(s.cb_eur) + ' paid out' : 'not one ticket has opened', true],
+  ];
+  document.getElementById('score').innerHTML = cards.map(([l, v, d, lead]) =>
+    `<div class="card${lead ? ' lead' : ''}"><div class="l">${l}</div><div class="v">${v}</div><div class="d">${d}</div></div>`
+  ).join('');
+}
+
+/* The whole thing as one nested tree: who deposited, how big the biggest single
+   deposit was, whether the free spins arrived, where they came from, and whether
+   the cashback was ever paid. Laid out bottom-up -- a parent is exactly as tall
+   as its children plus the gaps -- so nothing overlaps and the boxes add up by
+   eye. Every box is a cut of the player list; clicking one applies it. */
+function bonusTree(){
+  const ROOT = P().deptree;
+  const PAD = 16, GAP = 7, MINH = 30, COLGAP = 26;
+  const COLW = [150, 168, 176, 196, 176, 178, 176];
+  const XS = []; COLW.forEach((w, i) => XS.push(i ? XS[i-1] + COLW[i-1] + COLGAP : PAD));
+  const W = XS[XS.length-1] + COLW[COLW.length-1] + PAD;
+
+  // scale so the finished tree lands near 470px even after the height floor
+  const leafCounts = [];
+  (function walk(n){ n.kids && n.kids.length ? n.kids.forEach(walk) : leafCounts.push(n.n); })(ROOT);
+  let k = 1;
+  for(let i = 0; i < 40; i++){
+    const h = leafCounts.reduce((a, n) => a + Math.max(n * k, MINH) + GAP, -GAP) + GAP * 6;
+    if(Math.abs(h - 470) < 4) break;
+    k *= 470 / h;
+  }
+  const hOf = n => Math.max(n * k, MINH);
+
+  let y = PAD;
+  const boxes = [];
+  (function place(n, depth){
+    const b = { d: n, x: XS[depth], w: COLW[depth] };
+    boxes.push(b);
+    if(!n.kids || !n.kids.length){ b.y = y; b.h = hOf(n.n); y += b.h + GAP; return b; }
+    const kids = n.kids.map(kd => place(kd, depth + 1));
+    if(depth <= 2) y += GAP;                       // a little air between the big groups
+    b.y = kids[0].y;
+    b.h = kids[kids.length-1].y + kids[kids.length-1].h - b.y;
+    b.kids = kids;
+    return b;
+  })(ROOT, 0);
+  const H = y - GAP + PAD;
+
+  const clip = (str, px) => { const max = Math.floor(px / 6.0);
+                              return str.length > max ? str.slice(0, max-1) + '\u2026' : str; };
+  const same = (a, b) => a && b && JSON.stringify(a) === JSON.stringify(b);
+  let links = '', rects = '';
+  boxes.forEach((b, i) => {
+    (b.kids || []).forEach(kd => {
+      links += `<path d="M${b.x+b.w},${b.y+b.h/2} C${(b.x+b.w+kd.x)/2},${b.y+b.h/2}`
+             + ` ${(b.x+b.w+kd.x)/2},${kd.y+kd.h/2} ${kd.x},${kd.y+kd.h/2}"`
+             + ` fill="none" stroke="var(--line)" stroke-width="1.5"`
+             + `${kd.d.dead ? ' stroke-dasharray="3 3"' : ''}/>`;
+    });
+    const n = b.d, share = n.of ? Math.round(100 * n.n / n.of) + '%' : '';
+    const on = same(n.q, F.tree);
+    // a ticket minted and never opened is a failure of delivery, so it is red
+    // rather than the grey used for "this simply did not happen"
+    const fill = n.bad ? 'var(--neg)' : n.dead ? 'var(--pre)' : 'var(--post)';
+    rects += `<g class="tnode" data-i="${i}" style="cursor:pointer">`
+           + `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="6"`
+           + ` fill="${fill}"${n.dead && !n.bad ? ' opacity=".45"' : ''}`
+           + `${on ? ' stroke="var(--ink)" stroke-width="2.5"' : ''}>`
+           + `<title>${esc(n.label)}: ${n.n.toLocaleString('en-US')}`
+           + `${share ? ' \u2014 ' + share + ' of the box to its left' : ''}`
+           + `${n.sub ? ' \u00b7 ' + esc(n.sub) : ''} \u2014 click to list these players</title></rect>`;
+    const cy = b.y + b.h/2;
+    if(b.h >= 44 && n.sub){
+      rects += `<text x="${b.x+9}" y="${cy-9}" font-size="11" font-weight="600" fill="#fff">${esc(clip(n.label, b.w-18))}</text>`
+             + `<text x="${b.x+9}" y="${cy+5}" font-size="10.5" fill="#fff" opacity=".9">`
+             + `${n.n.toLocaleString('en-US')}${share ? '  \u00b7  ' + share : ''}</text>`
+             + `<text x="${b.x+9}" y="${cy+18}" font-size="10" fill="#fff" opacity=".72">${esc(clip(n.sub, b.w-18))}</text>`;
+    } else if(b.h >= 30){
+      rects += `<text x="${b.x+9}" y="${cy-3}" font-size="11" font-weight="600" fill="#fff">${esc(clip(n.label, b.w-18))}</text>`
+             + `<text x="${b.x+9}" y="${cy+12}" font-size="10.5" fill="#fff" opacity=".9">`
+             + `${n.n.toLocaleString('en-US')}${share ? '  \u00b7  ' + share : ''}</text>`;
+    } else {
+      rects += `<text x="${b.x+9}" y="${cy+4}" font-size="10" fill="#fff">${esc(clip(n.label + '  ' + n.n, b.w-18))}</text>`;
+    }
+    rects += '</g>';
+  });
+
+  const host = document.getElementById('tree');
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Deposit size, free spins and cashback">`
+                 + links + rects + '</svg>';
+  host.querySelectorAll('g.tnode').forEach(g => {
+    g.onclick = () => {
+      const n = boxes[+g.dataset.i].d;
+      const off = same(n.q, F.tree) || !Object.keys(n.q).length;   // re-click, or the root
+      F.tree      = off ? null : n.q;
+      F.treeLabel = off ? ''   : n.label;
+      render();
+      if(!off){
+        const tbl = document.getElementById('tPlayers');
+        openSection(tbl);
+        tbl.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    };
+  });
+}
+
+function bonusDistTable(){
+  const bd = P().bonus_dist;
+  const pc = (n, d) => d ? Math.round(100 * n / d) + '%' : '—';
+  const row = (v, bold) => `<tr${bold ? ' style="font-weight:600"' : ''}${bold ? '' : ` class="pick" data-name="${esc(v.name)}"`}>`
+    + `<td class="mut">${v.code || '—'}</td>`
+    + `<td class="l txt">${esc(v.name)}</td>`
+    + `<td class="grp">${v.given.toLocaleString('en-US')}</td>`
+    + `<td>${v.activated || '—'}</td><td class="mut">${pc(v.activated, v.given)}</td>`
+    + `<td class="grp">${v.completed || '—'}</td><td class="mut">${pc(v.completed, v.given)}</td>`
+    + `<td class="l">${esc(v.first || '—')}</td><td class="l">${esc(v.last || '—')}</td></tr>`;
+  document.getElementById('tBonusDist').innerHTML =
+      '<thead><tr><th>Code</th><th class="l">Transfer offer</th><th class="grp">Given to</th>'
+    + '<th>Activated</th><th>%</th><th class="grp">Completed</th><th>%</th>'
+    + '<th class="l">First given</th><th class="l">Last given</th></tr></thead>'
+    + '<tbody>' + bd.rows.map(v => row(v, false)).join('') + '</tbody>'
+    + '<tfoot>' + row(bd.total, true) + '</tfoot>';
+  bindPick('tBonusDist', 'offer');
+}
+
+function contactTable(){
+  const c = P().contact;
+  const pc = (n, d) => d ? `<span class="mut"> ${Math.round(100*n/d)}%</span>` : '';
+  const row = (v, bold) => `<tr${bold ? ' style="font-weight:600"' : ''}>`
+    + `<td class="l txt">${esc(v.name)}</td>`
+    + `<td class="grp">${v.onb  || '—'}</td><td>${v.onb_tg  || '—'}</td><td>${v.onb_ph  || '—'}</td>`
+    + `<td>${v.onb_any  || '—'}${pc(v.onb_any,  v.onb)}</td><td class="${v.onb_none ?'neg':''}">${v.onb_none  || '—'}</td>`
+    + `<td class="grp">${v.pend || '—'}</td><td>${v.pend_tg || '—'}</td><td>${v.pend_ph || '—'}</td>`
+    + `<td>${v.pend_any || '—'}${pc(v.pend_any, v.pend)}</td><td class="${v.pend_none?'neg':''}">${v.pend_none || '—'}</td></tr>`;
+  document.getElementById('tContact').innerHTML =
+      '<thead><tr><th class="l">Segment</th>'
+    + '<th class="grp">Onboarded</th><th>Telegram</th><th>Phone</th><th>Either</th><th>No contact</th>'
+    + '<th class="grp">Pending</th><th>Telegram</th><th>Phone</th><th>Either</th><th>No contact</th></tr></thead>'
+    + '<tbody>' + c.rows.map(v => row(v, false)).join('') + '</tbody>'
+    + '<tfoot>' + row(c.total, true) + '</tfoot>';
+}
+
+/* Say out loud how current the page is. The money view closes a day in arrears
+   while the bonus tables are live, so one date would be a lie either way. */
+function stamp(){
+  const c = D.covers || {};
+  const el = document.getElementById('asof');
+  if(!el) return;
+  el.innerHTML = 'Built ' + esc(D.generated)
+    + ' &middot; deposits, GGR and NGR complete through <b>' + esc(c.money || '—') + '</b>'
+    + ' &middot; bonus tickets through <b>' + esc(c.bonus || '—') + '</b>'
+    + ' &middot; last transfer request ' + esc(c.request || '—');
+}
+
+function render(){
+  const c = C();
+  applyScope();
+  numberSections();
+  addPlayerBox();
+  basisNote();
+  renderScore();
+  bonusTree();
+  bonusDistTable();
+  contactTable();
+  const live = visibleRowsForSummaries(), tag = TAG();
+  let byVA = groupRows(live, 'va_group', tag);
+  /* Scoped to one manager, By manager would be a single row identical to the
+     Total, which tells them nothing. Add every other manager as one aggregate
+     line so they can see where they stand, without naming colleagues. */
+  if(SCOPE){
+    const others = D.rows.filter(r => {
+      if(r.va === SCOPE || !r.tracked) return false;
+      if(PERIOD === 'jul' && r.first_req < D.since) return false;
+      if(BASIS === 'onb' && !(r.tracked && r.onboard)) return false;
+      return F.segments.size ? F.segments.has(r.segment || '—') : true;
+    });
+    if(others.length) byVA = byVA.concat(
+      Object.assign({ name: 'Every other manager', benchmark: true }, aggRows(others, tag)));
+  }
+  summaryTable('tVA',   byVA,        'Manager', initialsMap(byVA.map(v=>v.name)));
+  summaryTable('tSeg',  groupRows(live, 'segment',   tag), 'Segment');
+  fillSegments();
+  bindPick('tVA','va'); bindPick('tSeg','segments');
+  renderPlayers();
+}
+
+/* Exports exactly what is on screen -- same filters, same sort, same columns --
+   plus the tracker fields that are not shown as columns. Money goes out raw so
+   a spreadsheet can add it up; a delta with no meaningful base exports its
+   label ("new", "n/m") rather than a fake number. */
+function toCSV(){
+  const g = TAG();
+  const extra = [['va','VA'],['casino','Source casino'],['aff_type','Affiliate type'],['segment','Segment'],
+                 ['country','Country'],['reg_date','Registered'],['req_count','Requests']];
+  const dayLabel = BASIS==='onb' ? 'Days since onboarding' : 'Days since request';
+  const head = LAST.cols.map(c=>c[0]==='days_aft' ? dayLabel : c[1]).concat(extra.map(e=>e[1]));
+  const cell = (r,[k,l,c]) => {
+    if(c==='d'){                       // deltas compare monthly rates, same as the table
+      const b = k==='d_dep'?'bef_dep':'bef_ggr', a = k==='d_dep'?'aft_dep':'aft_ggr';
+      const x = delta(val(r,b), val(r,a));
+      return Number.isFinite(x.v) ? Math.round(x.v*10)/10 : x.t;
+    }
+    if(c==='r'){ const adj=r[g+'_aft_adj']; return adj>0 ? Math.round(1000*r[g+'_aft_bc']/adj)/10 : 'n/m'; }
+    if(c==='t'||c==='m') return Math.round(val(r,k)*100)/100;
+    if(k==='days_aft') return val(r,k);
+    return r[k] == null ? '' : r[k];
+  };
+  const esc = v => {
+    const s = String(v);
+    return /[",\n;]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const lines = [head.map(esc).join(',')];
+  for(const r of LAST.rows)
+    lines.push(LAST.cols.map(c=>esc(cell(r,c))).concat(extra.map(e=>esc(r[e[0]] ?? ''))).join(','));
+  return '\ufeff' + lines.join('\r\n');       // BOM so Excel reads it as UTF-8
+}
+document.getElementById('csv').onclick = () => {
+  const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const bits = ['vip-transfer', PERIOD === 'jul' ? 'since-jul' : 'all-time',
+                BASIS==='onb' ? 'onboard-split' : 'request-split'];
+  // name the active filter too, so two exports never collide
+  if(F.va)            bits.push(slug(F.va));
+  if(F.month)         bits.push(F.month);
+  if(F.treeLabel)     bits.push(slug(F.treeLabel));
+  if(F.segments.size) bits.push([...F.segments].map(slug).join('+'));
+  bits.push(D.today);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([toCSV()], {type:'text/csv;charset=utf-8'}));
+  a.download = bits.join('_') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+};
+
+function wire(sel, apply){
+  document.querySelectorAll(sel).forEach(b=>b.onclick=()=>{
+    apply(b);
+    document.querySelectorAll(sel).forEach(x=>x.classList.toggle('on', x===b));
+    F.va=''; F.month=''; F.offer=''; F.tree=null; F.treeLabel=''; F.segments.clear();
+    render();
+  });
+}
+wire('.switch [data-period]', b => { PERIOD = b.dataset.period; });
+wire('.switch [data-basis]',  b => { BASIS  = b.dataset.basis;  });
+
+/* Every h2 folds away the block under it. The page is long and most visits are
+   about one table, so the state is remembered per section -- wrapped in
+   try/catch because a browser with site data blocked throws on the read, and a
+   report that will not open is worse than one that forgets. */
+const FOLD_KEY = 'vipTransferOpen';
+function foldable(){
+  // Sections start closed. What is remembered is therefore what the reader
+  // OPENED, not what they shut -- storing the shut list would have meant a new
+  // section appearing open on a page that is meant to open quiet.
+  let open = new Set();
+  try { open = new Set(JSON.parse(localStorage.getItem(FOLD_KEY) || '[]')); } catch(e){}
+  document.querySelectorAll('.wrap > h2').forEach((h, i) => {
+    const body = [];
+    for(let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) body.push(el);
+    if(!body.length) return;
+    const sect = document.createElement('div');
+    sect.className = 'sect';
+    h.after(sect);
+    body.forEach(el => sect.appendChild(el));
+    // the heading's own words only: the sub-spans carry a live player count, and
+    // keying off that would hand each filter its own fold state
+    const id = (h.firstChild && h.firstChild.nodeType === 3 ? h.firstChild.textContent : '')
+                 .trim().slice(0, 24) || ('s' + i);
+    h.classList.add('fold');
+    h.insertAdjacentHTML('beforeend', '<span class="caretf">\u25b8</span>');
+    h.setAttribute('role', 'button');
+    const paint = () => {
+      const off = !open.has(id);
+      sect.hidden = off;
+      h.classList.toggle('shut', off);
+      h.setAttribute('aria-expanded', String(!off));
+    };
+    h.dataset.fold = id;
+    h.__open = () => { if(!open.has(id)){ open.add(id); save(); paint(); } };
+    h.onclick = ev => {
+      // the header carries live controls (Export CSV); let those act normally
+      if(ev.target.closest('button, input, select, a, label')) return;
+      open.has(id) ? open.delete(id) : open.add(id);
+      save(); paint();
+    };
+    paint();
+  });
+  function save(){ try { localStorage.setItem(FOLD_KEY, JSON.stringify([...open])); } catch(e){} }
+}
+function openSection(el){
+  const sect = el.closest('.sect');
+  if(sect && sect.previousElementSibling && sect.previousElementSibling.__open)
+    sect.previousElementSibling.__open();
+}
+
+SCOPE = viewerVA();
+render();
+stamp();
+foldable();
+</script>
+</body>
+</html>

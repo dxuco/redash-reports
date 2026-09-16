@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23213916'/%3E%3Cpath d='M6 9.5 L11 23 L16 13.5 L21 23 L26 9.5' fill='none' stroke='%23b3e580' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acquisition Cost — 2025</title>
+<style>
+:root {
+  --dark-green: #0B6E3A; --sage: #4E9D5C; --navy: #0F2A43; --slate: #5B7285; --grey: #B7C3CF;
+  --bg: #FFFFFF; --row-alt: #F3F7F3;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font-body); background: #F4F6F5; color: var(--navy); line-height: 1.5; }
+.cover { background: linear-gradient(135deg, var(--dark-green) 0%, #0a5a30 100%); color: #fff; padding: 1.6rem 20px 1.4rem; }
+.cover-inner { max-width: 1800px; margin: 0 auto; }
+.cover h1 { font-size: 1.55rem; margin: 0 0 .25rem; font-weight: 700; letter-spacing: -0.01em; }
+.cover p { color: #C0DD97; font-size: 0.86rem; margin: 0; }
+section { max-width: 1800px; margin: 0 auto; padding: 2rem; }
+.grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 950px) { .grid-2x2 { grid-template-columns: 1fr; } }
+.chart-card { background: var(--bg); border-radius: 10px; padding: 1.2rem 1.3rem 0.8rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.chart-card h4 { margin: 0 0 0.6rem; font-size: 0.95rem; color: var(--navy); font-weight: 700; }
+.chart-wrap { position: relative; height: 300px; }
+.chart-wrap.tall { height: 400px; }
+.chart-wrap.extra-tall { height: 520px; }
+.footnote { font-size: 0.82rem; color: var(--slate); font-style: italic; margin-top: 1.2rem; line-height: 1.45; }
+
+:root {
+  --dark-green: #0B6E3A; --sage: #4E9D5C; --navy: #0F2A43; --slate: #5B7285;
+  --bg: #FFFFFF; --row-alt: #F3F7F3; --border: #E5E5E5;
+  --pos: #0B6E3A; --neg: #C0392B; --orange: #E67E22; --red: #C0392B;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font-body); background: #F4F6F5; color: var(--navy); line-height: 1.5; }
+.cover { background: linear-gradient(135deg, var(--dark-green) 0%, #0a5a30 100%); color: #fff; padding: 1.6rem 20px 1.4rem; line-height: 1.45;}
+.cover-inner { max-width: 1800px; margin: 0 auto; min-height: 60px;}
+.cover h1 { font-size: 1.55rem; margin: 0 0 .25rem; font-weight: 700; }
+.cover p { color: #C0DD97; font-size: 0.86rem; margin: 0; }
+section { max-width: 1800px; margin: 0 auto; padding: 1.5rem 1.5rem 2.5rem; }
+.source-block { margin-bottom: 2.2rem; }
+.grp-header {
+  background: var(--navy); color: #fff; border-radius: 8px 8px 0 0;
+  padding: 0.7rem 1rem; font-size: 0.85rem; font-weight: 500;
+}
+.grp-title { font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.02em; }
+.grp-sep { opacity: 0.5; margin: 0 0.3rem; }
+.table-wrap {  border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.78rem; background: var(--bg); }
+thead th {
+  background: var(--dark-green); color: #fff; font-weight: 700; padding: 0.5rem 0.4rem;
+  text-align: center; font-size: 0.7rem; line-height: 1.25; white-space: nowrap;
+}
+thead th:first-child { text-align: left; }
+tbody td { padding: 0.42rem 0.45rem; text-align: center; border-top: 1px solid var(--border); white-space: nowrap; }
+tbody td.aff-name { text-align: left; font-weight: 600; color: var(--navy); }
+tbody td.mgr { color: var(--slate); }
+tbody tr.row-alt { background: var(--row-alt); }
+td.cell-val { font-weight: 700; }
+td.muted { color: var(--slate); }
+td.ngr-pos { color: var(--pos); }
+td.ngr-neg { color: var(--neg); }
+td.bonus-high { color: var(--orange); font-weight: 700; }
+.footnote { font-size: 0.82rem; color: var(--slate); font-style: italic; margin-top: 1.2rem; line-height: 1.5; max-width: 1500px; }
+
+
+.stat-row { display: flex; gap: 1rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+.stat-card { background: var(--bg); border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex: 1; min-width: 170px; text-align: center; }
+.stat-card.highlight { background: var(--dark-green); }
+.stat-card.highlight .stat-value, .stat-card.highlight .stat-label { color: #fff; }
+.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--dark-green); }
+.stat-label { font-size: 0.75rem; color: var(--slate); margin-top: 0.25rem; }
+.meta-strip { background: var(--panel-bg, #FAFBF9); border-radius: 10px; padding: 1rem 1.3rem; font-size: 0.85rem; color: var(--slate); }
+.meta-strip b { color: var(--navy); }
+th.sortable { cursor: pointer; user-select: none; transition: background 0.15s; }
+th.sortable:hover { background: #0d7f43; }
+.sort-arrow { display: inline-block; width: 0.9em; font-size: 0.75em; opacity: 0.8; }
+tr.total-row td { background: var(--sage) !important; color: #fff !important; font-weight: 700; border-top: 2px solid var(--dark-green); }
+.country-table { font-size: 0.78rem; }
+.country-table thead tr:first-child th { background: var(--navy); font-size: 0.72rem; letter-spacing: 0.03em; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.25); }
+.country-table thead tr:nth-child(2) th { font-size: 0.72rem; padding: 0.4rem; }
+.country-table td.na-cell { color: #B8C0C8; font-style: italic; font-size: 0.72rem; }
+.country-table td.pos { color: var(--dark-green); font-weight: 600; }
+.country-table td.neg { color: var(--red); font-weight: 600; }
+.country-table td.green { color: var(--dark-green); font-style: italic; }
+.country-table td.col-divider, .country-table th.col-divider { border-right: 3px solid var(--navy) !important; }
+.channel-toggle { display: flex; gap: 0.6rem; margin-bottom: 1rem; }
+.channel-btn { background: #fff; border: 1.5px solid var(--dark-green); color: var(--dark-green); font-weight: 700; font-size: 0.85rem; padding: 0.5rem 1.1rem; border-radius: 20px; cursor: pointer; transition: all 0.15s; }
+.channel-btn:hover { background: var(--row-alt); }
+.channel-btn.active { background: var(--dark-green); color: #fff; }
+.reactivation-table { font-size: 0.85rem; }
+.reactivation-table td.diag-cell { background: var(--light-green, #C0DD97); font-weight: 700; color: var(--navy); }
+.reactivation-table td.row-total { background: var(--panel-bg); font-weight: 700; }
+.reactivation-table td.zero-cell { color: #D8DEE0; }
+.callout { background: var(--row-alt); border: 1px solid var(--dark-green); border-radius: 8px; padding: 0.9rem 1.1rem; font-size: 0.9rem; }
+.callout.warn { border-color: var(--orange); background: #FDF6EC; }
+
+
+.table-wrap { overflow: auto; max-height: 78vh; }
+table { border-collapse: separate; border-spacing: 0; }
+thead th { position: sticky; z-index: 3; }
+thead tr:first-child th { top: 0; z-index: 4; }
+thead tr:nth-child(2) th { top: 27px; z-index: 3; }
+tbody tr.total-row td { position: sticky; bottom: 0; z-index: 2; background: var(--row-alt); border-top: 2px solid var(--navy); font-weight: 700; }
+thead th::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: rgba(255,255,255,0.35); }
+.table-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+.table-wrap::-webkit-scrollbar-thumb { background: #C3CCD4; border-radius: 5px; }
+.table-wrap::-webkit-scrollbar-thumb:hover { background: #A8B4BE; }
+
+/* --- cover band: fixed height, see theme.css --cover-* ------------------- */
+.cover-inner{height:60px;min-height:60px;display:flex;align-items:center;
+  flex-wrap:nowrap;overflow:hidden;gap:14px}
+.cover-inner>*{min-width:0}
+.cover header{display:flex;flex-wrap:nowrap;align-items:center;gap:14px;
+  width:100%;justify-content:space-between;min-width:0;border:0;padding:0;margin:0}
+.cover h1,.cover p,.cover .sub,.cover .meta{white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%}
+.cover .controls,.cover .seg{flex:0 0 auto}
+</style>
+</head>
+<body><div data-report-switcher style="display:flex;gap:0.32rem;align-items:center;padding:0.45rem 1.5rem;background:#213916;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;"><a href="/" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">Business Overview</a><a href="/pivot" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">Marketing Report</a><a href="/bonus" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">Bonus Cost</a><a href="/ftd-share" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">FTD Share</a><a href="/september-2026" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">FTD September</a><a href="/ftd" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">FTD (Monthly)</a><a href="/ftd-bonus" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">FTD Bonus Treatment</a><a href="/ftd-countries" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">FTD (Country)</a><a href="/retention" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">Retention</a><a href="/reactivation" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">Reactivation</a><a href="/vip-transfer" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">VIP Transfer</a><a href="/acquisition-2026" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">CPA 2026</a><a href="/acquisition-2025" aria-current="page" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:#72c87b;color:#12250b;cursor:default;">CPA 2025</a><a href="/community" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">Community</a><a href="/ux-funnel" style="display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#d9f0c4;border:1px solid #4a6b3c;">UX Funnel</a><a href="/logout" style="margin-left:auto;display:inline-block;padding:0.3rem 0.85rem;border-radius:14px;text-decoration:none;font-weight:700;font-size:0.74rem;letter-spacing:0.01em;background:transparent;color:#a9c496;border:1px solid #3c5730;">Sign out</a></div>
+<div class="cover"><div class="cover-inner"><h1>Cost 2025</h1><p>Acquisition cost by channel &middot; 2025 &middot; <a href="https://docs.google.com/spreadsheets/d/1zShicXqFdN7njLoDiLxjK1mssS5_f90c/edit" target="_blank" rel="noopener" style="color:#C0DD97;text-decoration:underline;">Cost sheet (Google Drive)</a></p></div></div>
+
+
+<section><div style="font-size:1.05rem;font-weight:700;color:#0F2A43;margin:0 0 0.2rem;">Cost by Channel &mdash; 2025</div><div class="table-wrap"><table class="sortable-table"><thead><tr><th class="sortable" data-type="str">Source <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Total Cost <span class="sort-arrow"></span></th><th class="sortable" data-type="num">% of Total <span class="sort-arrow"></span></th><th class="sortable" data-type="num">FTD's <span class="sort-arrow"></span></th><th class="sortable" data-type="num">CPA <span class="sort-arrow"></span></th></tr></thead><tbody><tr class=""><td class="aff-name" data-sort="SEO">SEO</td><td data-sort="76000.0">&euro;76,000</td><td data-sort="0.07069259638856454">7.1%</td><td data-sort="0">0</td><td data-sort="0">n/a</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Brand">Brand</td><td data-sort="127362.68000000001">&euro;127,363</td><td data-sort="0.11846840173955134">11.8%</td><td data-sort="0">0</td><td data-sort="0">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Media">Media</td><td data-sort="277124.59">&euro;277,125</td><td data-sort="0.2577717998712688">25.8%</td><td data-sort="0">0</td><td data-sort="0">n/a</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Community">Community</td><td data-sort="17055.29">&euro;17,055</td><td data-sort="0.015864246477104223">1.6%</td><td data-sort="0">0</td><td data-sort="0">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Influence">Influence</td><td data-sort="133549.75">&euro;133,550</td><td data-sort="0.1242234022966276">12.4%</td><td data-sort="1978">1,978</td><td data-sort="67.51756825075834">&euro;68</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate SEO">Affiliate SEO</td><td data-sort="326854.91">&euro;326,855</td><td data-sort="0.3040292398717182">30.4%</td><td data-sort="2536">2,536</td><td data-sort="128.8860055205047">&euro;129</td></tr><tr class=""><td class="aff-name" data-sort="Affiliate Meta">Affiliate Meta</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">0.0%</td><td data-sort="12">12</td><td data-sort="0">n/a</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate Tipster">Affiliate Tipster</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">0.0%</td><td data-sort="0">0</td><td data-sort="0">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Affiliate PPC">Affiliate PPC</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">0.0%</td><td data-sort="26">26</td><td data-sort="0">n/a</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate DSP">Affiliate DSP</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">0.0%</td><td data-sort="2">2</td><td data-sort="0">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Other">Other</td><td data-sort="117130.0">&euro;117,130</td><td data-sort="0.10895031335516532">10.9%</td><td data-sort="0">0</td><td data-sort="0">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Direct / Unattributed">Direct / Unattributed</td><td data-sort="0">&mdash;</td><td data-sort="0">&mdash;</td><td data-sort="6758">6,758</td><td data-sort="0">n/a</td></tr><tr class="total-row"><td class="aff-name" data-sort="TOTAL">TOTAL</td><td data-sort="1075077.22">&euro;1,075,077</td><td data-sort="1">100.0%</td><td data-sort="11312">11,312</td><td data-sort="95.038650990099">&euro;95</td></tr></tbody></table></div><div style="font-size:1.05rem;font-weight:700;color:#0F2A43;margin:1.6rem 0 0.2rem;">Monthly CPA</div><div class="table-wrap"><table class="sortable-table"><thead><tr><th class="sortable" data-type="str">Month <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Cost <span class="sort-arrow"></span></th><th class="sortable" data-type="num">FTDs <span class="sort-arrow"></span></th><th class="sortable" data-type="num">CPA <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Dep SM <span class="sort-arrow"></span></th><th class="sortable" data-type="num">GGR SM <span class="sort-arrow"></span></th><th class="sortable" data-type="num">NGR SM <span class="sort-arrow"></span></th><th class="sortable" data-type="num">NGR/Dep SM <span class="sort-arrow"></span></th><th class="sortable" data-type="num">BC SM <span class="sort-arrow"></span></th><th class="sortable" data-type="num">BC/GGR SM <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Dep Tot <span class="sort-arrow"></span></th><th class="sortable" data-type="num">GGR Tot <span class="sort-arrow"></span></th><th class="sortable" data-type="num">NGR Tot <span class="sort-arrow"></span></th><th class="sortable" data-type="num">NGR/Dep Tot <span class="sort-arrow"></span></th><th class="sortable" data-type="num">BC Tot <span class="sort-arrow"></span></th><th class="sortable" data-type="num">BC/GGR Tot <span class="sort-arrow"></span></th></tr></thead><tbody><tr class=""><td class="aff-name" data-sort="1">January</td><td data-sort="53835.06">&euro;53,835</td><td data-sort="824">824</td><td data-sort="65.33381067961164">&euro;65</td><td data-sort="598869.5511150255">&euro;598,870</td><td class="pos" data-sort="85857.95367079928">&euro;85,858</td><td class="pos" data-sort="12660.59165196663">&euro;12,661</td><td class="pos" data-sort="0.02114081710849062">2.1%</td><td data-sort="73197.3620188325">&euro;73,197</td><td data-sort="0.8525402585238564">85.3%</td><td data-sort="1612606.842959055">&euro;1,612,607</td><td class="pos" data-sort="241097.35360801878">&euro;241,097</td><td class="pos" data-sort="54480.26440773879">&euro;54,480</td><td class="pos" data-sort="0.03378397198648256">3.4%</td><td data-sort="186617.0892002795">&euro;186,617</td><td data-sort="0.7740320928768283">77.4%</td></tr><tr class="row-alt"><td class="aff-name" data-sort="2">February</td><td data-sort="61975.22">&euro;61,975</td><td data-sort="1021">1,021</td><td data-sort="60.70050930460333">&euro;61</td><td data-sort="691138.0682923418">&euro;691,138</td><td class="pos" data-sort="65714.6188728645">&euro;65,715</td><td class="neg" data-sort="-20642.615941000706">&euro;-20,643</td><td class="neg" data-sort="-0.029867571890525885">-3.0%</td><td data-sort="86357.23481386539">&euro;86,357</td><td data-sort="1.314125171766382">131.4%</td><td data-sort="1908804.8303803531">&euro;1,908,805</td><td class="pos" data-sort="283287.02519117796">&euro;283,287</td><td class="pos" data-sort="111386.89955106497">&euro;111,387</td><td class="pos" data-sort="0.05835426324275895">5.8%</td><td data-sort="171900.12564011308">&euro;171,900</td><td data-sort="0.6068055023843935">60.7%</td></tr><tr class=""><td class="aff-name" data-sort="3">March</td><td data-sort="65989.59">&euro;65,990</td><td data-sort="1131">1,131</td><td data-sort="58.34623342175066">&euro;58</td><td data-sort="879056.3410478658">&euro;879,056</td><td class="neg" data-sort="-14013.030701657928">&euro;-14,013</td><td class="neg" data-sort="-85216.57109151017">&euro;-85,217</td><td class="neg" data-sort="-0.09694096625243502">-9.7%</td><td data-sort="71203.54038985207">&euro;71,204</td><td data-sort="0">n/a</td><td data-sort="3086615.634571687">&euro;3,086,616</td><td class="pos" data-sort="921645.492728106">&euro;921,645</td><td class="pos" data-sort="647855.7992167163">&euro;647,856</td><td class="pos" data-sort="0.2098919580269073">21.0%</td><td data-sort="273789.693511395">&euro;273,790</td><td data-sort="0.2970661666244003">29.7%</td></tr><tr class="row-alt"><td class="aff-name" data-sort="4">April</td><td data-sort="59072.97">&euro;59,073</td><td data-sort="814">814</td><td data-sort="72.57121621621621">&euro;73</td><td data-sort="541838.404796791">&euro;541,838</td><td class="pos" data-sort="191961.85776527924">&euro;191,962</td><td class="pos" data-sort="148314.70090941142">&euro;148,315</td><td class="pos" data-sort="0.2737249696522246">27.4%</td><td data-sort="43647.156855867746">&euro;43,647</td><td data-sort="0.22737411152395268">22.7%</td><td data-sort="1318654.3755768957">&euro;1,318,654</td><td class="pos" data-sort="473768.22476077767">&euro;473,768</td><td class="pos" data-sort="388460.13574702875">&euro;388,460</td><td class="pos" data-sort="0.29458828859312136">29.5%</td><td data-sort="85308.08901374933">&euro;85,308</td><td data-sort="0.18006291801613414">18.0%</td></tr><tr class=""><td class="aff-name" data-sort="5">May</td><td data-sort="70604.19">&euro;70,604</td><td data-sort="1266">1,266</td><td data-sort="55.769502369668245">&euro;56</td><td data-sort="706942.1168738183">&euro;706,942</td><td class="neg" data-sort="-67969.61122367535">&euro;-67,970</td><td class="neg" data-sort="-93190.00061712359">&euro;-93,190</td><td class="neg" data-sort="-0.13182126003359482">-13.2%</td><td data-sort="25220.38939344802">&euro;25,220</td><td data-sort="0">n/a</td><td data-sort="2500404.5660599787">&euro;2,500,405</td><td class="pos" data-sort="451173.0064368563">&euro;451,173</td><td class="pos" data-sort="277926.42721379217">&euro;277,926</td><td class="pos" data-sort="0.11115258346041805">11.1%</td><td data-sort="173246.57922306377">&euro;173,247</td><td data-sort="0.3839914550546375">38.4%</td></tr><tr class="row-alt"><td class="aff-name" data-sort="6">June</td><td data-sort="53629.14">&euro;53,629</td><td data-sort="917">917</td><td data-sort="58.48324972737186">&euro;58</td><td data-sort="460007.8275502284">&euro;460,008</td><td class="pos" data-sort="93843.2811995262">&euro;93,843</td><td class="pos" data-sort="76243.02528564273">&euro;76,243</td><td class="pos" data-sort="0.1657428867931986">16.6%</td><td data-sort="17600.255913883157">&euro;17,600</td><td data-sort="0.18754945147817378">18.8%</td><td data-sort="1193146.3897430399">&euro;1,193,146</td><td class="pos" data-sort="437315.8726117263">&euro;437,316</td><td class="pos" data-sort="356627.5874692312">&euro;356,628</td><td class="pos" data-sort="0.29889675779519037">29.9%</td><td data-sort="80688.28514249885">&euro;80,688</td><td data-sort="0.18450801856473767">18.5%</td></tr><tr class=""><td class="aff-name" data-sort="7">July</td><td data-sort="84844.0">&euro;84,844</td><td data-sort="790">790</td><td data-sort="107.39746835443037">&euro;107</td><td data-sort="537248.7513092664">&euro;537,249</td><td class="pos" data-sort="169456.63912150907">&euro;169,457</td><td class="pos" data-sort="123594.77940113103">&euro;123,595</td><td class="pos" data-sort="0.23005131068230977">23.0%</td><td data-sort="45861.859720378205">&euro;45,862</td><td data-sort="0.2706406780999174">27.1%</td><td data-sort="2227431.9368689763">&euro;2,227,432</td><td class="pos" data-sort="735302.1568082827">&euro;735,302</td><td class="pos" data-sort="564774.3883538605">&euro;564,774</td><td class="pos" data-sort="0.25355404984798063">25.4%</td><td data-sort="170527.76845442515">&euro;170,528</td><td data-sort="0.2319152295086866">23.2%</td></tr><tr class="row-alt"><td class="aff-name" data-sort="8">August</td><td data-sort="89958.27">&euro;89,958</td><td data-sort="779">779</td><td data-sort="115.47916559691913">&euro;115</td><td data-sort="656803.5103054402">&euro;656,804</td><td class="pos" data-sort="167315.0838531164">&euro;167,315</td><td class="pos" data-sort="80759.86648305331">&euro;80,760</td><td class="pos" data-sort="0.12295894467052515">12.3%</td><td data-sort="86555.21737006294">&euro;86,555</td><td data-sort="0.5173186743046345">51.7%</td><td data-sort="2106884.3498255187">&euro;2,106,884</td><td class="pos" data-sort="799081.3673619763">&euro;799,081</td><td class="pos" data-sort="600444.1357399035">&euro;600,444</td><td class="pos" data-sort="0.28499150216272157">28.5%</td><td data-sort="198637.23162207621">&euro;198,637</td><td data-sort="0.24858198393217623">24.9%</td></tr><tr class=""><td class="aff-name" data-sort="9">September</td><td data-sort="61425.53">&euro;61,426</td><td data-sort="685">685</td><td data-sort="89.67230656934306">&euro;90</td><td data-sort="498275.0521070493">&euro;498,275</td><td class="pos" data-sort="148789.514233464">&euro;148,790</td><td class="pos" data-sort="105505.04146709805">&euro;105,505</td><td class="pos" data-sort="0.21174056581992262">21.2%</td><td data-sort="43284.47276636589">&euro;43,284</td><td data-sort="0.290910774118455">29.1%</td><td data-sort="1614474.9254689482">&euro;1,614,475</td><td class="pos" data-sort="403578.88106557616">&euro;403,579</td><td class="pos" data-sort="287402.4954320096">&euro;287,402</td><td class="pos" data-sort="0.17801607872511818">17.8%</td><td data-sort="116176.38563356496">&euro;116,176</td><td data-sort="0.28786537424065023">28.8%</td></tr><tr class="row-alt"><td class="aff-name" data-sort="10">October</td><td data-sort="130530.97">&euro;130,531</td><td data-sort="763">763</td><td data-sort="171.0759764089122">&euro;171</td><td data-sort="594283.5042261494">&euro;594,284</td><td class="pos" data-sort="147794.88016600293">&euro;147,795</td><td class="pos" data-sort="83123.10039818352">&euro;83,123</td><td class="pos" data-sort="0.13987112179131217">14.0%</td><td data-sort="64671.77976781939">&euro;64,672</td><td data-sort="0.4375779438041438">43.8%</td><td data-sort="2611766.0273592165">&euro;2,611,766</td><td class="pos" data-sort="1217550.3351786777">&euro;1,217,550</td><td class="pos" data-sort="961881.3611416526">&euro;961,881</td><td class="pos" data-sort="0.36828772220236766">36.8%</td><td data-sort="255668.97403702038">&euro;255,669</td><td data-sort="0.20998636906415907">21.0%</td></tr><tr class=""><td class="aff-name" data-sort="11">November</td><td data-sort="220578.14">&euro;220,578</td><td data-sort="1591">1,591</td><td data-sort="138.6411942174733">&euro;139</td><td data-sort="554238.7978266884">&euro;554,239</td><td class="neg" data-sort="-12078.40517601705">&euro;-12,078</td><td class="neg" data-sort="-58600.571439571926">&euro;-58,601</td><td class="neg" data-sort="-0.10573162988473507">-10.6%</td><td data-sort="46522.166263554944">&euro;46,522</td><td data-sort="0">n/a</td><td data-sort="1381043.4808163599">&euro;1,381,043</td><td class="pos" data-sort="247817.7590410722">&euro;247,818</td><td class="pos" data-sort="153167.02268722054">&euro;153,167</td><td class="pos" data-sort="0.11090673451981449">11.1%</td><td data-sort="94650.73635385155">&euro;94,651</td><td data-sort="0.3819368584402564">38.2%</td></tr><tr class="row-alt"><td class="aff-name" data-sort="12">December</td><td data-sort="122634.14">&euro;122,634</td><td data-sort="731">731</td><td data-sort="167.76216142270863">&euro;168</td><td data-sort="417023.25883063505">&euro;417,023</td><td class="pos" data-sort="138959.76295537324">&euro;138,960</td><td class="pos" data-sort="124754.50186631798">&euro;124,755</td><td class="pos" data-sort="0.299154781477031">29.9%</td><td data-sort="14205.261089055573">&euro;14,205</td><td data-sort="0.10222571474605621">10.2%</td><td data-sort="1135659.9125415056">&euro;1,135,660</td><td class="pos" data-sort="597399.8964447371">&euro;597,400</td><td class="pos" data-sort="476378.94127117813">&euro;476,379</td><td class="pos" data-sort="0.41947323843199197">41.9%</td><td data-sort="121020.95517355959">&euro;121,021</td><td data-sort="0.20257947129516238">20.3%</td></tr><tr class="total-row"><td class="aff-name" data-sort="13">TOTAL</td><td data-sort="1075077.22">&euro;1,075,077</td><td data-sort="11312">11,312</td><td data-sort="95.038650990099">&euro;95</td><td data-sort="7135725.1842813">&euro;7,135,725</td><td class="pos" data-sort="1115632.5447365844">&euro;1,115,633</td><td class="pos" data-sort="497305.8483735983">&euro;497,306</td><td data-sort="0.06969240484051605">7.0%</td><td data-sort="618326.6963629858">&euro;618,327</td><td data-sort="0.5542386687087735">55.4%</td><td data-sort="22697493.272171535">&euro;22,697,493</td><td class="pos" data-sort="6809017.371236986">&euro;6,809,017</td><td class="pos" data-sort="4880785.458231398">&euro;4,880,785</td><td data-sort="0.2150363213992238">21.5%</td><td data-sort="1928231.9130055972">&euro;1,928,232</td><td data-sort="0.2831879855602862">28.3%</td></tr></tbody></table></div><div style="font-size:1.05rem;font-weight:700;color:#0F2A43;margin:1.6rem 0 0.2rem;">Cost by Channel &amp; Month</div><div class="table-wrap"><table class="sortable-table"><thead><tr><th class="sortable" data-type="str">Source <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Jan <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Feb <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Mar <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Apr <span class="sort-arrow"></span></th><th class="sortable" data-type="num">May <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Jun <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Jul <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Aug <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Sep <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Oct <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Nov <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Dec <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Total <span class="sort-arrow"></span></th></tr></thead><tbody><tr class=""><td class="aff-name" data-sort="SEO">SEO</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="8666.67">&euro;8,667</td><td data-sort="47333.33">&euro;47,333</td><td data-sort="20000.0">&euro;20,000</td><td data-sort="76000.0">&euro;76,000</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Brand">Brand</td><td data-sort="662.01">&euro;662</td><td data-sort="662.01">&euro;662</td><td data-sort="1462.01">&euro;1,462</td><td data-sort="1571.9">&euro;1,572</td><td data-sort="4826.05">&euro;4,826</td><td data-sort="13961.43">&euro;13,961</td><td data-sort="21756.18">&euro;21,756</td><td data-sort="23158.7">&euro;23,159</td><td data-sort="29075.59">&euro;29,076</td><td data-sort="142.21000000000004">&euro;142</td><td data-sort="23423.07">&euro;23,423</td><td data-sort="6661.52">&euro;6,662</td><td data-sort="127362.68000000001">&euro;127,363</td></tr><tr class=""><td class="aff-name" data-sort="Media">Media</td><td data-sort="19089.66">&euro;19,090</td><td data-sort="26961.96">&euro;26,962</td><td data-sort="20308.64">&euro;20,309</td><td data-sort="18387.42">&euro;18,387</td><td data-sort="30858.3">&euro;30,858</td><td data-sort="4323.36">&euro;4,323</td><td data-sort="14177.86">&euro;14,178</td><td data-sort="8786.1">&euro;8,786</td><td data-sort="12814.72">&euro;12,815</td><td data-sort="27916.79">&euro;27,917</td><td data-sort="63228.51">&euro;63,229</td><td data-sort="30271.27">&euro;30,271</td><td data-sort="277124.59">&euro;277,125</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Community">Community</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="881.36">&euro;881</td><td data-sort="992.5">&euro;992</td><td data-sort="128.86">&euro;129</td><td data-sort="1664.13">&euro;1,664</td><td data-sort="0.0">&mdash;</td><td data-sort="4064.13">&euro;4,064</td><td data-sort="4604.9">&euro;4,605</td><td data-sort="4719.41">&euro;4,719</td><td data-sort="17055.29">&euro;17,055</td></tr><tr class=""><td class="aff-name" data-sort="Influence">Influence</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="5775.51">&euro;5,776</td><td data-sort="12262.65">&euro;12,263</td><td data-sort="8082.12">&euro;8,082</td><td data-sort="6664.04">&euro;6,664</td><td data-sort="0.0">&mdash;</td><td data-sort="2657.15">&euro;2,657</td><td data-sort="13146.7">&euro;13,147</td><td data-sort="54437.32">&euro;54,437</td><td data-sort="30524.26">&euro;30,524</td><td data-sort="133549.75">&euro;133,550</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate SEO">Affiliate SEO</td><td data-sort="34083.39">&euro;34,083</td><td data-sort="34351.25">&euro;34,351</td><td data-sort="44218.94">&euro;44,219</td><td data-sort="33338.14">&euro;33,338</td><td data-sort="12851.83">&euro;12,852</td><td data-sort="17636.73">&euro;17,637</td><td data-sort="13487.06">&euro;13,487</td><td data-sort="13493.34">&euro;13,493</td><td data-sort="16878.07">&euro;16,878</td><td data-sort="48507.47">&euro;48,507</td><td data-sort="27551.01">&euro;27,551</td><td data-sort="30457.68">&euro;30,458</td><td data-sort="326854.91">&euro;326,855</td></tr><tr class=""><td class="aff-name" data-sort="Affiliate Meta">Affiliate Meta</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate Tipster">Affiliate Tipster</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class=""><td class="aff-name" data-sort="Affiliate PPC">Affiliate PPC</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate DSP">Affiliate DSP</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class=""><td class="aff-name" data-sort="Other">Other</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="8924.0">&euro;8,924</td><td data-sort="8633.0">&euro;8,633</td><td data-sort="28630.0">&euro;28,630</td><td data-sort="42856.0">&euro;42,856</td><td data-sort="0.0">&mdash;</td><td data-sort="28087.0">&euro;28,087</td><td data-sort="0.0">&mdash;</td><td data-sort="0.0">&mdash;</td><td data-sort="117130.0">&euro;117,130</td></tr><tr class="total-row"><td class="aff-name" data-sort="TOTAL">TOTAL</td><td data-sort="53835.06">&euro;53,835</td><td data-sort="61975.22">&euro;61,975</td><td data-sort="65989.59">&euro;65,990</td><td data-sort="59072.97">&euro;59,073</td><td data-sort="70604.19">&euro;70,604</td><td data-sort="53629.14">&euro;53,629</td><td data-sort="84844.0">&euro;84,844</td><td data-sort="89958.27">&euro;89,958</td><td data-sort="61425.53">&euro;61,426</td><td data-sort="130530.97">&euro;130,531</td><td data-sort="220578.14">&euro;220,578</td><td data-sort="122634.14">&euro;122,634</td><td data-sort="1075077.22">&euro;1,075,077</td></tr></tbody></table></div><div style="font-size:1.05rem;font-weight:700;color:#0F2A43;margin:1.6rem 0 0.2rem;">CPA by Channel &amp; Month</div><div class="table-wrap"><table class="sortable-table"><thead><tr><th class="sortable" data-type="str">Channel <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Jan <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Feb <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Mar <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Apr <span class="sort-arrow"></span></th><th class="sortable" data-type="num">May <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Jun <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Jul <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Aug <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Sep <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Oct <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Nov <span class="sort-arrow"></span></th><th class="sortable" data-type="num">Dec <span class="sort-arrow"></span></th><th class="sortable" data-type="num">All <span class="sort-arrow"></span></th></tr></thead><tbody><tr class=""><td class="aff-name" data-sort="SEO">SEO</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Brand">Brand</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Media">Media</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Community">Community</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">&mdash;</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td></tr><tr class=""><td class="aff-name" data-sort="Influence">Influence</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="97.89">&euro;98</td><td data-sort="28.71814988290398">&euro;29</td><td data-sort="29.496788321167884">&euro;29</td><td data-sort="84.35493670886076">&euro;84</td><td data-sort="0.0">&euro;0</td><td data-sort="442.85833333333335">&euro;443</td><td data-sort="298.7886363636364">&euro;299</td><td data-sort="60.620623608017816">&euro;61</td><td data-sort="182.78">&euro;183</td><td data-sort="67.51756825075834">&euro;68</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate SEO">Affiliate SEO</td><td data-sort="158.52739534883722">&euro;159</td><td data-sort="113.74586092715232">&euro;114</td><td data-sort="122.83038888888889">&euro;123</td><td data-sort="156.51708920187792">&euro;157</td><td data-sort="49.430115384615384">&euro;49</td><td data-sort="104.35934911242603">&euro;104</td><td data-sort="84.294125">&euro;84</td><td data-sort="74.54883977900552">&euro;75</td><td data-sort="89.77696808510638">&euro;90</td><td data-sort="272.5138764044944">&euro;273</td><td data-sort="162.06476470588234">&euro;162</td><td data-sort="217.55485714285714">&euro;218</td><td data-sort="128.8860055205047">&euro;129</td></tr><tr class=""><td class="aff-name" data-sort="Affiliate Meta">Affiliate Meta</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate Tipster">Affiliate Tipster</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td></tr><tr class=""><td class="aff-name" data-sort="Affiliate PPC">Affiliate PPC</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="0.0">&euro;0</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class="row-alt"><td class="aff-name" data-sort="Affiliate DSP">Affiliate DSP</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td><td data-sort="-1">&mdash;</td><td data-sort="0.0">&euro;0</td></tr><tr class=""><td class="aff-name" data-sort="Other">Other</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">n/a</td><td data-sort="-1">&mdash;</td><td data-sort="-1">n/a</td><td data-sort="-1">&mdash;</td><td data-sort="-1">&mdash;</td><td data-sort="-1">n/a</td></tr><tr class="total-row"><td class="aff-name" data-sort="BLENDED">BLENDED</td><td data-sort="233.05220779220778">&euro;233</td><td data-sort="196.74673015873017">&euro;197</td><td data-sort="180.29942622950819">&euro;180</td><td data-sort="216.3845054945055">&euro;216</td><td data-sort="102.62236918604651">&euro;103</td><td data-sort="120.78635135135136">&euro;121</td><td data-sort="353.51666666666665">&euro;354</td><td data-sort="473.46457894736847">&euro;473</td><td data-sort="305.59965174129354">&euro;306</td><td data-sort="575.0262995594713">&euro;575</td><td data-sort="205.76319029850748">&euro;206</td><td data-sort="399.4597394136807">&euro;399</td><td data-sort="236.07317083882302">&euro;236</td></tr></tbody></table></div></section>
+<script>
+function sortTable(table, colIdx, type, th){
+  const tbody = table.querySelector('tbody');
+  const allRows = Array.from(tbody.querySelectorAll('tr'));
+  const totalRows = allRows.filter(r => r.classList.contains('total-row'));
+  const rows = allRows.filter(r => !r.classList.contains('total-row'));
+  const curDir = th.getAttribute('data-dir') || 'none';
+  const newDir = curDir === 'desc' ? 'asc' : 'desc';
+  table.querySelectorAll('th.sortable').forEach(h=>{ h.removeAttribute('data-dir'); h.querySelector('.sort-arrow').textContent=''; });
+  th.setAttribute('data-dir', newDir);
+  th.querySelector('.sort-arrow').textContent = newDir === 'desc' ? ' \u25bc' : ' \u25b2';
+
+  rows.sort((a,b)=>{
+    const ca = a.children[colIdx], cb = b.children[colIdx];
+    let va = ca.getAttribute('data-sort'), vb = cb.getAttribute('data-sort');
+    if(type === 'num'){
+      va = va === '' ? null : parseFloat(va);
+      vb = vb === '' ? null : parseFloat(vb);
+      if(va === null && vb === null) return 0;
+      if(va === null) return 1;
+      if(vb === null) return -1;
+      return newDir === 'desc' ? vb - va : va - vb;
+    } else {
+      va = (va||'').toLowerCase(); vb = (vb||'').toLowerCase();
+      if(va < vb) return newDir === 'desc' ? 1 : -1;
+      if(va > vb) return newDir === 'desc' ? -1 : 1;
+      return 0;
+    }
+  });
+  rows.forEach((r,i)=>{ r.classList.toggle('row-alt', i%2===1); tbody.appendChild(r); });
+  totalRows.forEach(r => tbody.appendChild(r));
+}
+document.querySelectorAll('table.sortable-table').forEach(table=>{
+  table.querySelectorAll('th.sortable').forEach((th, idx)=>{
+    th.addEventListener('click', ()=> sortTable(table, idx, th.getAttribute('data-type'), th));
+  });
+});
+</script>
+
+<script>
+(function(){
+  function isHeader(el){ return el && el.tagName==='DIV' && el.style && (el.style.fontSize==='1.3rem'||el.style.fontSize==='1.05rem'); }
+  document.querySelectorAll('section').forEach(function(sec){
+    var kids=Array.prototype.slice.call(sec.children);
+    kids.forEach(function(el,idx){
+      if(!isHeader(el)) return;
+      var controlled=[];
+      for(var j=idx+1;j<kids.length;j++){ if(isHeader(kids[j])) break; controlled.push(kids[j]); }
+      if(!controlled.length) return;
+      el.style.cursor='pointer'; el.style.userSelect='none';
+      var caret=document.createElement('span'); caret.textContent=' \u25be'; caret.style.color='#8B93A1'; caret.style.fontSize='0.8em';
+      el.appendChild(caret);
+      el.addEventListener('click',function(){
+        var hide = controlled[0].style.display!=='none';
+        controlled.forEach(function(c){ c.style.display = hide?'none':''; });
+        caret.textContent = hide?' \u25b8':' \u25be';
+      });
+    });
+  });
+})();
+</script>
+
+<script>
+(function(){
+  function isSrcTable(t){
+    var th=t.querySelector('thead th'); if(!th) return false;
+    var lbl=th.textContent.trim().toLowerCase();
+    return lbl.indexOf('source')===0||lbl.indexOf('channel')===0;
+  }
+  var firstTable=null;
+  document.querySelectorAll('table.sortable-table').forEach(function(t){
+    if(!firstTable&&isSrcTable(t)) firstTable=t;
+  });
+  if(!firstTable) return;
+  var SRC=[];
+  firstTable.querySelectorAll('tbody tr').forEach(function(r){
+    if(r.classList.contains('total-row')) return;
+    var c=r.querySelector('td'); if(!c) return;
+    var v=c.textContent.trim(); if(v&&SRC.indexOf(v)===-1) SRC.push(v);
+  });
+  if(!SRC.length) return;
+  var current='';
+  var onGreen=false;
+  var bar=document.createElement('div');
+  var lab=document.createElement('span');
+  lab.textContent='Sources:';
+  lab.style.cssText='font-weight:700;font-size:0.85rem;margin-right:0.3rem;color:#0F2A43;';
+  bar.appendChild(lab);
+  var btns=[];
+  function mkbtn(name){
+    var b=document.createElement('button');
+    b.textContent=name||'All';
+    b.style.cssText='padding:0.28rem 0.8rem;border-radius:14px;font-weight:700;font-size:0.74rem;cursor:pointer;';
+    b.addEventListener('click',function(){ current=name; apply(); paint(); });
+    b._name=name; btns.push(b); bar.appendChild(b);
+  }
+  mkbtn(''); SRC.forEach(mkbtn);
+  function paint(){
+    btns.forEach(function(b){
+      var on=(b._name===current);
+      if(onGreen){
+        b.style.border='1px solid rgba(255,255,255,0.75)';
+        b.style.background=on?'#fff':'transparent';
+        b.style.color=on?'#0B6E3A':'#fff';
+      } else {
+        b.style.border='1px solid #0B6E3A';
+        b.style.background=on?'#0B6E3A':'#fff';
+        b.style.color=on?'#fff':'#0B6E3A';
+      }
+    });
+  }
+  function apply(){
+    document.querySelectorAll('table.sortable-table').forEach(function(t){
+      if(!isSrcTable(t)) return;
+      t.querySelectorAll('tbody tr').forEach(function(r){
+        if(r.classList.contains('total-row')) return;
+        var c=r.querySelector('td'); if(!c) return;
+        r.style.display=(!current||c.textContent.trim()===current)?'':'none';
+      });
+    });
+    document.querySelectorAll('.source-block').forEach(function(blk){
+      var gt=blk.querySelector('.grp-title'); if(!gt) return;
+      blk.style.display=(!current||gt.textContent.trim().toLowerCase()===current.toLowerCase())?'':'none';
+    });
+    document.querySelectorAll('[data-msrc]').forEach(function(el){
+      var match=(el.getAttribute('data-msrc')===(current||'All'));
+      el.style.display=(match&&el.dataset.clps!=='1')?'':'none';
+    });
+  }
+  window.__srcApply=apply;
+  window.__srcCur=function(){return current;};
+  var slot=document.querySelector('.cover-inner');
+  if(slot){
+    onGreen=true;
+    lab.style.color='#fff';
+    bar.style.cssText='display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;margin-left:auto;';
+    var left=document.createElement('div');
+    while(slot.firstChild) left.appendChild(slot.firstChild);
+    slot.appendChild(left); slot.appendChild(bar);
+    slot.style.height='auto'; slot.style.minHeight='60px'; slot.style.display='flex';
+    slot.style.flexWrap='wrap'; slot.style.alignItems='center'; slot.style.gap='1rem';
+    slot.style.justifyContent='space-between';
+  } else {
+    bar.style.cssText='max-width:1500px;margin:0 auto;padding:1rem 1.5rem 0;display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;';
+    var firstSection=document.querySelector('section');
+    if(firstSection) firstSection.parentNode.insertBefore(bar,firstSection);
+  }
+  paint();
+})();
+</script>
+</body>
+</html>

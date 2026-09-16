@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deposit Retention</title>
+<style>
+*{box-sizing:border-box}
+/* House palette — same names and values as theme.css, so this page sits beside
+   the Bonus Cost, FTD, Acquisition and Business Overview reports without
+   clashing. The reports are standalone, so theme.css is a reference copy rather
+   than a link; 9-check-theme.bat enforces that nothing here drifts from it. */
+:root{
+ --dark-green:#0B6E3A;--green-hi:#0d7f43;--green-dk:#0a5a30;--sage:#4E9D5C;
+ --navy:#0F2A43;--slate:#5B7285;--light-green:#C0DD97;
+ --surface-1:#FFFFFF;--plane:#F4F6F5;--row-alt:#F3F7F3;--band:#E3F3E8;
+ --text-primary:#0F2A43;--text-secondary:#5B7285;--muted:#677181;
+ --grid:#E5E5E5;--axis:#C3CCD4;--border:#E5E5E5;--grey:#B7C3CF;--grey-3:#B8C0C8;
+ --warning:#E67E22;--critical:#C0392B;--good:#0B6E3A;--accent:#0B6E3A;
+ --heat-1:#E1EBE3;--heat-2:#C2D8C7;--heat-3:#A3C5AB;--heat-4:#84B28F;
+ --heat-5:#659F73;--heat-6:#468C57;--heat-7:#27793B;--heat-8:#0B5C2C;
+ --heat-ink:#243B4A;
+ --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color-scheme:light}
+body{margin:0;background:var(--plane);color:var(--text-primary);
+ font-family:var(--font-body);font-size:13px;line-height:1.45}
+.wrap{max-width:1800px;margin:0 auto;padding:20px 20px 48px}
+
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);color:#fff;
+ padding:1.6rem 20px 1.4rem; line-height: 1.45;}
+.cover-inner{max-width:1800px;margin:0 auto; min-height: 60px;}
+header{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+h1{font-size:1.55rem;font-weight:700;margin:0 0 .25rem;letter-spacing:-0.01em}
+.sub{color:var(--light-green);font-size:.86rem;margin:0}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.seg{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+ border-radius:20px;padding:2px}
+.seg button{appearance:none;border:0;background:transparent;color:#fff;font:inherit;font-weight:600;
+ font-size:12px;padding:5px 13px;border-radius:18px;cursor:pointer;white-space:nowrap}
+.seg button:hover{background:rgba(255,255,255,.16)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:700}
+/* One dropdown per filter dimension rather than another row of pills: six
+   dimensions of pills is three rows of chrome above a table. A dimension that
+   is set to anything but "all" turns solid, so an active filter is visible
+   without reading the words. */
+select.iconbtn{appearance:none;border:1.5px solid rgba(255,255,255,.6);
+ background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:12px;font-weight:600;
+ padding:5px 10px;border-radius:20px;cursor:pointer;max-width:190px}
+select.iconbtn:hover{background:rgba(255,255,255,.22)}
+select.iconbtn.on{background:#fff;color:var(--dark-green);font-weight:700;
+ border-color:#fff}
+select.iconbtn option{color:var(--navy);background:#fff}
+
+h2{font-size:.95rem;font-weight:700;margin:0;letter-spacing:.01em;color:var(--navy)}
+.seg.dark{background:var(--plane);border:1px solid var(--border);margin-left:14px}
+.seg.dark button{color:var(--slate);font-size:11px;padding:4px 11px;font-weight:600}
+.seg.dark button:hover{background:var(--band)}
+.seg.dark button[aria-pressed="true"]{background:var(--dark-green);color:#fff}
+
+.card{background:var(--surface-1);border-radius:8px;margin-top:16px;
+ box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.chead{display:flex;align-items:center;gap:9px;background:var(--surface-1);color:var(--navy);
+ border-radius:8px 8px 0 0;padding:.7rem .9rem .6rem;border-bottom:1px solid var(--border);
+ cursor:pointer;user-select:none}
+.chead:hover h2{color:var(--dark-green)}
+.chead .tog{appearance:none;width:19px;height:19px;flex:none;border:1px solid var(--axis);
+ border-radius:4px;background:var(--surface-1);color:var(--slate);font:inherit;font-size:13px;
+ line-height:1;font-weight:700;cursor:pointer;display:flex;align-items:center;
+ justify-content:center;padding:0}
+.chead:hover .tog{border-color:var(--dark-green);color:var(--dark-green)}
+.card.closed .cbody{display:none}
+.card.closed .chead{border-radius:8px;border-bottom:0}
+.chead .filters{margin-left:auto;font-size:11px;color:var(--muted);font-weight:500;
+ letter-spacing:.02em;cursor:default;text-align:right}
+
+/* ---- cohort table ----
+   A year of months fits on screen; the whole history in weeks does not, and the
+   year control is one click from either. Cap the height and stick the header, so
+   the column a figure sits under is still readable at row seventy. */
+.tbl{padding:.3rem .9rem 1rem;overflow:auto;max-height:640px}
+/* `fixed` so the first two columns are the same width in every table on the
+   page. Left to itself each table sizes its own columns from its own content,
+   and the three tables have 7, 12 and 7 measure columns — so "First depositors"
+   landed in a different place in each one and the eye had to re-find it on
+   every card. */
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;
+ table-layout:fixed}
+th,td{padding:.24rem .5rem;text-align:right;white-space:nowrap;
+ border-bottom:1px solid var(--border);line-height:1.3;
+ overflow:hidden;text-overflow:ellipsis}
+th:first-child,td:first-child{text-align:left}
+/* Wide enough for the longest label plus both badges — "week of 30 Dec 2024"
+   with PARTIAL and 0D WINDOW beside it. Under `table-layout:fixed` a narrow
+   column would clip them, and a clipped badge is worse than a wasted 40px in
+   the month view where labels are short. */
+th:nth-child(1),td:nth-child(1){width:290px}
+th:nth-child(2),td:nth-child(2){width:120px}
+/* Every body row the same height, whether or not its cells carry an `n=` line.
+   The sub-line is a block element, so a cell that has one was a line taller
+   than one that did not and the rows came out ragged — which reads as a layout
+   bug and, worse, makes a thinned row visually louder than a complete one for
+   no reason anybody intended. Reserving the space on every row costs a few
+   pixels and removes both problems. */
+/* 36px, not 34: a two-line cell measures 12.5px*1.3 + 9px*1.1 + padding = 33.8px,
+   and `height` on a td is a minimum — land within a pixel of the content and any
+   later nudge to a font size makes that one row taller than its neighbours again. */
+tbody td{height:36px;vertical-align:middle}
+thead th{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--slate);
+ font-weight:650;border-bottom:1.5px solid var(--axis);padding-bottom:.22rem;
+ position:sticky;top:0;z-index:2;background:var(--surface-1)}
+tbody tr:hover{background:var(--band)}
+td.m{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+td.c{color:var(--slate);font-variant-numeric:tabular-nums}
+td.cell{font-variant-numeric:tabular-nums;font-weight:650}
+td.cell .sub{display:block;font-size:9px;font-weight:500;opacity:.75;line-height:1.1}
+td.dash{color:var(--grey-3);font-weight:500}
+tfoot td{font-weight:700;border-top:1.5px solid var(--axis);border-bottom:0;
+ font-variant-numeric:tabular-nums;background:var(--row-alt);position:sticky;bottom:0}
+/* A cohort still filling up gets a small mark rather than a column of its own.
+   There is no prose on the page, so every mark and every dash carries its
+   meaning in a `title` — hover is the only explanation left. */
+tr.imm td:first-child::after{content:" ·";color:var(--warning);font-weight:700}
+td.m{overflow:visible}
+td.m .pt{display:inline-block;margin-left:5px;font-size:8px;font-weight:700;letter-spacing:.04em;
+ text-transform:uppercase;color:var(--warning);border:1px solid var(--warning);
+ border-radius:8px;padding:0 4px;vertical-align:1px;line-height:1.5}
+/* A row that can report nothing at all says so on the row, not only in the
+   tooltip of each of its dashes. Seven dashes beside a four-figure player count
+   reads as a broken table; "needs 90d" reads as a table waiting for time to
+   pass. Muted rather than orange — it is information, not a warning. */
+td.m .pt.info{color:var(--slate);border-color:var(--grey);letter-spacing:.04em}
+/* Two muted badges that look alike and mean different things, so they are
+   separable in code: `.info` alone marks a row that can show NOTHING and says
+   why; `.info.win` marks a row that does show figures but over a window shorter
+   than the horizon, so they are a floor rather than a finished rate. */
+.empty{padding:2.2rem .9rem;color:var(--muted);font-size:12.5px;text-align:center}
+
+/* cover band pinned to the business-overview benchmark */
+.cover h1{margin:0 0 .25rem;line-height:1.45}
+.cover .sub,.cover p{line-height:1.45}
+
+
+/* --- cover band: fixed height, see theme.css --cover-* ------------------- */
+.cover-inner{height:60px;min-height:60px;display:flex;align-items:center;
+  flex-wrap:nowrap;overflow:hidden;gap:14px}
+.cover-inner>*{min-width:0}
+.cover header{display:flex;flex-wrap:nowrap;align-items:center;gap:14px;
+  width:100%;justify-content:space-between;min-width:0;border:0;padding:0;margin:0}
+.cover h1,.cover p,.cover .sub,.cover .meta{white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%}
+.cover .controls,.cover .seg{flex:0 0 auto}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="cover-inner">
+<header>
+  <div>
+    <h1>Deposit Retention</h1>
+    <p class="sub" id="sub">&nbsp;</p>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Cohort grain">
+      <button id="gWeek"  aria-pressed="false">Weeks</button>
+      <button id="gMonth" aria-pressed="true">Months</button>
+    </div>
+    <div class="seg" role="group" aria-label="Maturity">
+      <button id="bAtRisk"   aria-pressed="true">At risk</button>
+      <button id="bComplete" aria-pressed="false">Complete cohorts</button>
+    </div>
+    <select class="iconbtn" id="f_year" title="Cohort year" aria-label="Cohort year"></select>
+    <select class="iconbtn" id="f_weeks" title="How many weeks to show"
+            aria-label="Weeks shown"></select>
+    <span id="dimPills"></span>
+    <span id="dimFilters"></span>
+  </div>
+</header>
+</div></div>
+
+<div class="wrap">
+
+<div class="card" id="cTable">
+  <div class="chead"><button class="tog">−</button><h2>Retention</h2>
+    <div class="seg dark" role="group" aria-label="Measure">
+      <button id="mAfter" aria-pressed="true">after D<i>n</i></button>
+      <button id="mBy"    aria-pressed="false">by D<i>n</i></button>
+    </div>
+    <div class="seg dark" role="group" aria-label="Show as">
+      <button id="rPct" aria-pressed="true">%</button>
+      <button id="rNum" aria-pressed="false">Players</button>
+    </div>
+    <span class="filters" id="tableFilters"></span></div>
+  <div class="cbody">
+    <div class="tbl"><table id="cohortTable"></table></div>
+  </div>
+</div>
+
+<div class="card" id="cMoney">
+  <div class="chead"><button class="tog">−</button><h2>Value per player</h2>
+    <div class="seg dark" role="group" aria-label="Value metric" id="segMoney"></div>
+    <div class="seg dark" role="group" aria-label="Value window" id="segMoneyWin">
+      <button id="vAfter" aria-pressed="true">after D<i>n</i></button>
+      <button id="vBy"    aria-pressed="false">by D<i>n</i></button>
+    </div>
+    <span class="filters" id="moneyFilters"></span></div>
+  <div class="cbody">
+    <div class="tbl"><table id="moneyTable"></table></div>
+  </div>
+</div>
+
+<div class="card" id="cMonthly">
+  <div class="chead"><button class="tog">−</button><h2>Monthly retention</h2>
+    <span class="filters" id="monthlyFilters"></span></div>
+  <div class="cbody">
+    <div class="tbl"><table id="monthlyTable"></table></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ------------------------------------------------------------------ data ---
+   Baked in at build time by make_retention_html.py. The page is standalone: it
+   opens by double-clicking, with no server and no network. Never edit the built
+   retention.html — edit this template and re-bake, or the next build silently
+   destroys the change.
+
+   WHAT THIS PAGE IS
+   -----------------
+   One table: the share of each first-deposit cohort that funded the account
+   again by day N. Betting is not retention here — the question is whether
+   acquired depositors come back and pay again, which is what the acquisition
+   spend is judged on.
+
+   It was built with milestone tiles, a return-curve chart, a milestone-trend
+   chart, a notes card, an explanatory note and a provenance footer. All were
+   removed on request, in that order. With the prose gone, every mark on the
+   table carries its meaning in a `title` instead: the dashes, the `·` on an
+   immature row, the `partial` badge, the `n=` under a thinned cell, and each
+   footer figure's cohort count and span. That is the only explanation left on
+   the page, so leave them in place.
+
+   HOW FILTERING WORKS
+   -------------------
+   The payload is one row per player — days observed, the day they first came
+   back, and a packed code for their attributes — rather than a pre-aggregated
+   cell per filter combination. Six dimensions would be hundreds of keys per
+   cohort under the old scheme, most never looked at. Here the page tallies
+   18,817 players on every change, which is well under a millisecond, and any
+   combination works. Adding a dimension is one entry in the builder's
+   DIMENSIONS list and no change to this file. */
+const D = __DATA__;
+
+const P = D.players;                 // {obs, lag, attr} — parallel, one per player
+const NP = P.obs.length;
+const MS = D.milestones;
+/* The survival measure needs each player's LAST return, which older builds of
+   this data do not carry. Rather than crash on `P.last[i]`, the page notices and
+   simply does not offer the switch — the same self-enabling rule the filter
+   dimensions follow. It appears by itself on the next build. */
+const HAS_AFTER = Array.isArray(P.last) && P.last.length === P.obs.length;
+const MIN_N = D.minEligible;
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const prettyDate = s => (+s.slice(8,10)) + ' ' + MONTHS[+s.slice(5,7)-1] + ' ' + s.slice(0,4);
+const fmt = n => n.toLocaleString('en-US');
+
+/* One decimal, which deviates from the house whole-number rule on purpose.
+   Cohort-to-cohort movement here is often under a point — Jul 2026 reads 27.3%
+   at D14 and 27.2% at D30, and that half-point fall is the whole signal that
+   the denominator has thinned. Rounded to whole numbers both cells say 27% and
+   the artefact becomes invisible, which is exactly the failure this page exists
+   to avoid. Every percentage on the page goes through here. */
+/* The sign goes before the currency symbol: -$5,000, never $-5,000. ARPU on
+   NGR goes negative for a cohort whose players are ahead, so this is not
+   hypothetical here. Averages under $100 keep their cents — $12 and $12.40 are
+   a different story about a cohort — and above that the cents are noise. */
+function money(n){
+  if (n === null || n === undefined || !isFinite(n)) return '—';
+  const s2 = n < 0 ? '-' : '', a2 = Math.abs(n);
+  return s2 + '$' + (a2 >= 100 ? Math.round(a2).toLocaleString('en-US') : a2.toFixed(2));
+}
+
+function pct1(x){
+  if (x === null || x === undefined || !isFinite(x)) return '—';
+  return x.toFixed(1) + '%';
+}
+
+/* Weeks by default. A cohort is fully observed at day N once its *last* member
+   has lived N days, so a monthly cohort waits out the whole month before its
+   clock starts; a weekly one waits seven days. On this data that moves the
+   newest complete day-30 figure from the month ending 30 June to the week
+   ending 19 July — nineteen days fresher, on more players, because fewer
+   cohorts are held back as immature. What it costs is denominator: about 205
+   players a week against 940 a month, so a single row is noisier. Read the
+   All-cohorts row in weeks; read one cohort in months. */
+const state = {
+  grain: 'month',         /* month | week  -- see the note below */
+  year: null,             /* set to the latest cohort year once YEARS exists */
+  /* Weeks shown, most recent first; 0 means every week in the selected year.
+     A year of weeks is fifty-two rows and the ones that answer "how are we
+     doing" are all at the bottom, so the weekly view lands on a screenful and
+     offers the rest. Months are twelve rows and need no such window — this is
+     ignored outside the weekly grain. */
+  weeks: 10,
+  /* Opens on 'risk': show every figure that can be computed, and mark the ones
+     computed on a thinned population with the n= they used.
+
+     'complete' was the default first, on the principle that no figure should
+     rest on a population that changed underneath it. In practice it withheld
+     the newest three or four cohorts from every table — the rows people open
+     the page to look at — and the question it produced, over and over, was
+     "why is this empty?" rather than "how comparable is this?". Withholding did
+     not make anyone more careful; it just hid the recent data and taught people
+     that the page was broken.
+
+     So the honest disclosure moved from absence to annotation: the figure is
+     there, the n= says what it rests on, and the row badge says how long the
+     cohort has been watched. 'Complete cohorts' is still one click away and is
+     still the right view for a strict like-for-like comparison. */
+  mature: 'risk',         /* risk | complete -- see usable() */
+  retMode: 'pct',         /* pct | n -- share, or the player count behind it */
+  /* Opens on 'after Dn': "how many of these first depositors are still
+     depositing past day N". It falls across the row the way a retention curve is
+     expected to, which is the shape people arrive expecting.
+
+     The cost, and it is worth knowing: 'after Dn' needs the cohort watched a
+     week PAST the milestone before a cell is publishable, so the newest rows
+     carry more dashes than the cumulative measure would put there. 'by Dn' —
+     which needs only N days and therefore fills in sooner, at the price of
+     rising rather than falling — is one click away. */
+  retMetric: 'after',     /* after | by */
+  sel: {},                /* dimension key -> 'all' or a code index as a string */
+  money: D.moneyMetrics[0][0],
+  /* The value table's own by/after switch, deliberately NOT shared with the
+     retention card's. They answer different questions and people read them in
+     different combinations — "how many are still here after day 30" beside
+     "how much did the cohort bring by day 30" is an ordinary pairing, and one
+     global toggle would forbid it.
+
+     Opens on 'after' to match the retention card above it: both tables then
+     answer the same shape of question, "what is still ahead of this cohort at
+     day N" rather than "what has it done so far". 'by Dn' — the cumulative
+     curve ADPU and ARPU normally mean — is one click away. */
+  moneyMetric: 'after'    /* after | by */   /* which metric the value table shows */
+};
+/* Each dimension opens on whatever the builder said, not blanket "all".
+   Account status defaults to the live population: a blocked account cannot come
+   back, so counting it as churn measures the block rather than the retention.
+   The header strip always names the filter, because a page that quietly
+   excludes people is worse than one that excludes them out loud. */
+D.dims.forEach(dim => { state.sel[dim.key] = dim.dflt || 'all'; });
+
+/* Dimensions rendered as a segmented switch rather than a dropdown. A switch
+   shows every option at once and takes one click to change; a dropdown hides
+   them behind two. That is worth the width for a short, frequently-used
+   dimension and not worth it for a long or rarely-touched one — six switches
+   would be three rows of chrome above the table, which is why the rest stay as
+   dropdowns. Add a key here and it moves; nothing else changes. */
+const PILL_DIMS = new Set(['status', 'chan', 'rail', 'kyc']);
+
+/* How many players carry each code of a dimension, over the whole dataset and
+   ignoring every filter — this is about which options exist at all, not which
+   are reachable right now. */
+function dimCounts(dim){
+  const c = new Array(dim.card).fill(0);
+  for (let i = 0; i < NP; i++) c[Math.floor(P.attr[i] / dim.stride) % dim.card]++;
+  return c;
+}
+
+const G = () => D.grains[state.grain];
+const cohorts = () => G().cohorts;
+const metaOf = ym => G().meta[ym] || { label: ym, short: ym, partial: 0 };
+const labelOf = ym => metaOf(ym).label;
+const shortOf = ym => metaOf(ym).short;
+const unit = () => state.grain === 'week' ? 'week' : 'month';
+
+/* Cohort year. This is a different kind of filter from the dropdowns beside it:
+   those narrow the *players* counted inside every cohort, this narrows which
+   cohorts are rows at all. Both the table and the All-cohorts row obey it, so
+   picking 2026 gives 2026's pooled figure rather than the whole history's.
+
+   The year comes from the cohort key, which for a week is the ISO year. That
+   puts the week of 30 Dec 2024 under 2025, because it is 2025-W01 — the same
+   reading that sorts the list and the same one its key plainly shows. It is
+   already flagged `partial` for the separate reason that the cache starts
+   mid-week. */
+const yearOf = ym => ym.slice(0, 4);
+const YEARS = [...new Set([].concat(
+  D.grains.month.cohorts.map(yearOf), D.grains.week.cohorts.map(yearOf)))].sort();
+/* Days a cohort must be watched PAST a milestone before its survival figure
+   is publishable. See the tally loop for why this is not zero. */
+const AFTER_MIN_WINDOW = 7;
+const inYear = c => state.year === 'all' || yearOf(cohorts()[c]) === state.year;
+
+/* The weekly window, on top of the year.
+
+   Cohorts are sorted ascending and a year is a key prefix, so the cohorts
+   passing inYear are always a contiguous run — "the last N of them" is one
+   floor index rather than a set. Everything that draws or pools a row goes
+   through inView, footers included: if the All-cohorts row pooled fifty-two
+   weeks while ten were on screen, the total would not be the total of what you
+   are looking at, which is the kind of disagreement nobody catches by eye.
+
+   Memoised on the three bits of state it depends on, because it is called from
+   inside loops over every cohort. */
+const WEEK_WINDOWS = [10, 26, 52, 0];        // 0 = every week in the year
+let _floorKey = null, _floor = -1;
+function viewFloor(){
+  const key = state.grain + '|' + state.year + '|' + state.weeks;
+  if (key === _floorKey) return _floor;
+  _floorKey = key;
+  _floor = -1;
+  if (state.grain === 'week' && state.weeks){
+    const cs = cohorts();
+    let n = 0;
+    for (let c = cs.length - 1; c >= 0; c--)
+      if (inYear(c) && ++n === state.weeks){ _floor = c; break; }
+    /* Fewer weeks exist than the window asks for — show them all rather than
+       nothing. Landing on an empty table because the year just turned over is
+       the failure mode this guards. */
+  }
+  return _floor;
+}
+const inView = c => inYear(c) && c >= viewFloor();
+
+/* The page opens on the LATEST cohort year, monthly.
+
+   Not 'all' and not a hardcoded '2026': the year is read from the data, so on
+   1 January this follows the calendar instead of opening on an empty table.
+   Whole history is one click away in the same control.
+
+   Monthly rather than weekly is a readability call. A year of months is twelve
+   rows you can take in at once; a year of weeks is fifty-two and you scroll.
+   The freshness argument for weeks is unchanged and still true — a weekly
+   cohort is fully observed at day 30 about three weeks sooner — it is just one
+   click away rather than the thing you land on. */
+state.year = YEARS[YEARS.length - 1];
+
+/* --------------------------------------------------------------- tallying --
+   Every player's attributes are packed into one mixed-radix integer, so the
+   filter is answered once per *combination* rather than once per player: build
+   a lookup over the (few dozen) possible codes, then the per-player test is a
+   single array read. */
+function allowTable(){
+  const allow = new Uint8Array(D.combos);
+  for (let code = 0; code < D.combos; code++){
+    let okc = 1;
+    for (let k = 0; k < D.dims.length; k++){
+      const dim = D.dims[k], v = state.sel[dim.key];
+      if (v === 'all') continue;
+      if (Math.floor(code / dim.stride) % dim.card !== +v){ okc = 0; break; }
+    }
+    allow[code] = okc;
+  }
+  return allow;
+}
+
+/* One pass over the players, into per-cohort counters.
+
+   `n` is the cohort's size under the current filter; `elig[c][j]` is how many
+   of them have had milestone j's days to come back; `ret[c][j]` is how many
+   did. Distinct never sums and never needs to here — a player appears once. */
+const MKEYS = D.moneyMetrics.map(m => m[0]);
+const MB = MKEYS.map(k => D.money[k]);          // per metric, deltas, NP x J
+
+function tally(){
+  const g = G(), ci = g.ci, K = g.cohorts.length, J = MS.length;
+  const allow = allowTable();
+  const n = new Int32Array(K);
+  const elig = new Int32Array(K * J);
+  const ret = new Int32Array(K * J);
+  /* Money is summed in the same pass. Float64 because these are dollars over
+     thousands of players and NGR is signed — an Int32Array would silently wrap
+     somewhere north of two billion cents. */
+  const eligA = new Int32Array(K * J);   // observed PAST milestone j
+  const aft = new Int32Array(K * J);     // ...and still depositing after it
+  const minObs = new Int32Array(K).fill(1e9);
+  const sums = MB.map(() => new Float64Array(K * J));
+  /* ...and the mirror of it: what the same players brought AFTER each
+     milestone, days MS[j]+1 through the horizon. Not a second pass over the
+     data — a player's whole-horizon total minus what they had brought by day
+     MS[j] is exactly what came later. */
+  const aftSums = MB.map(() => new Float64Array(K * J));
+  const run = new Float64Array(MB.length);
+  const runA = new Float64Array(MB.length);
+  const tot = new Float64Array(MB.length);
+
+  for (let i = 0; i < NP; i++){
+    if (!allow[P.attr[i]]) continue;
+    const c = ci[i], o = P.obs[i], lg = P.lag[i], base = c * J, mb = i * J;
+    n[c]++;
+    if (HAS_AFTER){
+      /* Per-column, exactly like the cumulative measure beside it. To ask
+         whether somebody kept depositing after day N you need to have watched
+         them PAST day N — not for the whole 90-day horizon.
+         Requiring the full horizon was the first version of this and it was
+         wrong: it withheld May 2026's entire row to avoid a bias worth at most
+         six days at the tail of an 89-day window, when every one of those 1,080
+         players had already been observed 84 days or more. What remains is that
+         a cohort watched for 40 days has a shorter window to keep depositing in
+         than one watched for 90, so its figure is a floor — the row says its
+         observed window on the label for exactly that reason. */
+      if (o < minObs[c]) minObs[c] = o;
+      const lst = P.last[i];
+      /* Whole-horizon total per metric, to subtract from. The buckets only ever
+         cover day 0..horizon, so this IS the player's value as far as this page
+         is concerned. */
+      for (let k = 0; k < MB.length; k++){
+        tot[k] = 0;
+        for (let j = 0; j < J; j++) tot[k] += MB[k][mb + j];
+        runA[k] = 0;
+      }
+      for (let j = 0; j < J; j++){
+        /* One day past the milestone is not enough to answer "are they still
+           depositing after day 60". Watch someone to day 63 and the only way
+           they can count is a deposit in those three days, so the rate collapses
+           towards zero and prints 0.0% next to a healthy n= — which is not a low
+           retention rate, it is a non-measurement wearing one's clothes. The
+           last 10 weeks made this visible: a 116-player cell read 0.0% at D60
+           and dragged the All-cohorts figure down with it.
+
+           So require a week of watching past the milestone before the cell is
+           computed at all. Seven days is the same span the D7 column already
+           treats as enough to see a return in, and it costs nothing where it
+           matters: every one of May's 1,080 players clears day 1 plus a week
+           many times over. */
+        /* Capped at the horizon. The last milestone is never *displayed* under
+           this measure — nothing can be after day 90 inside a 90-day window —
+           but its eligibility count is what everything else reads to decide
+           whether a cohort is fully observed. Asking for day 90 plus a week
+           there would demand more observation than the horizon can hold, and
+           the deepest column would report zero mature cohorts forever. */
+        if (o < Math.min(MS[j] + AFTER_MIN_WINDOW, MS[J-1] + 1)) break;
+        eligA[c*J + j]++;
+        if (lst > MS[j]) aft[c*J + j]++;
+        for (let k = 0; k < MB.length; k++){
+          runA[k] += MB[k][mb + j];                  // value BY day MS[j]
+          aftSums[k][c*J + j] += tot[k] - runA[k];   // ...so this is what came after
+        }
+      }
+    }
+    run.fill(0);
+    for (let j = 0; j < J; j++){
+      /* The emitted money is a delta per bucket, so the running sum through
+         bucket j IS the cumulative value at milestone j. Add before the
+         eligibility test: a player who drops out at j simply stops contributing
+         from there, rather than contributing a truncated total. */
+      for (let k = 0; k < MB.length; k++) run[k] += MB[k][mb + j];
+      /* The milestones ascend, so once a player is short of one they are short
+         of every later one — the break is not an optimisation detail, it is
+         what keeps `elig` monotonically shrinking across the row. */
+      if (o < MS[j]) break;
+      elig[base + j]++;
+      if (lg && lg <= MS[j]) ret[base + j]++;
+      for (let k = 0; k < MB.length; k++) sums[k][base + j] += run[k];
+    }
+  }
+  return { n, elig, ret, aft, eligA, minObs, sums, aftSums, K, J };
+}
+
+/* Whether cohort `c` may report milestone `j` at all.
+     'complete' — every member of the cohort has had those days, so the
+                  denominator is the whole cohort and the row can only rise
+                  across its columns. The default: it never shows a rate that
+                  fell because the population changed underneath it.
+     'risk'     — the denominator is whoever has had the days, which is how the
+                  newest cohorts get to say anything. Those cells print the n
+                  they used, because the rate describes earlier-in-period
+                  depositors only and can sit *below* the column to its left.
+   Either way a denominator under MIN_N is refused outright: a rate on twenty
+   players is noise wearing a percent sign.
+
+   Returns 0 (refuse), 1 (thinned), or 2 (fully observed). */
+function usable(T, c, j){
+  const e = T.elig[c * T.J + j];
+  if (e < MIN_N) return 0;
+  if (e === T.n[c]) return 2;
+  return state.mature === 'complete' ? 0 : 1;
+}
+
+/* Eligibility for the "after day N" measure. One denominator for the whole
+   row — the players with the full horizon observed — because "still depositing
+   after day 7" only compares between cohorts if everyone had the same window
+   to do it in. Returns 0 / 1 / 2 like usable(). */
+function usableAfter(T, c, j){
+  const e = T.eligA[c * T.J + j];
+  if (e < MIN_N) return 0;
+  if (e === T.n[c]) return 2;
+  return state.mature === 'complete' ? 0 : 1;
+}
+
+/* The All-cohorts row. Each column pools every cohort that qualifies at *that*
+   milestone and divides one summed numerator by one summed denominator — a
+   weighted rate, never the average of the column above it. On a column whose
+   cohorts differ in size those two answers differ by about a point.
+
+   The cohorts pooled are not the same set from column to column: one three
+   weeks old counts towards D1 and cannot count towards D90. Each footer cell
+   names its own base in a `title`. */
+function milestone(T, j){
+  const cs = cohorts();
+  let num = 0, den = 0, k = 0, from = null, to = null;
+  for (let c = 0; c < T.K; c++){
+    if (!inView(c)) continue;
+    if (!usable(T, c, j)) continue;
+    num += T.ret[c * T.J + j];
+    den += T.elig[c * T.J + j];
+    k++;
+    if (from === null) from = cs[c];
+    to = cs[c];
+  }
+  return { rate: den ? num / den * 100 : null, n: den, k, from, to };
+}
+
+/* Value per player at milestone j: money accumulated by that day divided by the
+   players who were eligible to accumulate it. Same denominator as the retention
+   table, so the two read off the same population and a filter moves both.
+
+   It is an ARITHMETIC MEAN, which is what ADPU and ARPU mean and the right
+   number for unit economics — but on this data the top 1% of players carry 58%
+   of deposits and more than 100% of NGR (more, because losers are netted
+   against them). So the figure is a true average of a very skewed set, and
+   every cell says so on hover rather than pretending otherwise.
+
+   Both accessors take the measure, and with it the matching denominator. That
+   pairing is the whole point: "value after day 30" over everyone who merely
+   REACHED day 30 would mix players who had two months left to spend with
+   players who had a day, and the average would sag for a reason that is not
+   about the players at all. So `after` divides by eligA — the same population
+   the survival column uses, watched a week past the milestone. */
+const moneyAfter = () => state.moneyMetric === 'after' && HAS_AFTER;
+
+function valueAt(T, c, j, mi){
+  const a = moneyAfter();
+  const e = (a ? T.eligA : T.elig)[c * T.J + j];
+  return e ? (a ? T.aftSums : T.sums)[mi][c * T.J + j] / e : null;
+}
+
+function pooledValue(T, j, mi){
+  const a = moneyAfter();
+  const S = a ? T.aftSums : T.sums, E = a ? T.eligA : T.elig;
+  let sum = 0, den = 0, k = 0;
+  for (let c = 0; c < T.K; c++){
+    if (!inView(c) || !(a ? usableAfter(T, c, j) : usable(T, c, j))) continue;
+    sum += S[mi][c * T.J + j];
+    den += E[c * T.J + j];
+    k++;
+  }
+  return { value: den ? sum / den : null, n: den, k, total: sum };
+}
+
+/* ------------------------------------------------------- monthly table ----
+   The classic cohort triangle, and a DIFFERENT measure from the day table
+   rather than a coarser one.
+
+   The day columns are cumulative — "had come back by day N" — so they only
+   rise. These are point-in-time — "deposited in calendar month N" — so they
+   fall, which is the shape people expect from a retention curve. A player who
+   returns in month 1, goes quiet in month 2 and comes back in month 3 counts in
+   M1 and M3 and not in M2. That cannot be derived from the first-return lag the
+   day table uses, which is why the builder emits a separate bitmask.
+
+   M1 is the calendar month AFTER the first deposit. There is no M0 column on
+   purpose: in a conventional triangle M0 is the acquisition month and reads
+   100%, but here it would read ~30% — the share who came back again inside
+   their own first month — and a column that looks like the convention and means
+   something else is exactly the confusion the "by D1" headers had to fix.
+
+   Cohorts are always calendar months here, whatever grain the rest of the page
+   is on: "month 3 of a week-long cohort" has no meaning. */
+const MONTH_COLS = 12;
+
+const monthIdx = ym => (+ym.slice(0,4)) * 12 + (+ym.slice(5,7)) - 1;
+const CUT_MONTH = monthIdx(D.cutoff.slice(0,7));
+
+/* 2 = the whole calendar month is in the data, 1 = it is the month the cache
+   stops partway through, 0 = it has not happened yet. The cutoff month is
+   always partial — the cache ends mid-month — so a cohort's most recent column
+   understates until that month closes. */
+function monthState(c, k){
+  const idx = monthIdx(D.grains.month.cohorts[c]) + k;
+  if (idx < CUT_MONTH) return 2;
+  if (idx === CUT_MONTH) return 1;
+  return 0;
+}
+
+const inYearMonth = c =>
+  state.year === 'all' || yearOf(D.grains.month.cohorts[c]) === state.year;
+
+function monthlyTally(){
+  const g = D.grains.month, ci = g.ci, K = g.cohorts.length;
+  const allow = allowTable();
+  const n = new Int32Array(K);
+  const hit = new Int32Array(K * MONTH_COLS);
+  for (let i = 0; i < NP; i++){
+    if (!allow[P.attr[i]]) continue;
+    const c = ci[i], m = P.mmask[i];
+    n[c]++;
+    for (let k = 1; k <= MONTH_COLS; k++)
+      if (m & (1 << k)) hit[c * MONTH_COLS + (k - 1)]++;
+  }
+  return { n, hit, K };
+}
+
+function renderMonthly(){
+  const g = D.grains.month, M = monthlyTally();
+  let h = '<thead><tr><th>Cohort</th><th>First depositors</th>' +
+          Array.from({length: MONTH_COLS}, (_, i) =>
+            '<th title="share of the cohort that made a deposit during the calendar month '+
+            (i+1)+' month'+(i?'s':'')+' after their first deposit — point-in-time, so a '+
+            'player who skips a month and returns later is out of this column and back in '+
+            'a later one">M'+(i+1)+'</th>').join('') + '</tr></thead><tbody>';
+  let drawn = 0;
+
+  g.cohorts.forEach((ym, c) => {
+    if (!inYearMonth(c) || !M.n[c]) return;
+    drawn++;
+    h += '<tr><td class="m">'+g.meta[ym].label+'</td><td class="c">'+fmt(M.n[c])+'</td>';
+    for (let k = 1; k <= MONTH_COLS; k++){
+      const st = monthState(c, k);
+      if (st === 0 || M.n[c] < MIN_N){
+        h += '<td class="dash" title="'+(M.n[c] < MIN_N
+             ? 'fewer than '+MIN_N+' players in this cohort'
+             : 'month '+k+' after '+g.meta[ym].label+' has not happened yet')+'">—</td>';
+        continue;
+      }
+      if (st === 1 && state.mature === 'complete'){
+        h += '<td class="dash" title="that month is only covered to '+prettyDate(D.cutoff)+
+             ' — switch to At risk to see it part-counted">—</td>';
+        continue;
+      }
+      const v = M.hit[c*MONTH_COLS + (k-1)] / M.n[c] * 100;
+      h += '<td class="cell" style="'+heatFill(v)+'"'+
+           (st === 1 ? ' title="only counted to '+prettyDate(D.cutoff)+', so this month is '+
+                       'still filling and understates"' : '')+'>'+pct1(v)+
+           (st === 1 ? '<span class="sub">part</span>' : '')+'</td>';
+    }
+    h += '</tr>';
+  });
+
+  /* Pooled per column over the cohorts that qualify for it — sum the returners,
+     sum the cohort sizes, divide once. Like the other footers, the set pooled
+     shrinks as the columns go right, because a young cohort has no month 9. */
+  let totN = 0;
+  for (let c = 0; c < M.K; c++) if (inYearMonth(c)) totN += M.n[c];
+  h += '</tbody><tfoot><tr><td title="pooled returners over pooled cohort sizes — a weighted '+
+       'rate, not the average of the column above">All cohorts</td><td>'+fmt(totN)+'</td>';
+  for (let k = 1; k <= MONTH_COLS; k++){
+    let num = 0, den = 0, kk = 0;
+    for (let c = 0; c < M.K; c++){
+      if (!inYearMonth(c) || M.n[c] < MIN_N) continue;
+      const st = monthState(c, k);
+      if (st === 0 || (st === 1 && state.mature === 'complete')) continue;
+      num += M.hit[c*MONTH_COLS + (k-1)]; den += M.n[c]; kk++;
+    }
+    h += den
+      ? '<td title="'+kk+' cohort'+(kk===1?'':'s')+', '+fmt(den)+' players">'+
+        pct1(num/den*100)+'</td>'
+      : '<td class="dash">—</td>';
+  }
+  h += '</tr></tfoot>';
+
+  document.getElementById('monthlyTable').innerHTML = drawn ? h :
+    '<tbody><tr><td class="empty">No first depositor matches this combination of filters. '+
+    'Widen one of them.</td></tr></tbody>';
+
+  document.getElementById('monthlyFilters').textContent =
+    'monthly cohorts · ' +
+    (state.mature === 'complete' ? 'whole months only' : 'part months included') + ' · ' +
+    (state.year === 'all' ? 'all cohort years' : state.year + ' cohorts') +
+    (activeFilters().length ? ' · ' + activeFilters().join(' · ') : '');
+}
+
+/* ---------------------------------------------------------------- table --- */
+function heatFill(x){
+  if (x === null) return '';
+  /* Pale to dark over 0–50%, which is the range these cohorts actually occupy.
+     A ramp stretched to the observed min–max would repaint itself every time a
+     filter narrowed the data and make two screenshots incomparable. */
+  const steps = ['#E1EBE3','#C2D8C7','#A3C5AB','#84B28F','#659F73','#468C57','#27793B','#0B5C2C'];
+  const i = Math.min(steps.length-1, Math.max(0, Math.floor(x / 50 * steps.length)));
+  return 'background:'+steps[i]+(i >= 5 ? ';color:#fff' : ';color:#243B4A');
+}
+
+/* The All-cohorts cell for whichever measure is on. Pooled numerators over
+   pooled denominators either way — never the average of the column. */
+function afterFooter(T, j){
+  if (j === T.J - 1)
+    return '<td class="dash" title="nothing can be after the end of the window">—</td>';
+  let num = 0, den = 0, k = 0;
+  for (let c = 0; c < T.K; c++){
+    if (!inView(c) || !usableAfter(T, c, j)) continue;
+    num += T.aft[c*T.J + j]; den += T.eligA[c*T.J + j]; k++;
+  }
+  if (!den) return '<td class="dash">—</td>';
+  return '<td title="'+fmt(num)+' of '+fmt(den)+' across '+k+' '+unit()+(k===1?'':'s')+
+         ' — still depositing after day '+MS[j]+'">'+
+         (state.retMode === 'n' ? fmt(num) : pct1(num/den*100))+'</td>';
+}
+
+function renderTable(T){
+  const cs = cohorts(), J = T.J;
+  /* "by D7", not "D7".
+     These columns are CUMULATIVE — the share that came back on any day from 1
+     to N — so the row rises across them. The industry's "D7 retention" usually
+     means the opposite, the share active *on* day 7, which falls. A bare "D7"
+     gives the reader no way to tell which they are looking at, and the rising
+     row then reads as a bug. The "by" is the whole disambiguation, so leave it
+     in; the header tooltip says it again in full. */
+  const after = state.retMetric === 'after';
+  let h = '<thead><tr><th>Cohort</th><th>First depositors</th>' +
+          MS.map(m => '<th title="'+(after
+            ? 'share still depositing AFTER day '+m+' — at least one deposit between day '+
+              (m+1)+' and day '+MS[MS.length-1]+'. A survival measure, so it falls across the '+
+              'row. Someone whose only return was day 3 counts under \u201Cby D7\u201D and not here.'
+            : 'share of the cohort that had deposited again on any day from 1 to '+m+
+              ' — cumulative, so it can only rise across the row. Day 0 is their own first '+
+              'deposit and a same-day top-up is not a return.')+'">'+
+            (after ? 'after D' : 'by D')+m+'</th>').join('') + '</tr></thead><tbody>';
+  let drawn = 0;
+
+  cs.forEach((ym, c) => {
+    if (!inView(c)) return;                    // a different year was selected
+    if (!T.n[c]) return;                       // no player matches the filter here
+    drawn++;
+    const imm = T.elig[c*J + J-1] < T.n[c];
+
+    /* Can this row show anything under the measure and maturity now selected?
+       If not, badge it with the reason rather than leaving a wall of dashes
+       next to a player count. */
+    let anyCol = false;
+    for (let j = 0; j < J && !anyCol; j++)
+      if (after ? (j < J - 1 && usableAfter(T, c, j)) : usable(T, c, j)) anyCol = true;
+    let badge = '';
+    /* How long this row's window actually is. A cohort watched 40 days has had
+       less chance to keep depositing than one watched 90, so its survival
+       figures are a floor rather than a rate — the label says the window so the
+       two are never read as the same thing. Only shown when it is short: on a
+       mature row it would be noise on every line. */
+    if (after && anyCol && T.minObs[c] < MS[J-1])
+      badge += '<span class="pt info win" title="the shortest observation in this '+unit()+
+               ' is '+T.minObs[c]+' days, so these figures count deposits over a '+
+               T.minObs[c]+'-day window rather than the full '+MS[J-1]+
+               ' — a floor, not a finished rate, and not comparable with the rows above">'+
+               T.minObs[c]+'d window</span>';
+    if (!anyCol){
+      /* The first column is the easiest one to satisfy, so what the row needs
+         is what THAT column needs: day 1 plus the week of watching the survival
+         measure requires, not the full horizon. Saying "needs 90d" on a row
+         that will start reporting in a week is a wrong answer to "when does
+         this fill in". */
+      const need = after ? MS[0] + AFTER_MIN_WINDOW : MS[0];
+      const have = after ? T.eligA[c*J] : T.elig[c*J];
+      const dys = need + ' day' + (need === 1 ? '' : 's');
+      badge = have === 0
+        ? '<span class="pt info" title="no member of this '+unit()+' has had '+dys+
+          ' yet, so there is nothing to measure — this row fills in as time passes">needs '+
+          need+'d</span>'
+        : (have < MIN_N
+            ? '<span class="pt info" title="only '+fmt(have)+' of '+fmt(T.n[c])+' have had '+
+              dys+', under the '+MIN_N+'-player floor">too few yet</span>'
+            : '<span class="pt info" title="'+fmt(have)+' of '+fmt(T.n[c])+' have had '+dys+
+              (after ? ', and the whole window is what \u201Cafter day N\u201D needs — a player who has '+
+                       'not returned YET is not the same as one who never will' : '')+
+              ' — switch to At risk to compute it on them">at risk only</span>');
+    }
+    /* The cohort key on the row, so anything reading the table back identifies
+       a row by its identity rather than by parsing the label text — the badges
+       concatenate straight onto it ("…20260d window") and a regex over that is
+       a bug waiting to happen. */
+    h += '<tr data-cohort="'+ym+'" class="'+(imm?'imm':'')+'"><td class="m"'+
+         (imm ? ' title="this '+unit()+' has not yet had the full '+MS[J-1]+' days, so its '+
+                'later milestones are either withheld or computed on the members who have"' : '')+'>'+
+         labelOf(ym) +
+         (metaOf(ym).partial
+           ? '<span class="pt" title="the cache does not cover the whole of this '+unit()+
+             ', so the size is not comparable to a full one">partial</span>' : '') + badge +
+         '</td><td class="c">'+fmt(T.n[c])+'</td>';
+    for (let j = 0; j < J; j++){
+      /* The two measures have different denominators. "by D7" divides by whoever
+         has had 7 days; "after D7" divides by whoever has had the whole horizon,
+         because you cannot ask whether someone kept depositing past day 7 unless
+         you watched them long enough to see it. */
+      const u = after ? usableAfter(T, c, j) : usable(T, c, j);
+      const e = after ? T.eligA[c*J + j] : T.elig[c*J + j];
+      const need = after ? MS[j] + AFTER_MIN_WINDOW : MS[j];
+      if (after && j === J - 1){
+        h += '<td class="dash" title="nothing can be after day '+MS[j]+' inside a '+MS[j]+
+             '-day window — this column exists only in the by-day measure">—</td>';
+        continue;
+      }
+      if (!u){
+        /* The survival measure needs a different sentence from the cumulative
+           one, and it is the sentence people keep having to ask for: "by D1"
+           needs one day of observation, "after D1" needs the whole window,
+           because saying somebody did NOT keep depositing means having watched
+           the entire span they had to do it in. */
+        const why = after
+          ? (e < MIN_N
+              ? 'fewer than '+MIN_N+' of these players have been watched to day '+need+
+                ' — a week past day '+MS[j]+', the least it takes to see whether they kept going'
+              : 'answering \u201Cafter day '+MS[j]+'\u201D needs the whole '+need+'-day window, not just '+
+                MS[j]+' day'+(MS[j]===1?'':'s')+' — otherwise someone who has not come back YET counts the same as '+
+                'someone who never will, and this '+unit()+' reads low against the complete ones '+
+                'above it. '+fmt(e)+' of '+fmt(T.n[c])+' have had it; switch to At risk to '+
+                'compute the row on those '+fmt(e)+'.')
+          : (e < MIN_N
+              ? 'fewer than '+MIN_N+' of these players have had '+need+' days'
+              : 'only '+fmt(e)+' of '+fmt(T.n[c])+' have had '+need+' days — switch to At risk '+
+                'to compute it on them');
+        h += '<td class="dash" title="'+why+'">—</td>';
+        continue;
+      }
+      const got = after ? T.aft[c*J + j] : T.ret[c*J + j], v = got / e * 100;
+      /* Every cell says how many players it is, not only what share — "how many
+         of our FTDs came back within 7 days" is the question people actually
+         arrive with, and reading it off a percentage needs a calculator. The
+         colour stays keyed to the percentage either way, so switching the
+         display does not repaint the table into something incomparable. */
+      h += '<td class="cell" style="'+heatFill(v)+'" title="'+fmt(got)+' of '+fmt(e)+
+           (after
+             ? ' first depositors were still depositing after day '+MS[j]+
+               ' — at least one deposit between day '+(MS[j]+1)+' and day '+
+               Math.min(T.minObs[c], MS[J-1]) +
+               (T.minObs[c] < MS[J-1] ? ', which is as far as this '+unit()+
+                ' has been watched — a floor rather than a finished rate' : '')
+             : ' first depositors deposited again within '+MS[j]+' day'+(MS[j]===1?'':'s')+
+               ' of their own first deposit')+
+           (u === 1 ? ' — computed on the '+fmt(e)+' of '+fmt(T.n[c])+' who have had that long, '+
+                      'a narrower and earlier-in-'+unit()+' group than this row\'s other columns'
+                    : '')+'">'+
+           (state.retMode === 'n' ? fmt(got) : pct1(v)) +
+           (u === 1 ? '<span class="sub">n='+fmt(e)+'</span>' : '')+'</td>';
+    }
+    h += '</tr>';
+  });
+
+  let total = 0;
+  for (let c = 0; c < T.K; c++) if (inView(c)) total += T.n[c];
+
+  h += '</tbody><tfoot><tr><td title="pooled numerators over pooled denominators — a weighted '+
+       'rate, not the average of the column above">All cohorts</td><td>'+fmt(total)+'</td>' +
+       MS.map((m, j) => {
+         const t = milestone(T, j);
+         if (after) return afterFooter(T, j);
+         if (t.rate === null) return '<td class="dash">—</td>';
+         const got = Math.round(t.rate / 100 * t.n);
+         return '<td title="'+fmt(got)+' of '+fmt(t.n)+' across '+t.k+' '+unit()+(t.k===1?'':'s')+
+                ' ('+shortOf(t.from)+'–'+shortOf(t.to)+') — the later columns pool fewer '+
+                'cohorts, because a young one cannot have a day-'+m+' outcome">'+
+                (state.retMode === 'n' ? fmt(got) : pct1(t.rate))+'</td>';
+       }).join('') +
+       '</tr></tfoot>';
+
+  document.getElementById('cohortTable').innerHTML = drawn ? h :
+    '<tbody><tr><td class="empty">No first depositor matches this combination of filters. '+
+    'Widen one of them.</td></tr></tbody>';
+}
+
+function renderMoney(T){
+  const cs = cohorts(), J = T.J;
+  const mi = MKEYS.indexOf(state.money);
+  const label = D.moneyMetrics[mi][2];
+  const after = moneyAfter();
+  let h = '<thead><tr><th>Cohort</th><th>First depositors</th>' +
+          MS.map(m => '<th title="'+(after
+            ? 'value per cohort member from day '+(m+1)+' to day '+MS[MS.length-1]+
+              ' — what they brought AFTER day '+m+', not counting anything up to it. '+
+              'Falls across the row, because each column starts later and has less '+
+              'time left to earn in.'
+            : 'value accumulated per cohort member from day 0 through day '+m+
+              ', day 0 being their own first deposit')+'">'+
+            (after ? 'after D' : 'by D')+m+'</th>').join('') + '</tr></thead><tbody>';
+  let drawn = 0;
+
+  cs.forEach((ym, c) => {
+    if (!inView(c) || !T.n[c]) return;
+    drawn++;
+    const imm = T.elig[c*J + J-1] < T.n[c];
+    h += '<tr class="'+(imm?'imm':'')+'"><td class="m"'+
+         (imm ? ' title="this '+unit()+' has not yet had the full '+MS[J-1]+' days, so its '+
+                'later columns are either withheld or computed on the members who have"' : '')+'>'+
+         labelOf(ym) +
+         (metaOf(ym).partial
+           ? '<span class="pt" title="the cache does not cover the whole of this '+unit()+
+             ', so the size is not comparable to a full one">partial</span>' : '') +
+         '</td><td class="c">'+fmt(T.n[c])+'</td>';
+    for (let j = 0; j < J; j++){
+      /* The last column has nothing after it — the horizon ends there — so under
+         the after measure it is structurally empty, exactly as in the retention
+         table above. Say that rather than leaving a bare dash. */
+      if (after && j === J - 1){
+        h += '<td class="dash" title="nothing comes after day '+MS[j]+' inside a '+MS[j]+
+             '-day window — this column exists only in the by-day measure">—</td>';
+        continue;
+      }
+      const u = after ? usableAfter(T, c, j) : usable(T, c, j);
+      const e = (after ? T.eligA : T.elig)[c*J + j];
+      const need = after ? MS[j] + AFTER_MIN_WINDOW : MS[j];
+      if (!u){
+        h += '<td class="dash" title="'+(e < MIN_N
+               ? 'fewer than '+MIN_N+' of these players have had '+need+' days'
+               : 'only '+fmt(e)+' of '+fmt(T.n[c])+' have had '+need+' days — switch to At risk '+
+                 'to compute it on them')+'">—</td>';
+        continue;
+      }
+      const v = valueAt(T, c, j, mi);
+      const raw = (after ? T.aftSums : T.sums)[mi][c*J + j];
+      h += '<td class="cell num" title="'+money(raw)+
+           (after ? ' brought after day '+MS[j]+' by ' : ' across ')+fmt(e)+
+           ' players who have had '+need+' days'+(u === 1 ? ' — a narrower, earlier-in-'+
+           unit()+' group than this row\'s other columns' : '')+'">'+money(v)+
+           (u === 1 ? '<span class="sub">n='+fmt(e)+'</span>' : '')+'</td>';
+    }
+    h += '</tr>';
+  });
+
+  let tot = 0;
+  for (let c = 0; c < T.K; c++) if (inView(c)) tot += T.n[c];
+
+  h += '</tbody><tfoot><tr><td title="total money over total eligible players — a weighted '+
+       'mean, not the average of the column above">All cohorts</td><td>'+fmt(tot)+'</td>' +
+       MS.map((m, j) => {
+         /* Nothing comes after the last milestone, so the pooled figure there is
+            a true and useless $0.00 — the rows already dash it, and a footer
+            that disagrees with every cell above it reads as a bug. */
+         if (after && j === J - 1)
+           return '<td class="dash" title="nothing comes after day '+m+' inside a '+m+
+                  '-day window — this column exists only in the by-day measure">—</td>';
+         const t = pooledValue(T, j, mi);
+         if (t.value === null) return '<td class="dash">—</td>';
+         return '<td title="'+money(t.total)+(after ? ' brought after day '+m+' by ' :
+                ' across ')+fmt(t.n)+' players in '+t.k+' '+
+                unit()+(t.k===1?'':'s')+' — an arithmetic mean over a very skewed set: the '+
+                'top 1% of players carry 58% of deposits and over 100% of NGR">'+
+                money(t.value)+'</td>';
+       }).join('') +
+       '</tr></tfoot>';
+
+  document.getElementById('moneyTable').innerHTML = drawn ? h :
+    '<tbody><tr><td class="empty">No first depositor matches this combination of filters. '+
+    'Widen one of them.</td></tr></tbody>';
+
+  document.getElementById('moneyFilters').textContent =
+    label + ' · ' + (after ? 'after day N' : 'cumulative') + ' · ' +
+    document.getElementById('tableFilters').textContent;
+}
+
+/* --------------------------------------------------------------- render --- */
+function activeFilters(){
+  return D.dims
+    .filter(dim => state.sel[dim.key] !== 'all')
+    .map(dim => dim.opts.find(o => o[0] === state.sel[dim.key])[1]);
+}
+
+function render(){
+  const cs = cohorts();
+  const T = tally();
+
+  const shown = cs.filter((_, c) => inView(c));
+  const sub = document.getElementById('sub');
+  sub.textContent =
+    fmt(D.totalMembers) + ' first depositors · ' + shown.length + ' ' + unit() + 'ly cohorts, ' +
+    labelOf(shown[0]) + ' – ' + labelOf(shown[shown.length-1]) +
+    ' · observed to ' + prettyDate(D.cutoff);
+  /* The build provenance had its own footer line until that was removed too.
+     It is the answer to "is this stale?", so it survives on hover rather than
+     disappearing: the subtitle already carries the data cutoff, this carries
+     when the page was made from it. */
+  sub.title = 'Built ' + D.built + ' from the query-1732 month caches, no Redash calls · ' +
+    D.grains.month.cohorts.length + ' monthly / ' + D.grains.week.cohorts.length +
+    ' weekly cohorts over the same ' + fmt(D.totalMembers) + ' first depositors';
+
+  const act = activeFilters();
+  if (state.grain === 'week' && state.weeks) act.unshift('last ' + state.weeks + ' weeks');
+  if (state.year !== 'all') act.unshift(state.year + ' cohorts');
+  document.getElementById('tableFilters').textContent =
+    unit() + 'ly cohorts · ' +
+    (state.mature === 'complete' ? 'complete cohorts only' : 'at-risk denominators') + ' · ' +
+    (act.length ? act.join(' · ') : 'unfiltered');
+  /* Anything left at its builder default is still a filter — it just was not
+     chosen by the reader. Marking those keeps the strip honest without making
+     a deliberate change look the same as a default. */
+
+  D.dims.forEach(dim => {
+    const el = document.getElementById('f_' + dim.key);
+    if (el) el.className = 'iconbtn' + (state.sel[dim.key] === 'all' ? '' : ' on');
+  });
+  document.querySelectorAll('#dimPills button').forEach(b =>
+    b.setAttribute('aria-pressed', String(state.sel[b.dataset.dim] === b.dataset.v)));
+  document.getElementById('f_year').className =
+    'iconbtn' + (state.year === 'all' ? '' : ' on');
+  const fw = document.getElementById('f_weeks');
+  fw.style.display = state.grain === 'week' ? '' : 'none';
+  fw.className = 'iconbtn' + (state.weeks ? ' on' : '');
+  fw.value = state.weeks;
+
+  renderTable(T);
+  renderMonthly();
+  renderMoney(T);
+}
+
+/* ---------------------------------------------------------------- wiring --- */
+function press(id, on){
+  const n = document.getElementById(id);
+  if (n) n.setAttribute('aria-pressed', String(!!on));
+}
+
+/* A default set in `state` but not in the markup renders controls that lie on
+   load, so every one of them is written from state rather than trusted to
+   match. */
+function syncControls(){
+  press('gWeek', state.grain === 'week'); press('gMonth', state.grain === 'month');
+  press('bComplete', state.mature === 'complete'); press('bAtRisk', state.mature === 'risk');
+  press('rPct', state.retMode === 'pct'); press('rNum', state.retMode === 'n');
+  if (HAS_AFTER){ press('mBy', state.retMetric === 'by'); press('mAfter', state.retMetric === 'after'); }
+  D.dims.forEach(dim => {
+    const el = document.getElementById('f_' + dim.key);
+    if (el) el.value = state.sel[dim.key];
+  });
+  document.querySelectorAll('#dimPills button').forEach(b =>
+    b.setAttribute('aria-pressed', String(state.sel[b.dataset.dim] === b.dataset.v)));
+  document.getElementById('f_year').value = state.year;
+  document.getElementById('f_weeks').value = state.weeks;
+  document.querySelectorAll('#segMoney button').forEach(b2 =>
+    b2.setAttribute('aria-pressed', String(b2.dataset.v === state.money)));
+  if (HAS_AFTER){
+    press('vBy',    state.moneyMetric === 'by');
+    press('vAfter', state.moneyMetric === 'after');
+  }
+}
+
+/* One dropdown per dimension, built from what the builder emitted. A dimension
+   whose column is absent from the cache is not in D.dims at all, so the control
+   simply is not there — and appears by itself on the first build after the data
+   starts arriving, with no change to this file. */
+document.getElementById('dimPills').innerHTML = D.dims
+  .filter(dim => PILL_DIMS.has(dim.key))
+  .map(dim =>
+    '<div class="seg" role="group" aria-label="'+dim.label+'" data-dim="'+dim.key+'">' +
+    dim.opts.filter((o, i) => {
+      /* Drop an option no player is in. It matters more on a switch than in a
+         dropdown: a switch's whole value is that every option is visible and
+         live, and a permanently-empty button invites a click that can only
+         produce an empty table. "KYC unknown" is exactly that once the cache
+         carries kyc_status for every month — and it comes back by itself if a
+         future month ever lands without the column. The dropdowns keep their
+         full option list, so nothing is hidden from the data model. */
+      return i === 0 || dimCounts(dim)[i - 1] > 0;
+    }).map(o =>
+      '<button data-dim="'+dim.key+'" data-v="'+o[0]+'" aria-pressed="false">'+o[1]+'</button>'
+    ).join('') + '</div>').join(' ');
+
+document.querySelectorAll('#dimPills button').forEach(b => {
+  b.onclick = () => { state.sel[b.dataset.dim] = b.dataset.v; syncControls(); render(); };
+});
+
+document.getElementById('segMoney').innerHTML = D.moneyMetrics.map(m =>
+  '<button data-v="'+m[0]+'" aria-pressed="'+(state.money === m[0])+'">'+
+  m[1]+'</button>').join('');
+document.querySelectorAll('#segMoney button').forEach(b2 => {
+  b2.title = (D.moneyMetrics.find(m => m[0] === b2.dataset.v) || [])[2] || '';
+  b2.onclick = () => { state.money = b2.dataset.v; syncControls(); render(); };
+});
+
+if (HAS_AFTER){
+  document.getElementById('vBy').title =
+    'value accumulated from day 0 through day N — the cumulative curve ADPU and ARPU '+
+    'normally mean, so it can only rise across the row';
+  document.getElementById('vAfter').title =
+    'value brought AFTER day N, from day N+1 to the end of the window. Falls across '+
+    'the row: each column starts later and has less time left to earn in. Read beside '+
+    '"by Dn" it answers how much of a cohort\'s value is still ahead of it at day N.';
+  document.getElementById('vBy').onclick =
+    () => { state.moneyMetric = 'by';    syncControls(); render(); };
+  document.getElementById('vAfter').onclick =
+    () => { state.moneyMetric = 'after'; syncControls(); render(); };
+} else {
+  /* No last-return data in this build, so there is no after-window to divide by.
+     Remove the control rather than leaving a dead one — same rule as the
+     retention card's switch. */
+  const seg = document.getElementById('segMoneyWin');
+  if (seg) seg.remove();
+  state.moneyMetric = 'by';
+}
+
+const fYear = document.getElementById('f_year');
+fYear.innerHTML = '<option value="all">All cohort years</option>' +
+  YEARS.map(y => '<option value="'+y+'">'+y+' cohorts</option>').join('');
+fYear.onchange = e => { state.year = e.target.value; render(); };
+
+/* The window control. Hidden outside the weekly grain rather than disabled —
+   twelve months never needs it, and a permanently greyed control reads as
+   something broken. */
+const fWeeks = document.getElementById('f_weeks');
+fWeeks.innerHTML = WEEK_WINDOWS.map(w =>
+  '<option value="'+w+'">'+(w ? 'Last '+w+' weeks' : 'All weeks')+'</option>').join('');
+fWeeks.onchange = e => { state.weeks = +e.target.value; render(); };
+
+document.getElementById('dimFilters').innerHTML = D.dims
+  .filter(dim => !PILL_DIMS.has(dim.key))
+  .map(dim =>
+    '<select class="iconbtn" id="f_'+dim.key+'" title="'+dim.label+'" aria-label="'+dim.label+'">' +
+    dim.opts.map(o => '<option value="'+o[0]+'">'+o[1]+'</option>').join('') +
+    '</select>').join(' ');
+
+D.dims.filter(dim => !PILL_DIMS.has(dim.key)).forEach(dim => {
+  document.getElementById('f_' + dim.key).onchange = e => {
+    state.sel[dim.key] = e.target.value;
+    render();
+  };
+});
+
+if (HAS_AFTER){
+  document.getElementById('mBy').onclick    = () => { state.retMetric = 'by';    syncControls(); render(); };
+  document.getElementById('mAfter').onclick = () => { state.retMetric = 'after'; syncControls(); render(); };
+} else {
+  /* No last-return data in this build, so the measure cannot be offered. Remove
+     the control rather than leaving a dead one — same rule as a filter dimension
+     the cache cannot support. */
+  const seg = document.getElementById('mBy').closest('.seg');
+  if (seg) seg.remove();
+  state.retMetric = 'by';
+}
+document.getElementById('rPct').onclick = () => { state.retMode = 'pct'; syncControls(); render(); };
+document.getElementById('rNum').onclick = () => { state.retMode = 'n';   syncControls(); render(); };
+
+document.getElementById('bComplete').onclick = () => { state.mature = 'complete'; syncControls(); render(); };
+document.getElementById('bAtRisk').onclick   = () => { state.mature = 'risk';     syncControls(); render(); };
+
+function setGrain(g){
+  if (state.grain === g) return;
+  state.grain = g;
+  syncControls(); render();
+}
+document.getElementById('gWeek').onclick  = () => setGrain('week');
+document.getElementById('gMonth').onclick = () => setGrain('month');
+
+document.querySelectorAll('.card .chead').forEach(h => {
+  h.onclick = e => {
+    if (e.target.closest('.seg')) return;      // a filter click must not fold the card
+    const c = h.parentNode;
+    c.classList.toggle('closed');
+    h.querySelector('.tog').textContent = c.classList.contains('closed') ? '+' : '−';
+  };
+});
+
+/* `const` is script-scoped and never reaches `window`, so nothing outside this
+   block — the test, the console — can see any of the above. The handover is
+   explicit and is what test_retention.js drives. */
+window.RET = { D, state, tally, usable, usableAfter, milestone, allowTable, render, pct1, money,
+               monthlyTally, monthState, MONTH_COLS, inYearMonth, HAS_AFTER,
+               valueAt, pooledValue, MKEYS, moneyAfter, AFTER_MIN_WINDOW,
+               G, cohorts, metaOf, shortOf, labelOf, unit, setGrain,
+               syncControls, activeFilters, YEARS, yearOf, inYear, inView, viewFloor, WEEK_WINDOWS,
+               dimCounts, PILL_DIMS };
+
+syncControls();
+render();
+</script>
+</body>
+</html>

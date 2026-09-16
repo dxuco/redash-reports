@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>US 360 — traffic, acquisition and revenue</title>
+<style>
+:root{--dark-green:#0B6E3A;--green-hi:#0D7F43;--green-dk:#0A5A30;--sage:#4E9D5C;
+--light-green:#C0DD97;--band:#E3F3E8;--row-alt:#F3F7F3;--navy:#0F2A43;--slate:#5B7285;
+--muted:#677181;--grey:#B7C3CF;--axis:#C3CCD4;--border:#E5E5E5;--bar-bg:#EEF1F4;
+--surface:#FFFFFF;--plane:#F4F6F5;--panel:#FAFBF9;--divider:#D8DEE0;--warning:#E67E22;
+--warn-bg:#FDF6EC;--critical:#C0392B;--grey-2:#8B93A1;--grey-3:#B8C0C8;--grey-5:#C6CED4;
+--tint-1:#E7F1E9;--ramp-navy-2:#4A6480;--ramp-warm-2:#ECA255;--heat-3:#A3C5AB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--navy);
+font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 72px}
+header{background:var(--dark-green);color:#fff;padding:36px 0 30px;margin-bottom:28px}
+header .wrap{padding-bottom:0}
+h1{margin:0 0 6px;font-size:27px;font-weight:600;letter-spacing:-.2px}
+header p{margin:0;color:var(--light-green);font-size:14px}
+h2{font-size:18px;font-weight:600;margin:38px 0 4px;padding-top:20px;border-top:2px solid var(--dark-green)}
+h2 .n{color:var(--grey-2);font-weight:400;margin-right:8px}
+.sub{color:var(--slate);font-size:13.5px;margin:0 0 16px;max-width:78ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin:18px 0 4px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 15px}
+.card .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--grey-2)}
+.card .val{font-size:22px;font-weight:600;margin:5px 0 2px;font-variant-numeric:tabular-nums}
+.card .chg{font-size:12.5px;font-variant-numeric:tabular-nums}
+.up{color:var(--dark-green)}.dn{color:var(--critical)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin:16px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+th{text-align:right;padding:7px 9px;border-bottom:2px solid var(--divider);color:var(--slate);
+font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:7px 9px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr:hover{background:var(--band)}
+tr.tot td{font-weight:600;border-top:2px solid var(--divider);background:var(--row-alt)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:2px 0 10px;font-size:12.5px;color:var(--slate)}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:2px;display:inline-block}
+.note{background:var(--warn-bg);border-left:3px solid var(--warning);border-radius:0;
+padding:12px 15px;margin:14px 0;font-size:13.5px}
+.note b{color:var(--warning)}
+.scroll{overflow-x:auto}
+svg{display:block;max-width:100%}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--divider);
+color:var(--muted);font-size:12.5px}
+code{background:var(--row-alt);padding:1px 5px;border-radius:3px;font-size:12.5px}
+</style></head><body>
+<header><div class="wrap">
+<h1>US 360 — traffic, acquisition and revenue</h1>
+<p>January–August 2025 vs 2026 · GA4 property 339919146 + Redash query 1732 · whale excluded</p>
+</div></header>
+<div class="wrap">
+
+<div class="note"><b>How "US" is defined here.</b> The revenue figures cover the
+<b>US bloc</b>: players whose <code>player_country</code> is
+<i>United States of America</i> or <i>VPN Player</i>. The VPN bucket is ~90% US
+and is the largest single country bucket in the cache — bigger than the US
+bucket itself — so a US read that drops it understates the business by more than
+half. GA4 cannot make the same join: it geolocates by IP, so a US player on a
+VPN is counted under the VPN's exit country. Traffic and revenue in this report
+therefore cover overlapping but not identical populations, and the traffic side
+is the narrower of the two.</div>
+
+<h2><span class="n">01</span>The headline</h2>
+<p class="sub">Every funnel measure fell. Every money measure rose. This is the
+whole report in one line: the traffic that left was traffic that did not spend.</p>
+<div class="cards" id="cards"></div>
+
+<h2><span class="n">02</span>Gross and net gaming revenue, by month</h2>
+<p class="sub">Negative months stack below the zero rule rather than being
+clamped. January 2026 was a real loss month — a single VPN-bucket cohort ran
+−$360k GGR — and averaging it away would hide the most volatile thing in the data.</p>
+<div class="panel"><div class="legend" id="lg1"></div><div id="ch1"></div></div>
+
+<h2><span class="n">03</span>The funnel</h2>
+<p class="sub">Depositors held; first-time depositors halved. The gap between
+those two lines is the entire risk in this report.</p>
+<div class="panel"><div class="legend" id="lg2"></div><div id="ch2"></div></div>
+
+<h2><span class="n">04</span>GA4 sessions by channel — US only</h2>
+<p class="sub">Referral collapsed from 56,107 sessions in January 2025 to a few
+thousand a month. Two spikes are tracking artifacts, not demand — see the note below.</p>
+<div class="panel"><div class="legend" id="lg3"></div><div id="ch3"></div></div>
+<div class="note"><b>Two spikes to discount.</b> November 2025 carries 143,645
+<i>Unassigned</i> US sessions and August 2026 carries 133,481 <i>Direct</i> —
+each several times the surrounding months, and neither has any answering
+movement in deposits or GGR. Treat both as instrumentation events. The apparent
+"recovery" in July–August 2026 is almost entirely this.</div>
+
+<h2><span class="n">05</span>Where the money comes from — <code>aff_source</code></h2>
+<p class="sub">Present on 42% of rows, so this is a partial view, but it is the
+attribution you already have and it needs no new instrumentation.</p>
+<div class="panel scroll"><table id="tsrc"></table></div>
+
+<h2><span class="n">06</span>Direct, affiliate and streamer</h2>
+<div class="panel scroll"><table id="ttype"></table></div>
+<div class="note"><b>Streamer traffic loses money.</b> It grew depositors 48% and
+deposits 390% — and returned <i>negative</i> GGR and NGR both years, −$1,704 and
+−$2,967 in 2026. More of it makes the number worse, not better.</div>
+
+<h2><span class="n">07</span>Which players are paying — by registration year</h2>
+<p class="sub">The most important table here. Revenue growth is not coming from
+new players; it is coming from a small, long-tenured cohort spending much more.</p>
+<div class="panel scroll"><table id="tcoh"></table></div>
+
+<h2><span class="n">08</span>First-deposit quality</h2>
+<p class="sub">If the lost traffic were purely junk, the qualified tiers would
+have held while the unqualified tier fell. They did not.</p>
+<div class="panel scroll"><table id="tftd"></table></div>
+
+<h2><span class="n">09</span>Product mix and house edge</h2>
+<p class="sub">House edge is GGR divided by bet — a weighted ratio, never the
+mean of the category rates.</p>
+<div class="panel scroll"><table id="tprod"></table></div>
+
+<h2><span class="n">10</span>Payment rails</h2>
+<div class="panel scroll"><table id="trail"></table></div>
+
+<footer id="foot"></footer>
+</div>
+
+<script>window.DATA = __DATA__;</script>
+<script>
+(function(){
+var D = window.DATA, M = D.months, W = D.window;
+window.US360 = window.US360 || {};
+var NS='http://www.w3.org/2000/svg';
+function el(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function money(v){var s=v<0?'-':'';v=Math.abs(v);
+  if(v>=1e6)return s+'$'+(v/1e6).toFixed(2)+'M';
+  if(v>=1e3)return s+'$'+Math.round(v/1e3)+'k';return s+'$'+Math.round(v);}
+function full(v){var s=v<0?'-':'';return s+'$'+Math.abs(Math.round(v)).toLocaleString();}
+function n(v){return Math.round(v).toLocaleString();}
+function pct(a,b){if(!a)return b?'new':'—';var p=(b/a-1)*100;
+  var t=(p>0?'+':'')+(Math.abs(p)<1&&p!==0?(p>0?'<1':'>-1'):Math.round(p))+'%';return t;}
+function cls(a,b,inv){if(!a&&!b)return '';var g=b>=a;if(inv)g=!g;return g?'up':'dn';}
+function step(max){var raw=max/4,mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  var norm=raw/mag;var m=norm<=1?1:norm<=2?2:norm<=2.5?2.5:norm<=5?5:10;return m*mag;}
+
+/* ---- 01 cards ---- */
+var A=W.p25,B=W.p26;
+var g4=D.ga4.months, sum=function(mo){return (g4[mo]||[]).reduce(function(x,y){return x+y},0)};
+var s25=0,s26=0;
+M.forEach(function(m){if(m<='2025-08')s25+=sum(m);else if(m>='2026-01'&&m<='2026-08')s26+=sum(m);});
+var CARDS=[['GA4 sessions (US only)',s25,s26,n,0],['Signups',A.sign,B.sign,n,0],
+['First deposits',A.ftd,B.ftd,n,0],['Bettors',A.bettors,B.bettors,n,0],
+['Depositors',A.dep,B.dep,n,0],['Deposits',A.depusd,B.depusd,money,0],
+['GGR',A.ggr,B.ggr,money,0],['NGR',A.ngr,B.ngr,money,0],
+['Bonus cost',A.bonus,B.bonus,money,1]];
+document.getElementById('cards').innerHTML=CARDS.map(function(c){
+ return '<div class="card"><div class="lbl">'+c[0]+'</div><div class="val">'+c[3](c[2])+
+ '</div><div class="chg '+cls(c[1],c[2],c[4])+'">'+pct(c[1],c[2])+' from '+c[3](c[1])+'</div></div>';
+}).join('');
+
+/* ---- signed stacked/grouped bar drawer ---- */
+function bars(host,legend,cfg){
+  var W0=1120,H=cfg.h||300,L=74,R=16,T=14,Bm=46;
+  var pw=W0-L-R, ph=H-T-Bm;
+  var lo=0,hi=0;
+  cfg.labels.forEach(function(_,i){
+    var p=0,q=0;
+    cfg.series.forEach(function(s){var v=s.data[i]||0;if(v>=0)p+=v;else q+=v;});
+    if(cfg.grouped){cfg.series.forEach(function(s){var v=s.data[i]||0;hi=Math.max(hi,v);lo=Math.min(lo,v);});}
+    else{hi=Math.max(hi,p);lo=Math.min(lo,q);}
+  });
+  var st=step(Math.max(hi,-lo)||1);
+  hi=Math.ceil(hi/st)*st; lo=Math.floor(lo/st)*st;
+  var y=function(v){return T+ph-(v-lo)/(hi-lo)*ph;};
+  var svg=el('svg',{viewBox:'0 0 '+W0+' '+H,width:'100%'});
+  for(var t=lo;t<=hi+1e-9;t+=st){
+    svg.appendChild(el('line',{x1:L,x2:W0-R,y1:y(t),y2:y(t),
+      stroke:Math.abs(t)<1e-9?'#9aa7b2':'var(--border)','stroke-width':Math.abs(t)<1e-9?1.4:1}));
+    var tx=el('text',{x:L-9,y:y(t)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'});
+    tx.textContent=cfg.fmt?cfg.fmt(t):n(t); svg.appendChild(tx);
+  }
+  var bw=pw/cfg.labels.length, inner=bw*0.62, k=cfg.grouped?cfg.series.length:1;
+  cfg.labels.forEach(function(lb,i){
+    var x0=L+i*bw+(bw-inner)/2, up=0,dn=0;
+    cfg.series.forEach(function(s,si){
+      var v=s.data[i]||0; if(!v)return;
+      var bx=cfg.grouped?x0+si*(inner/k):x0, w=cfg.grouped?inner/k-1.5:inner;
+      var y1,y2;
+      if(v>=0){y1=y(up+v);y2=y(up);if(!cfg.grouped)up+=v;}
+      else{y1=y(dn);y2=y(dn+v);if(!cfg.grouped)dn+=v;}
+      if(cfg.grouped){y1=Math.min(y(0),y(v));y2=Math.max(y(0),y(v));}
+      var r=el('rect',{x:bx,y:y1,width:w,height:Math.max(1,y2-y1),fill:s.color,rx:2});
+      r.appendChild(el('title')).textContent=lb+' · '+s.name+' · '+(cfg.fmt?full(v):n(v));
+      svg.appendChild(r);
+    });
+    if(i%(cfg.every||1)===0){
+      var t2=el('text',{x:L+i*bw+bw/2,y:H-26,'text-anchor':'middle','font-size':10.5,fill:'var(--muted)'});
+      t2.textContent=lb.slice(2).replace('-','/'); svg.appendChild(t2);
+    }
+  });
+  host.appendChild(svg);
+  if(legend)legend.innerHTML=cfg.series.map(function(s){
+    return '<span><i class="sw" style="background:'+s.color+'"></i>'+s.name+'</span>';}).join('');
+}
+
+/* ---- 02 GGR / NGR ---- */
+var mo=function(f,k){return M.map(function(m){var b=D.monthly[m]&&D.monthly[m].bloc;return b?b[f]:0;});};
+bars(document.getElementById('ch1'),document.getElementById('lg1'),{
+  labels:M,grouped:true,fmt:money,h:300,series:[
+   {name:'GGR',color:'#0B6E3A',data:mo('ggr')},
+   {name:'NGR',color:'#4E9D5C',data:mo('ngr')},
+   {name:'Bonus cost',color:'#E67E22',data:mo('bonus')}]});
+
+/* ---- 03 funnel ---- */
+bars(document.getElementById('ch2'),document.getElementById('lg2'),{
+  labels:M,grouped:true,h:270,series:[
+   {name:'Depositors',color:'#0F2A43',data:mo('dep')},
+   {name:'Bettors',color:'#4A6480',data:mo('bettors')},
+   {name:'First deposits',color:'#ECA255',data:mo('ftd')}]});
+
+/* ---- 04 GA4 stacked ---- */
+var CH=D.ga4.channels, COL=['#0B6E3A','#E67E22','#4E9D5C','#A3C5AB','#C0392B','#4A6480','#B7C3CF'];
+bars(document.getElementById('ch3'),document.getElementById('lg3'),{
+  labels:M,h:300,series:CH.map(function(c,ci){return {name:c,color:COL[ci],
+    data:M.map(function(m){return (g4[m]||[])[ci]||0;})};})});
+
+/* ---- tables ---- */
+function table(id,rowsOf,sec,order,cols){
+  var keys={};Object.keys(D[sec]).forEach(function(k){keys[k.split('|')[1]]=1;});
+  var rows=Object.keys(keys).map(function(k){
+    var a=D[sec]['p25|'+k]||{},b=D[sec]['p26|'+k]||{};return {k:k,a:a,b:b};});
+  rows.sort(function(x,y){return (y.b[order]||0)-(x.b[order]||0);});
+  rows=rows.filter(function(r){return cols.some(function(c){return (r.a[c[1]]||0)||(r.b[c[1]]||0);});});
+  var h='<thead><tr><th>'+rowsOf+'</th>';
+  cols.forEach(function(c){h+='<th>'+c[0]+' 25</th><th>'+c[0]+' 26</th><th>Δ</th>';});
+  h+='</tr></thead><tbody>';
+  rows.forEach(function(r){
+    h+='<tr><td>'+r.k+'</td>';
+    cols.forEach(function(c){
+      var av=r.a[c[1]]||0,bv=r.b[c[1]]||0,f=c[2]||n;
+      h+='<td>'+f(av)+'</td><td>'+f(bv)+'</td><td class="'+cls(av,bv,c[3])+'">'+pct(av,bv)+'</td>';});
+    h+='</tr>';});
+  document.getElementById(id).innerHTML=h+'</tbody>';
+}
+table('tsrc','aff_source','src','ggr',[['Depositors','dep'],['FTD','ftd'],
+  ['Deposits','depusd',money],['GGR','ggr',money],['NGR','ngr',money]]);
+table('ttype','aff_type','type','ggr',[['Depositors','dep'],['FTD','ftd'],
+  ['Deposits','depusd',money],['GGR','ggr',money],['NGR','ngr',money]]);
+table('tcoh','Registered','cohort','ggr',[['Depositors','dep'],
+  ['Deposits','depusd',money],['GGR','ggr',money],['NGR','ngr',money]]);
+table('tftd','FTD type','ftdtype','ftd',[['First deposits','ftd']]);
+table('trail','Rail','rail','depusd',[['Depositors','dep'],['Deposits','depusd',money]]);
+
+/* product table carries a derived house-edge column */
+(function(){
+  var keys={};Object.keys(D.prod).forEach(function(k){keys[k.split('|')[1]]=1;});
+  var rows=Object.keys(keys).map(function(k){
+    return {k:k,a:D.prod['p25|'+k]||{},b:D.prod['p26|'+k]||{}};});
+  rows.sort(function(x,y){return (y.b.ggr||0)-(x.b.ggr||0);});
+  var h='<thead><tr><th>Product</th><th>Bettors 25</th><th>Bettors 26</th><th>Δ</th>'+
+    '<th>Bet 25</th><th>Bet 26</th><th>Δ</th><th>GGR 25</th><th>GGR 26</th><th>Δ</th>'+
+    '<th>Edge 25</th><th>Edge 26</th></tr></thead><tbody>';
+  var ta={bettors:0,bet:0,ggr:0},tb={bettors:0,bet:0,ggr:0};
+  rows.forEach(function(r){
+    var e=function(x){return x.bet?(x.ggr/x.bet*100).toFixed(2)+'%':'—';};
+    h+='<tr><td>'+r.k+'</td>'+
+      '<td>'+n(r.a.bettors||0)+'</td><td>'+n(r.b.bettors||0)+'</td><td class="'+cls(r.a.bettors,r.b.bettors)+'">'+pct(r.a.bettors||0,r.b.bettors||0)+'</td>'+
+      '<td>'+money(r.a.bet||0)+'</td><td>'+money(r.b.bet||0)+'</td><td class="'+cls(r.a.bet,r.b.bet)+'">'+pct(r.a.bet||0,r.b.bet||0)+'</td>'+
+      '<td>'+money(r.a.ggr||0)+'</td><td>'+money(r.b.ggr||0)+'</td><td class="'+cls(r.a.ggr,r.b.ggr)+'">'+pct(r.a.ggr||0,r.b.ggr||0)+'</td>'+
+      '<td>'+e(r.a)+'</td><td>'+e(r.b)+'</td></tr>';
+    ['bettors','bet','ggr'].forEach(function(f){ta[f]+=r.a[f]||0;tb[f]+=r.b[f]||0;});});
+  /* the total edge is weighted -- GGR summed over bet summed -- and is NOT the
+     mean of the rows above it. dice at 0.2% and casino at 5.4% would both round
+     away in an average. */
+  h+='<tr class="tot"><td>All (weighted)</td><td>'+n(ta.bettors)+'</td><td>'+n(tb.bettors)+'</td>'+
+    '<td class="'+cls(ta.bettors,tb.bettors)+'">'+pct(ta.bettors,tb.bettors)+'</td>'+
+    '<td>'+money(ta.bet)+'</td><td>'+money(tb.bet)+'</td><td class="'+cls(ta.bet,tb.bet)+'">'+pct(ta.bet,tb.bet)+'</td>'+
+    '<td>'+money(ta.ggr)+'</td><td>'+money(tb.ggr)+'</td><td class="'+cls(ta.ggr,tb.ggr)+'">'+pct(ta.ggr,tb.ggr)+'</td>'+
+    '<td>'+(ta.ggr/ta.bet*100).toFixed(2)+'%</td><td>'+(tb.ggr/tb.bet*100).toFixed(2)+'%</td></tr>';
+  document.getElementById('tprod').innerHTML=h+'</tbody>';
+  window.US360.edge={p25:ta.ggr/ta.bet,p26:tb.ggr/tb.bet,rows:rows};
+})();
+
+document.getElementById('foot').innerHTML =
+ 'Built '+new Date().toISOString().slice(0,10)+' from ftd-report/cache (query 1732, '+
+ M.length+' months) and the GA4 Data API. <br><br>'+
+ '<b>Counting.</b> Depositors, bettors and first depositors are distinct players '+
+ 'unioned across the whole window — they are never the sum of the monthly bars, '+
+ 'which double-count anyone active in more than one month. Summing the monthly '+
+ 'figures would report 3,002 depositors for 2026 where the true distinct is '+
+ '1,264. Category rows likewise exceed their totals: a player who bets casino and '+
+ 'sport is one bettor in two rows.<br><br>'+
+ '<b>Cross-check.</b> This build\'s first-depositor method reproduces the FTD '+
+ 'report exactly — 996 players through 2026-08-21, the day that report was built; '+
+ 'the cache now runs to 2026-08-26 and gives 1,163.<br><br>'+
+ '<b>Whale.</b> player_id 1709996 is excluded throughout, per house convention. '+
+ 'His player_country is Latvia, so he falls outside the US bloc and these figures '+
+ 'are identical whether he is carved out or not.';
+
+window.US360.D=D; window.US360.window=W; window.US360.bars=bars;
+window.US360.pct=pct; window.US360.cards=CARDS; window.US360.ga4={s25:s25,s26:s26};
+})();
+</script></body></html>

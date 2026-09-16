@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deposit Frequency</title>
+<style>
+:root {
+  --dark-green: #0B6E3A; --green-hi: #0D7F43; --green-dk: #0A5A30;
+  --sage: #4E9D5C; --light-green: #C0DD97; --band: #E3F3E8; --row-alt: #F3F7F3;
+  --navy: #0F2A43; --slate: #5B7285; --muted: #677181; --grey: #B7C3CF;
+  --axis: #C3CCD4; --border: #E5E5E5; --bar-bg: #EEF1F4;
+  --bg: #FFFFFF; --plane: #F4F6F5; --panel: #FAFBF9; --divider: #D8DEE0;
+  --warning: #E67E22; --warn-bg: #FDF6EC; --critical: #C0392B;
+  --grey-2: #8B93A1; --grey-4: #A8B4BE; --grey-5: #C6CED4; --tint-1: #E7F1E9;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font-body); background: var(--plane); color: var(--navy); line-height: 1.5; }
+
+.cover { background: linear-gradient(135deg, var(--dark-green) 0%, var(--green-dk) 100%); color: #fff; padding: 1.6rem 20px 1.4rem; line-height: 1.45;}
+.cover-inner { max-width: 1800px; margin: 0 auto; min-height: 60px;}
+.cover h1 { font-size: 1.55rem; margin: 0 0 .25rem; font-weight: 700; letter-spacing: -0.01em; }
+.cover p { color: var(--light-green); font-size: 0.86rem; margin: 0; }
+
+section { max-width: 1800px; margin: 0 auto; padding: 1.5rem 1.5rem 2.5rem; }
+/* The meta strip that used to sit above the filters was removed on request;
+   its provenance moved into the footnote list at the bottom of the page. */
+
+/* Compact filter bar: nine controls in a wrapping grid rather than nine
+   stacked rows. The per-control explanations moved to title tooltips and
+   the one shared context line, which is where the vertical space went. */
+.filters { background: var(--bg); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); padding: 0.7rem 0.9rem 0.55rem; margin-bottom: 1rem; }
+.fgrid { display: flex; flex-wrap: wrap; gap: 0.4rem 1.05rem; align-items: center; }
+.fgroup { display: flex; align-items: center; gap: 0.3rem; cursor: help; }
+.toggle-label { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--grey-2); font-weight: 700; flex-shrink: 0; }
+.channel-btn { background: #fff; border: 1px solid var(--dark-green); color: var(--dark-green); font-weight: 700; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 12px; cursor: pointer; transition: all 0.15s; font-family: inherit; line-height: 1.35; }
+.channel-btn:hover { background: var(--row-alt); }
+.channel-btn.active { background: var(--dark-green); color: #fff; }
+.fgroup .channel-btn + .channel-btn { margin-left: -1px; }
+select { font-family: inherit; font-size: 0.72rem; font-weight: 700; color: var(--dark-green); background: #fff; border: 1px solid var(--dark-green); border-radius: 12px; padding: 0.2rem 0.4rem; cursor: pointer; max-width: 15rem; }
+select.narrowed { background: var(--dark-green); color: #fff; }
+.reset-btn { background: #fff; border: 1px solid var(--warning); color: var(--warning); font-weight: 700; font-size: 0.7rem; padding: 0.18rem 0.6rem; border-radius: 12px; cursor: pointer; font-family: inherit; }
+.reset-btn:hover { background: var(--warn-bg); }
+.filter-summary { font-size: 0.75rem; color: var(--slate); border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.45rem; display: flex; gap: 0.7rem; align-items: baseline; flex-wrap: wrap; }
+.filter-summary b { color: var(--navy); }
+.filter-meta { font-size: 0.7rem; color: var(--muted); font-style: italic; flex: 1 1 100%; }
+
+/* The stat-card strip was removed on request; its six figures now run along
+   the group header above the table (see renderTable). */
+
+.grp-header { background: var(--navy); color: #fff; border-radius: 8px 8px 0 0; padding: 0.7rem 1rem; font-size: 0.85rem; font-weight: 500; cursor: pointer; user-select: none; }
+.grp-header:hover .collapser { background: rgba(255,255,255,0.25); }
+.grp-header.collapsed { border-radius: 8px; }
+.collapser { display: inline-block; width: 1.15rem; height: 1.15rem; line-height: 1.05rem; text-align: center;
+  border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; margin-right: 0.5rem;
+  font-weight: 700; font-size: 0.85rem; background: rgba(255,255,255,0.1); }
+.xtab-header { margin-top: 2rem; }
+#xtab td.n0, #avgtab td.n0 { color: var(--grey-5); }
+#xtab td.heat1, #avgtab td.heat1 { background: var(--heat-1); }
+#xtab td.heat2, #avgtab td.heat2 { background: var(--heat-2); }
+#xtab td.heat3, #avgtab td.heat3 { background: var(--heat-3); }
+#xtab td.heat4, #avgtab td.heat4 { background: var(--heat-4); }
+#xtab td.heat5, #avgtab td.heat5 { background: var(--heat-5); color: var(--heat-ink); }
+#xtab td.heat6, #avgtab td.heat6 { background: var(--heat-6); color: #fff; }
+#xtab td.heat7, #avgtab td.heat7 { background: var(--heat-7); color: #fff; }
+#xtab td.heat8, #avgtab td.heat8 { background: var(--heat-8); color: #fff; }
+#xtab tbody tr.neg th, #avgtab tbody tr.neg th { color: var(--critical); }
+#xtab tbody tr.rowtot th, #xtab tbody tr.rowtot td, #avgtab tbody tr.rowtot th, #avgtab tbody tr.rowtot td { border-top: 2px solid var(--navy); font-weight: 700; background: var(--row-alt); }
+#xtab td[data-xd], #avgtab td[data-ad] { cursor: pointer; }
+#xtab td[data-xd]:hover, #avgtab td[data-ad]:hover { outline: 2px solid var(--navy); outline-offset: -2px; }
+.grp-title { font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.02em; }
+.grp-sep { opacity: 0.5; margin: 0 0.3rem; }
+
+.table-wrap { border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: auto; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.78rem; background: var(--bg); }
+thead th { background: var(--dark-green); color: #fff; font-weight: 700; padding: 0.5rem 0.5rem; text-align: center; font-size: 0.7rem; line-height: 1.25; white-space: nowrap; position: sticky; top: 0; z-index: 3; }
+thead th:first-child { text-align: left; left: 0; z-index: 4; }
+thead th.col-total { background: var(--green-dk); border-left: 2px solid #fff; }
+tbody th { text-align: left; font-weight: 600; color: var(--navy); padding: 0.42rem 0.6rem; border-top: 1px solid var(--border); white-space: nowrap; background: var(--bg); position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--border); font-size: 0.78rem; }
+tbody td { padding: 0.42rem 0.5rem; text-align: center; border-top: 1px solid var(--border); white-space: nowrap; }
+tbody tr.row-alt td, tbody tr.row-alt th { background: var(--row-alt); }
+tbody tr:hover td, tbody tr:hover th { background: var(--band); }
+td.col-total, th.col-total { background: var(--panel); font-weight: 700; border-left: 2px solid var(--divider); }
+tbody tr.row-alt td.col-total { background: var(--tint-1); }
+td.pct { color: var(--slate); }
+td.money { font-weight: 600; }
+td.avg { color: var(--dark-green); font-weight: 700; }
+td.med { color: var(--muted); font-style: italic; }
+td.dim { color: var(--grey-2); font-size: 0.72rem; }
+tbody tr.negrow td { color: var(--critical); }
+td.zero { color: var(--grey-5); }
+tbody tr.band-start td, tbody tr.band-start th { border-top: 2px solid var(--grey-5); }
+
+/* Both charts were removed on request, along with the hand-rolled SVG
+   drawers and the helpers that existed only to render them. */
+
+/* The summary callout, the rate-provenance warning and the footnote list
+   that sat below the charts were all removed on request. */
+.empty { background: var(--warn-bg); border: 1px solid var(--warning); border-radius: 8px; padding: 1.2rem; text-align: center; color: var(--navy); font-weight: 700; margin-bottom: 1.2rem; }
+
+.footnote { font-size: 0.82rem; color: var(--slate); font-style: italic; margin-top: 1.4rem; line-height: 1.6; max-width: 1500px; }
+.footnote b { color: var(--navy); font-style: normal; }
+
+/* Drill-down: click a Players cell to see who is in that bucket. */
+#tbl tbody tr.drillrow td:not(.col-total), #tbl tbody tr.drillrow td.col-total { cursor: pointer; }
+#tbl tbody tr.drillrow td:hover { outline: 2px solid var(--dark-green); outline-offset: -2px; }
+/* The drill-down renders inline under the buckets table rather than in an
+   overlay — you keep the filters and the table you clicked from in view. */
+#drillPanel { margin-top: 2rem; scroll-margin-top: 1rem; }
+.drill-header { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.drill-header .sub { font-size: 0.78rem; opacity: 0.85; }
+.drill-header .drill-rows { margin-left: auto; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85; display: flex; align-items: center; gap: 0.35rem; }
+.drill-header select { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.45); border-radius: 12px; font-size: 0.72rem; font-weight: 700; padding: 0.1rem 0.35rem; }
+.drill-header select option { color: var(--navy); }
+.modal-close { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: #fff; border-radius: 12px; font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.6rem; cursor: pointer; font-family: inherit; }
+.modal-close:hover { background: rgba(255,255,255,0.15); }
+.drill-wrap { max-height: 70vh; }
+#drill td.uname { text-align: left; font-weight: 700; color: var(--navy); }
+#drill td.pid { text-align: left; color: var(--slate); font-variant-numeric: tabular-nums; }
+#drill td.neg { color: var(--critical); font-weight: 700; }
+#drill td.pos { color: var(--dark-green); font-weight: 700; }
+#drill td.na { color: var(--grey-3); font-style: italic; }
+#drill th.rank { text-align: right; color: var(--slate); font-weight: 400; }
+#drill th.sortable { cursor: pointer; user-select: none; transition: background 0.15s; }
+#drill th.sortable:hover { background: var(--green-hi); }
+#drill .sort-arrow { display: inline-block; width: 0.9em; font-size: 0.75em; opacity: 0.85; }
+
+.table-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--axis); border-radius: 5px; }
+.table-wrap::-webkit-scrollbar-thumb:hover { background: var(--grey-4); }
+
+/* --- cover band: fixed height, see theme.css --cover-* ------------------- */
+.cover-inner{height:60px;min-height:60px;display:flex;align-items:center;
+  flex-wrap:nowrap;overflow:hidden;gap:14px}
+.cover-inner>*{min-width:0}
+.cover header{display:flex;flex-wrap:nowrap;align-items:center;gap:14px;
+  width:100%;justify-content:space-between;min-width:0;border:0;padding:0;margin:0}
+.cover h1,.cover p,.cover .sub,.cover .meta{white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%}
+.cover .controls,.cover .seg{flex:0 0 auto}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="cover-inner">
+  <h1>Deposit Frequency</h1>
+  <p>How often players deposit, and what each frequency is worth &middot; 23 May 2018 &ndash; 23 Aug 2026</p>
+</div></div>
+
+<section>
+
+<div class="filters">
+  <div class="fgrid">
+    <div class="fgroup" id="gEra">
+      <span class="toggle-label">Era</span>
+      <button class="channel-btn" id="btnNew">Post</button>
+      <button class="channel-btn" id="btnOld">Pre</button>
+      <button class="channel-btn active" id="btnAll">All</button>
+    </div>
+    <div class="fgroup" id="gWhale">
+      <span class="toggle-label">Whale</span>
+      <button class="channel-btn" id="btnWEx">Excl</button>
+      <button class="channel-btn active" id="btnWInc">Incl</button>
+    </div>
+    <div class="fgroup" id="gEmail" title="Email verified — 96,801 of 102,280 depositors (95%)">
+      <span class="toggle-label">Email</span>
+      <button class="channel-btn" id="btnEAll">All</button>
+      <button class="channel-btn active" id="btnEYes">Yes</button>
+      <button class="channel-btn" id="btnENo">No</button>
+    </div>
+    <div class="fgroup" id="gPhone" title="Phone verified — 66,090 of 102,280 depositors (65%)">
+      <span class="toggle-label">Phone</span>
+      <button class="channel-btn" id="btnPAll">All</button>
+      <button class="channel-btn active" id="btnPYes">Yes</button>
+      <button class="channel-btn" id="btnPNo">No</button>
+    </div>
+    <div class="fgroup" id="gStatus" title="Account status. Blocked is broader than locked out: 67,214 blocked depositors, but only 63,933 are account-level. The rest are partial blocks (reward, withdraw, provider) and can still play.">
+      <span class="toggle-label">Status</span>
+      <button class="channel-btn active" id="btnSAll">All</button>
+      <button class="channel-btn" id="btnSActive">Active</button>
+      <button class="channel-btn" id="btnSBlocked">Blocked</button>
+    </div>
+    <div class="fgroup" id="gReason" title="Why the account is blocked. Dormant and unknown are 88% of blocked depositors.">
+      <span class="toggle-label">Reason</span>
+      <select id="selReason"></select>
+    </div>
+    <div class="fgroup" id="gFraud">
+      <span class="toggle-label">Fraud</span>
+      <button class="channel-btn" id="btnFAll">All</button>
+      <button class="channel-btn" id="btnFYes">Yes</button>
+      <button class="channel-btn active" id="btnFNo">No</button>
+    </div>
+    <div class="fgroup" id="gProd" title="Favourite product over the player's whole lifetime, not per era. 37,408 depositors have none.">
+      <span class="toggle-label">Product</span>
+      <select id="selProd"></select>
+    </div>
+    <div class="fgroup" id="gChurn">
+      <span class="toggle-label">Churned</span>
+      <select id="selChurn"></select>
+    </div>
+  </div>
+  <div class="filter-summary">
+    <span id="filterSummary"></span>
+    <button class="reset-btn" id="btnReset" style="display:none">Clear filters</button>
+    <span class="filter-meta" id="filterMeta"></span>
+  </div>
+</div>
+
+<div id="emptyMsg"></div>
+
+<div class="grp-header" data-collapse="bucketsBody">
+  <span class="collapser">&minus;</span>
+  <span class="grp-title">Buckets</span><span class="grp-sep">&middot;</span>
+  <span id="grpMeta">players grouped by how many deposits they have made</span>
+</div>
+<div id="bucketsBody">
+  <div class="table-wrap"><table id="tbl"></table></div>
+</div>
+
+<div class="grp-header xtab-header" data-collapse="xtabBody">
+  <span class="collapser">&minus;</span>
+  <span class="grp-title">GGR &times; deposit count</span><span class="grp-sep">&middot;</span>
+  <span id="xtabMeta"></span>
+</div>
+<div id="xtabBody">
+  <div class="table-wrap"><table id="xtab"></table></div>
+  <div class="footnote" id="xtabNote"></div>
+</div>
+
+<div class="grp-header xtab-header" data-collapse="avgBody">
+  <span class="collapser">&minus;</span>
+  <span class="grp-title">Avg deposit &times; deposit count</span><span class="grp-sep">&middot;</span>
+  <span id="avgMeta"></span>
+</div>
+<div id="avgBody">
+  <div class="table-wrap"><table id="avgtab"></table></div>
+  <div class="footnote" id="avgNote"></div>
+</div>
+
+<div id="drillPanel" style="display:none">
+  <div class="grp-header drill-header" data-collapse="drillBody">
+    <span class="collapser">&minus;</span>
+    <span class="grp-title" id="drillTitle"></span>
+    <span class="grp-sep">&middot;</span>
+    <span class="sub" id="drillSub"></span>
+    <span class="drill-rows">
+      Rows
+      <select id="drillRows">
+        <option value="25">25</option>
+        <option value="50" selected>50</option>
+        <option value="100">100</option>
+        <option value="250">250</option>
+        <option value="500">500</option>
+        <option value="-1">All</option>
+      </select>
+    </span>
+    <button class="modal-close" id="drillClose">Close &times;</button>
+  </div>
+  <div id="drillBody">
+    <div class="table-wrap drill-wrap"><table id="drill"></table></div>
+    <div class="footnote" id="drillFoot"></div>
+  </div>
+</div>
+
+
+
+</section>
+
+<script>
+var RAW = __DATA__;
+
+var BUCKETS = ["1","2","3","4","5","6-10","11-20","21-50","51-100","100+"];
+var F_EMAIL = 1, F_PHONE = 2, F_BLOCKED = 4, F_WHALE = 8;
+var ERAS = RAW.meta.eras, PRODS = RAW.meta.prods;
+
+var LATEST = RAW.meta.latestYear;
+
+/* The page opens on the question it exists to answer: all history,
+   email- and phone-verified players, fraud & abuse blocks EXCLUDED.
+   Whale INCLUDED, which deliberately differs from every other report on
+   this site.
+   Note that Clear filters resets to unfiltered, not to these defaults —
+   so clearing widens the view rather than restoring it.
+   These must stay in step with the `active` classes in the markup above;
+   a default set in only one place renders buttons that lie on load. */
+var DEFAULTS = { era:"all", whale:"inc", email:"yes", phone:"yes", status:"all",
+                 prod:-1, churn:"", reason:"", fraud:"no" };
+var state = {
+  era: DEFAULTS.era, whale: DEFAULTS.whale, email: DEFAULTS.email,
+  phone: DEFAULTS.phone, status: DEFAULTS.status, prod: DEFAULTS.prod,
+  churn: DEFAULTS.churn, reason: DEFAULTS.reason, fraud: DEFAULTS.fraud
+};
+
+var REASONS = RAW.meta.reasons, REASON_GROUPS = RAW.meta.reasonGroups;
+
+/* Fraud & abuse as a standalone yes/no, independent of the Reason dropdown.
+   "Yes" is the Fraud & abuse group; "No" is everyone else — which includes
+   players blocked for some OTHER reason as well as players not blocked at
+   all, so No is not the same as "clean and active". */
+var FRAUD_SET = (function(){
+  var g = REASON_GROUPS.filter(function(x){ return x[0] === "Fraud & abuse"; })[0];
+  var s = {};
+  if (g) g[1].forEach(function(ri){ s[ri] = 1; });
+  return s;
+})();
+function fraudPasses(ri, fraud){
+  if (fraud === "all") return true;
+  var isFraud = FRAUD_SET[ri] === 1;
+  return fraud === "yes" ? isFraud : !isFraud;
+}
+
+/* reason is "" any, "nb" not blocked, "g:2" a group index, "r:5" one reason. */
+function reasonPasses(ri, reason){
+  if (!reason) return true;
+  if (reason === "nb") return ri === 0;
+  var kind = reason.slice(0, 1), arg = +reason.slice(2);
+  if (kind === "r") return ri === arg;
+  if (kind === "g") return REASON_GROUPS[arg][1].indexOf(ri) >= 0;
+  return true;
+}
+
+/* Recency is measured from ANCHOR — the most recent deposit day in the data,
+   not today. 24 Aug 2026 has deposits but no published FX rate yet, so the
+   data stops on the 23rd; anchoring on the data keeps "30 days" stable
+   between rebuilds instead of drifting with the clock. */
+var ANCHOR = RAW.meta.anchor;
+var ANCHOR_MS = Date.UTC(+ANCHOR.slice(0,4), +ANCHOR.slice(5,7) - 1, +ANCHOR.slice(8,10));
+var BANDS = [[0,30,"0-30"],[31,90,"31-90"],[91,180,"91-180"],[181,360,"181-360"],[361,1e9,"360+"]];
+var THRESHOLDS = [30, 90, 180, 360];
+
+function yearOfGap(gap){ return new Date(ANCHOR_MS - gap * 86400000).getUTCFullYear(); }
+
+/* churn is one string: "" any, "b:31-90" a band, "c:90" a cumulative
+   threshold, "y:2021" a calendar year. One control, three questions. */
+function gapPasses(gap, churn){
+  if (!churn) return true;
+  var kind = churn.slice(0, 1), arg = churn.slice(2);
+  if (kind === "b"){
+    for (var i = 0; i < BANDS.length; i++)
+      if (BANDS[i][2] === arg) return gap >= BANDS[i][0] && gap <= BANDS[i][1];
+    return true;
+  }
+  if (kind === "c") return gap > +arg;
+  if (kind === "y") return yearOfGap(gap) === +arg;
+  return true;
+}
+
+function bucketOf(n){
+  if (n <= 5) return n - 1;
+  if (n <= 10) return 5;
+  if (n <= 20) return 6;
+  if (n <= 50) return 7;
+  if (n <= 100) return 8;
+  return 9;
+}
+
+/* One pass over the 102k rows. Buckets carry their own amount list so the
+   median is the real middle of the filtered selection, not something
+   derived from the totals. */
+function aggregate(){
+  var nN = RAW.nN, aN = RAW.aN, gN = RAW.dN, nO = RAW.nO, aO = RAW.aO, gO = RAW.dO,
+      F = RAW.f, P = RAW.pr, R = RAW.rs;
+  var era = state.era, whale = state.whale, email = state.email,
+      phone = state.phone, status = state.status, prod = state.prod,
+      churn = state.churn, reason = state.reason, fraud = state.fraud;
+
+  var GG = RAW.gg, AG = RAW.ag, HG = RAW.hg;
+  var B = [];
+  for (var k = 0; k < 10; k++) B.push({ p:0, d:0, c:0, amts:[], ggr:0, adj:0, ggrN:0 });
+  var T = { p:0, d:0, c:0, ggr:0, adj:0, ggrN:0 };
+
+  for (var i = 0; i < nN.length; i++){
+    var n, c, gap;
+    if (era === "new"){ n = nN[i]; c = aN[i]; gap = gN[i]; }
+    else if (era === "old"){ n = nO[i]; c = aO[i]; gap = gO[i]; }
+    else {
+      n = nN[i] + nO[i]; c = aN[i] + aO[i];
+      /* smaller offset = more recent; -1 means no deposit in that era */
+      gap = gN[i] < 0 ? gO[i] : (gO[i] < 0 ? gN[i] : Math.min(gN[i], gO[i]));
+    }
+    if (n === 0) continue;
+    if (churn && !gapPasses(gap, churn)) continue;
+
+    var f = F[i];
+    if (whale === "ex" && (f & F_WHALE)) continue;
+    if (email === "yes" && !(f & F_EMAIL)) continue;
+    if (email === "no"  &&  (f & F_EMAIL)) continue;
+    if (phone === "yes" && !(f & F_PHONE)) continue;
+    if (phone === "no"  &&  (f & F_PHONE)) continue;
+    if (status === "blocked" && !(f & F_BLOCKED)) continue;
+    if (status === "active"  &&  (f & F_BLOCKED)) continue;
+    if (prod >= 0 && P[i] !== prod) continue;
+    if (reason && !reasonPasses(R[i], reason)) continue;
+    if (fraud !== "all" && !fraudPasses(R[i], fraud)) continue;
+
+    var b = B[bucketOf(n)];
+    b.p++; b.d += n; b.c += c; b.amts.push(c);
+    T.p++; T.d += n; T.c += c;
+
+    /* GGR and adjusted GGR exist only for the post-migration population, so
+       ggrN counts how many players in each bucket actually carry a figure.
+       Summing over a subset without saying so would understate silently. */
+    if (HG[i]){
+      b.ggr += GG[i]; b.adj += AG[i]; b.ggrN++;
+      T.ggr += GG[i]; T.adj += AG[i]; T.ggrN++;
+    }
+  }
+  return { B: B, T: T };
+}
+
+/* Matches Postgres percentile_cont(0.5): interpolate between the two
+   middle values on an even count rather than taking the lower one. */
+function median(sortedCents){
+  var n = sortedCents.length;
+  if (n === 0) return 0;
+  var mid = (n - 1) / 2, lo = Math.floor(mid), hi = Math.ceil(mid);
+  return (sortedCents[lo] + sortedCents[hi]) / 2;
+}
+
+function num(v){ return Math.round(v).toLocaleString("en-US"); }
+function eur(c){ var v = c / 100; return (v < 0 ? "-" : "") + "€" + Math.round(Math.abs(v)).toLocaleString("en-US"); }
+function eurShort(c){
+  var v = c / 100, s = v < 0 ? "-" : ""; v = Math.abs(v);
+  if (v >= 1e6) return s + "€" + (v/1e6).toFixed(v >= 1e7 ? 0 : 1) + "m";
+  if (v >= 1e3) return s + "€" + Math.round(v/1e3) + "k";
+  return s + "€" + Math.round(v);
+}
+function pct(v){ if (v === 0) return "0%"; if (v > 0 && v < 0.5) return "&lt;1%"; return Math.round(v) + "%"; }
+
+var AGG = null;
+
+function filtersActive(){
+  return state.email !== "all" || state.phone !== "all" || state.status !== "all" ||
+         state.prod >= 0 || state.churn !== "" || state.reason !== "" || state.fraud !== "all";
+}
+
+function reasonLabel(reason){
+  if (!reason) return "";
+  if (reason === "nb") return "not blocked";
+  var kind = reason.slice(0, 1), arg = +reason.slice(2);
+  if (kind === "r") return "blocked: " + REASONS[arg];
+  if (kind === "g") return "blocked: " + REASON_GROUPS[arg][0].toLowerCase();
+  return "";
+}
+
+/* Player counts per reason and per group, in the current era. */
+function reasonCounts(){
+  var R = RAW.rs, nN = RAW.nN, nO = RAW.nO, era = state.era;
+  var per = [];
+  for (var k = 0; k < REASONS.length; k++) per.push(0);
+  for (var i = 0; i < R.length; i++){
+    var n = era === "new" ? nN[i] : era === "old" ? nO[i] : nN[i] + nO[i];
+    if (n === 0) continue;
+    per[R[i]]++;
+  }
+  return per;
+}
+
+/* Every player's recency gap in the selected era, ignoring the churn filter
+   itself — so the option list can carry counts and the era switch can tell
+   which options are actually populated. */
+function gaps(){
+  var gN = RAW.dN, gO = RAW.dO, nN = RAW.nN, nO = RAW.nO, era = state.era, out = [];
+  for (var i = 0; i < gN.length; i++){
+    var n, gap;
+    if (era === "new"){ n = nN[i]; gap = gN[i]; }
+    else if (era === "old"){ n = nO[i]; gap = gO[i]; }
+    else {
+      n = nN[i] + nO[i];
+      gap = gN[i] < 0 ? gO[i] : (gO[i] < 0 ? gN[i] : Math.min(gN[i], gO[i]));
+    }
+    if (n === 0 || gap < 0) continue;
+    out.push(gap);
+  }
+  return out;
+}
+
+/* Counts for each option in the selector: exclusive bands, cumulative
+   thresholds, calendar years. Bands and years partition; thresholds nest. */
+function churnOptions(){
+  var g = gaps();
+  var bands = {}, years = {}, thresh = {};
+  BANDS.forEach(function(b){ bands[b[2]] = 0; });
+  THRESHOLDS.forEach(function(t){ thresh[t] = 0; });
+
+  for (var i = 0; i < g.length; i++){
+    var gap = g[i];
+    for (var b = 0; b < BANDS.length; b++)
+      if (gap >= BANDS[b][0] && gap <= BANDS[b][1]){ bands[BANDS[b][2]]++; break; }
+    for (var t = 0; t < THRESHOLDS.length; t++)
+      if (gap > THRESHOLDS[t]) thresh[THRESHOLDS[t]]++;
+    var y = yearOfGap(gap);
+    years[y] = (years[y] || 0) + 1;
+  }
+  return {
+    total: g.length,
+    bands: BANDS.map(function(b){ return { key: b[2], n: bands[b[2]] }; }),
+    thresholds: THRESHOLDS.map(function(t){ return { days: t, n: thresh[t] }; }),
+    years: Object.keys(years).map(Number).sort(function(a, b){ return a - b; })
+             .map(function(y){ return { year: y, n: years[y] }; })
+  };
+}
+
+function churnLabel(churn){
+  if (!churn) return "";
+  var kind = churn.slice(0, 1), arg = churn.slice(2);
+  if (kind === "b") return arg === "0-30" ? "deposited in the last 30 days"
+                          : arg === "360+" ? "last deposit over 360 days ago"
+                          : "last deposit " + arg + " days ago";
+  if (kind === "c") return "churned — no deposit in " + arg + "+ days";
+  if (kind === "y") return "last deposited in " + arg;
+  return "";
+}
+
+function renderNotes(){
+  var e = ERAS[state.era];
+
+  var save = { era: state.era, whale: state.whale, email: state.email, phone: state.phone, status: state.status, prod: state.prod };
+  state.whale = "inc"; var inc = aggregate().T;
+  state.whale = "ex";  var ex  = aggregate().T;
+  state.whale = save.whale;
+  var whaleTxt = "karolik777 is " + eurShort(inc.c - ex.c) + " over " +
+                 num(inc.d - ex.d) + " deposits in this selection";
+
+  /* One shared context line replaces the nine per-row notes; the rest became
+     title tooltips on each control. That is where the vertical space went. */
+  document.getElementById("filterMeta").textContent =
+    e.label + " " + e.range + " · converted via " + e.rates + " · " + whaleTxt +
+    " · recency counted back from " + ANCHOR + ", the most recent deposit day in the data";
+
+  document.getElementById("gEra").title =
+    e.label + ": " + e.range + ". Converted via " + e.rates +
+    ". The platform migrated on 12 Jul 2022; each era uses its own rate table.";
+  document.getElementById("gWhale").title = whaleTxt +
+    " — 16% of all money ever deposited. This page includes him by default, unlike the other reports on this site.";
+  document.getElementById("gChurn").title =
+    "Year or recency of the player's last deposit, counted back from " + ANCHOR +
+    " (not today). Bands are exclusive; the 'churned N+ days' options are cumulative and must not be summed.";
+
+  var parts = [];
+  if (state.email !== "all") parts.push("email " + (state.email === "yes" ? "verified" : "not verified"));
+  if (state.phone !== "all") parts.push("phone " + (state.phone === "yes" ? "verified" : "not verified"));
+  if (state.status !== "all") parts.push(state.status === "active" ? "active accounts" : "blocked accounts");
+  if (state.prod >= 0) parts.push("favourite product " + PRODS[state.prod]);
+  if (state.churn) parts.push(churnLabel(state.churn));
+  if (state.reason) parts.push(reasonLabel(state.reason));
+  if (state.fraud !== "all") parts.push(state.fraud === "yes" ? "fraud & abuse blocks only"
+                                                             : "excluding fraud & abuse blocks");
+
+  var saveF = { email: state.email, phone: state.phone, status: state.status,
+                prod: state.prod, churn: state.churn, reason: state.reason, fraud: state.fraud };
+  state.email = "all"; state.phone = "all"; state.status = "all";
+  state.prod = -1; state.churn = ""; state.reason = ""; state.fraud = "all";
+  var whole = aggregate().T;
+  state.email = saveF.email; state.phone = saveF.phone; state.status = saveF.status;
+  state.prod = saveF.prod; state.churn = saveF.churn; state.reason = saveF.reason;
+  state.fraud = saveF.fraud;
+
+  var saveFr = state.fraud;
+  state.fraud = "yes"; var fy = aggregate().T; state.fraud = saveFr;
+  document.getElementById("gFraud").title =
+    "Fraud & abuse: multi-accounting, bonus abuse, bug abuse, suspicious user, risk decision, bot — " +
+    num(fy.p) + " players, " + eurShort(fy.c) + " deposited in this selection. " +
+    "'No' means everyone else, which still includes players blocked for other reasons.";
+
+  var T = AGG.T;
+  var el = document.getElementById("filterSummary");
+  if (!parts.length){
+    el.innerHTML = "No attribute filters — showing all <b>" + num(T.p) + "</b> depositors in this era.";
+    document.getElementById("btnReset").style.display = "none";
+  } else {
+    el.innerHTML = "Filtered to " + parts.join(" · ") + " — <b>" + num(T.p) + "</b> of " +
+      num(whole.p) + " depositors (" + pct(whole.p ? T.p / whole.p * 100 : 0) + ") and <b>" +
+      eurShort(T.c) + "</b> of " + eurShort(whole.c) + " (" + pct(whole.c ? T.c / whole.c * 100 : 0) + ").";
+    document.getElementById("btnReset").style.display = "";
+  }
+}
+
+function renderTable(){
+  var B = AGG.B, T = AGG.T;
+  B.forEach(function(b){ if (!b.sorted){ b.amts.sort(function(x,y){ return x - y; }); b.sorted = true; } });
+
+  var head = '<thead><tr><th>Deposits made</th>' +
+    BUCKETS.map(function(b){ return "<th>" + b + "</th>"; }).join("") +
+    '<th class="col-total">All</th></tr></thead>';
+
+  function cell(v, empty, cls){
+    return v === null ? '<td class="' + cls + ' zero">' + empty + "</td>" : '<td class="' + cls + '">' + v + "</td>";
+  }
+
+  var rows = [
+    { label:"Players",         cls:"",      fn:function(b){ return num(b.p); },                                    tot:num(T.p),                     band:false, drill:true },
+    { label:"% of depositors", cls:"pct",   fn:function(b){ return T.p ? pct(b.p/T.p*100) : "—"; },                tot:T.p ? "100%" : "—",           band:false },
+    { label:"Deposits",        cls:"",      fn:function(b){ return num(b.d); },                                    tot:num(T.d),                     band:true  },
+    { label:"% of deposits",   cls:"pct",   fn:function(b){ return T.d ? pct(b.d/T.d*100) : "—"; },                tot:T.d ? "100%" : "—",           band:false },
+    { label:"Total deposited", cls:"money", fn:function(b){ return eurShort(b.c); },                               tot:eurShort(T.c),                band:true  },
+    { label:"% of value",      cls:"pct",   fn:function(b){ return T.c ? pct(b.c/T.c*100) : "—"; },                tot:T.c ? "100%" : "—",           band:false },
+    { label:"Avg per deposit", cls:"avg",   fn:function(b){ return b.d ? eur(b.c/b.d) : "—"; },                    tot:T.d ? eur(T.c/T.d) : "—",     band:true  },
+    { label:"Avg per player",  cls:"",      fn:function(b){ return b.p ? eur(b.c/b.p) : "—"; },                    tot:T.p ? eur(T.c/T.p) : "—",     band:false },
+    { label:"Median player",   cls:"med",   fn:function(b){ return b.p ? eur(median(b.amts)) : "—"; },             tot:"&mdash;",                    band:false },
+    { label:"GGR",             cls:"money", fn:function(b){ return b.ggrN ? eurShort(b.ggr) : "—"; },              tot:T.ggrN ? eurShort(T.ggr) : "—", band:true  },
+    { label:"Adjusted GGR",    cls:"money", fn:function(b){ return b.ggrN ? eurShort(b.adj) : "—"; },              tot:T.ggrN ? eurShort(T.adj) : "—", band:false },
+    { label:"Adj GGR per player", cls:"avg", fn:function(b){ return b.ggrN ? eur(b.adj / b.ggrN) : "—"; },         tot:T.ggrN ? eur(T.adj / T.ggrN) : "—", band:false },
+    { label:"…with a GGR record", cls:"dim", fn:function(b){ return num(b.ggrN); },                                tot:num(T.ggrN),                  band:false }
+  ];
+
+  var body = "<tbody>" + rows.map(function(r, i){
+    var trCls = (i % 2 === 1 ? "row-alt" : "") + (r.band ? " band-start" : "") + (r.drill ? " drillrow" : "");
+    var title = r.drill ? ' title="Click to see the top ' + DRILL_N + ' players in this bucket"' : "";
+    return '<tr class="' + trCls.trim() + '"><th>' + r.label + "</th>" +
+      B.map(function(b, bi){
+        var d = r.drill && b.p > 0 ? ' data-drill="' + bi + '"' + title : "";
+        return '<td class="' + r.cls + (b.p === 0 ? " zero" : "") + '"' + d + ">" +
+               (b.p === 0 ? "—" : r.fn(b)) + "</td>";
+      }).join("") +
+      '<td class="col-total ' + r.cls + '"' + (r.drill && T.p > 0 ? ' data-drill="-1"' + title : "") + ">" +
+      r.tot + "</td></tr>";
+  }).join("") + "</tbody>";
+
+  document.getElementById("tbl").innerHTML = head + body;
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll("#tbl td[data-drill]"),
+    function(td){
+      td.addEventListener("click", function(){
+        openDrill(parseInt(td.getAttribute("data-drill"), 10));
+      });
+    }
+  );
+
+  /* The prose note that sat under this table was removed on request. The
+     coverage it carried is still in the table itself: the "…with a GGR
+     record" row shows how many players in each bucket actually have a GGR
+     figure, so a subset total is still visible as a number. */
+
+  /* The six stat cards used to live above this table. Their figures moved
+     here so removing the cards lost no information. */
+  document.getElementById("grpMeta").textContent =
+    ERAS[state.era].label + " · " + num(T.p) + " depositors · " + num(T.d) + " deposits · " +
+    eur(T.c) + " · " + (T.d ? eur(T.c / T.d) : "—") + " per deposit · " +
+    (T.p ? eur(T.c / T.p) : "—") + " per player · " +
+    (T.p ? (T.d / T.p).toFixed(1) : "—") + " deposits per player" +
+    (state.whale === "ex" ? " · karolik777 excluded" : " · karolik777 included");
+}
+
+/* ---------- drill-down ----------
+   Collects the players behind one bucket under the CURRENT filters, using
+   exactly the same predicate chain as aggregate(), so the row count can
+   never disagree with the cell that was clicked. */
+var DRILL_N = 50;
+
+/* Which GGR row a player falls in — shared by the cross-tab and the drill so
+   a cell and its player list can never disagree. Index GGR_BANDS.length is
+   the "no GGR record" row. */
+function ggrRowOf(i){
+  if (!RAW.hg[i]) return GGR_BANDS.length;
+  var g = RAW.gg[i];
+  for (var r = 0; r < GGR_BANDS.length; r++)
+    if (g >= GGR_BANDS[r][1] && g < GGR_BANDS[r][2]) return r;
+  return GGR_BANDS.length;
+}
+
+/* Average deposit per player, in cents, era-scoped like the bucket itself.
+   Unlike GGR this is defined for every depositor — everyone has at least one
+   deposit — so there is no "no record" row here. */
+var AVG_BANDS = [
+  ["under €10",    0,        1000],
+  ["€10 to €25",   1000,     2500],
+  ["€25 to €50",   2500,     5000],
+  ["€50 to €100",  5000,     10000],
+  ["€100 to €250", 10000,    25000],
+  ["€250 to €500", 25000,    50000],
+  ["€500 to €1k",  50000,    100000],
+  ["€1k to €5k",   100000,   500000],
+  ["€5k+",         500000,   Infinity]
+];
+
+function avgRowOf(n, c){
+  if (n <= 0) return -1;
+  var a = c / n;
+  for (var r = 0; r < AVG_BANDS.length; r++)
+    if (a >= AVG_BANDS[r][1] && a < AVG_BANDS[r][2]) return r;
+  return AVG_BANDS.length - 1;
+}
+
+/* bucket: deposit-count bucket, -1 for any.
+   gband:  GGR row, -1 for any.
+   aband:  average-deposit row, -1 for any. */
+function drill(bucket, gband, aband){
+  if (gband === undefined) gband = -1;
+  if (aband === undefined) aband = -1;
+  var nN = RAW.nN, aN = RAW.aN, gN = RAW.dN, nO = RAW.nO, aO = RAW.aO, gO = RAW.dO,
+      F = RAW.f, P = RAW.pr, R = RAW.rs, G = RAW.gg, AJ = RAW.ag, H = RAW.hg,
+      ID = RAW.id, UN = RAW.un, FT = RAW.ft, CO = RAW.co, DD = RAW.dd,
+      COUNTRIES = RAW.meta.countries, COUNTRIES_FULL = RAW.meta.countriesFull;
+  var era = state.era, whale = state.whale, email = state.email, phone = state.phone,
+      status = state.status, prod = state.prod, churn = state.churn,
+      reason = state.reason, fraud = state.fraud;
+
+  var hits = [];
+  for (var i = 0; i < nN.length; i++){
+    /* n and amt are ERA-SCOPED and must be derived exactly as crosstab()
+       derives them, or a cell and its player list disagree. */
+    var n, amt, gap;
+    if (era === "new"){ n = nN[i]; amt = aN[i]; gap = gN[i]; }
+    else if (era === "old"){ n = nO[i]; amt = aO[i]; gap = gO[i]; }
+    else {
+      n = nN[i] + nO[i]; amt = aN[i] + aO[i];
+      gap = gN[i] < 0 ? gO[i] : (gO[i] < 0 ? gN[i] : Math.min(gN[i], gO[i]));
+    }
+    if (n === 0) continue;
+    if (bucket >= 0 && bucketOf(n) !== bucket) continue;
+    if (gband >= 0 && ggrRowOf(i) !== gband) continue;
+    if (aband >= 0 && avgRowOf(n, amt) !== aband) continue;
+
+    var f = F[i];
+    if (whale === "ex" && (f & F_WHALE)) continue;
+    if (email === "yes" && !(f & F_EMAIL)) continue;
+    if (email === "no"  &&  (f & F_EMAIL)) continue;
+    if (phone === "yes" && !(f & F_PHONE)) continue;
+    if (phone === "no"  &&  (f & F_PHONE)) continue;
+    if (status === "blocked" && !(f & F_BLOCKED)) continue;
+    if (status === "active"  &&  (f & F_BLOCKED)) continue;
+    if (prod >= 0 && P[i] !== prod) continue;
+    if (reason && !reasonPasses(R[i], reason)) continue;
+    if (fraud !== "all" && !fraudPasses(R[i], fraud)) continue;
+    if (churn && !gapPasses(gap, churn)) continue;
+
+    hits.push({
+      id: ID[i], un: UN[i], ftd: FT[i], lastGap: gap,
+      country: COUNTRIES[CO[i]] || "—",
+      countryFull: (COUNTRIES_FULL && COUNTRIES_FULL[CO[i]]) || COUNTRIES[CO[i]] || "—",
+      status: (F[i] & F_BLOCKED) ? "Blocked" : "Active",
+      days: DD[i],
+      adj: H[i] ? AJ[i] : null,
+      /* Lifetime figures span BOTH eras whatever era is selected — the
+         bucket is era-scoped but these columns say "lifetime". */
+      cnt: nN[i] + nO[i],
+      amt: aN[i] + aO[i],
+      ggr: H[i] ? G[i] : null,
+      prod: PRODS[P[i]]
+    });
+  }
+  hits.sort(function(a, b){ return b.amt - a.amt; });
+  return hits;
+}
+
+function esc2(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function dayToDate(gap){
+  if (gap < 0) return null;
+  return new Date(ANCHOR_MS - gap * 86400000).toISOString().slice(0, 10);
+}
+
+/* Sortable columns. Sorting re-selects the top 50 from the WHOLE matching
+   set rather than reshuffling the 50 already on screen — clicking "Lifetime
+   GGR" should give the 50 biggest by GGR, not the 50 biggest depositors
+   reordered. The subtitle says which, so the distinction is never implicit.
+
+   `val` returns a sortable number or string; `miss` values (no FTD, no GGR
+   record) always sink to the bottom whichever direction is active, because
+   "unknown" is not "smallest". */
+var DRILL_COLS = [
+  { key:"un",     label:"Player",            type:"str", val:function(p){ return (p.un || "").toLowerCase(); } },
+  { key:"id",     label:"ID",                type:"num", val:function(p){ return p.id; } },
+  { key:"country",label:"Country",           type:"str", val:function(p){ return p.country.toLowerCase(); } },
+  { key:"status", label:"Status",            type:"str", val:function(p){ return p.status; } },
+  { key:"ftd",    label:"FTD date",          type:"num", val:function(p){ return p.ftd < 0 ? null : -p.ftd; } },
+  { key:"last",   label:"Last deposit",      type:"num", val:function(p){ return p.lastGap < 0 ? null : -p.lastGap; } },
+  { key:"since",  label:"Days since deposit",type:"num", val:function(p){ return p.lastGap < 0 ? null : p.lastGap; } },
+  { key:"cnt",    label:"Lifetime deposits", type:"num", val:function(p){ return p.cnt; } },
+  { key:"days",   label:"Deposit days",      type:"num", val:function(p){ return p.days; } },
+  { key:"amt",    label:"Lifetime deposited",type:"num", val:function(p){ return p.amt; } },
+  { key:"ggr",    label:"Lifetime GGR",      type:"num", val:function(p){ return p.ggr; } },
+  { key:"adj",    label:"Adjusted GGR",      type:"num", val:function(p){ return p.adj; } },
+  { key:"prod",   label:"Favourite product", type:"str", val:function(p){ return p.prod.toLowerCase(); } }
+];
+
+var DRILL_HITS = [], DRILL_SORT = { key:"amt", dir:"desc" }, DRILL_LABEL = "";
+var DRILL_LIMIT = 50;
+
+function sortHits(){
+  var col = DRILL_COLS.filter(function(c){ return c.key === DRILL_SORT.key; })[0] || DRILL_COLS[5];
+  var dir = DRILL_SORT.dir === "asc" ? 1 : -1;
+  return DRILL_HITS.slice().sort(function(a, b){
+    var va = col.val(a), vb = col.val(b);
+    var ma = va === null || va === undefined, mb = vb === null || vb === undefined;
+    if (ma && mb) return 0;
+    if (ma) return 1;          /* missing always last */
+    if (mb) return -1;
+    if (va < vb) return -1 * dir;
+    if (va > vb) return  1 * dir;
+    return 0;
+  });
+}
+
+function renderDrillRows(){
+  var col = DRILL_COLS.filter(function(c){ return c.key === DRILL_SORT.key; })[0] || DRILL_COLS[9];
+  var sorted = sortHits();
+  var limit = DRILL_LIMIT < 0 ? sorted.length : Math.min(DRILL_LIMIT, sorted.length);
+  var top = sorted.slice(0, limit);
+
+  document.getElementById("drillSub").textContent =
+    "showing " + num(top.length) + " of " + num(DRILL_HITS.length) +
+    " · sorted by " + col.label.toLowerCase() +
+    (DRILL_SORT.dir === "desc" ? " (highest first)" : " (lowest first)");
+
+  var head = '<thead><tr><th class="rank">#</th>' +
+    DRILL_COLS.map(function(c){
+      var arrow = c.key === DRILL_SORT.key ? (DRILL_SORT.dir === "desc" ? " ▼" : " ▲") : "";
+      return '<th class="sortable" data-key="' + c.key + '">' + c.label +
+             '<span class="sort-arrow">' + arrow + "</span></th>";
+    }).join("") + "</tr></thead>";
+
+  function money(v){
+    return v === null ? '<td class="na">no record</td>'
+                      : '<td class="' + (v < 0 ? "neg" : "pos") + '">' + eur(v) + "</td>";
+  }
+
+  var body = "<tbody>" + top.map(function(p, i){
+    var ftd = dayToDate(p.ftd), last = dayToDate(p.lastGap);
+    return '<tr class="' + (i % 2 === 1 ? "row-alt" : "") + '">' +
+      '<td class="rank">' + (i + 1) + "</td>" +
+      '<td class="uname">' + esc2(p.un || "—") + "</td>" +
+      '<td class="pid">' + p.id + "</td>" +
+      '<td title="' + esc2(p.countryFull) + '">' + esc2(p.country) + "</td>" +
+      '<td class="' + (p.status === "Blocked" ? "neg" : "") + '">' + p.status + "</td>" +
+      "<td>" + (ftd || '<span class="na">—</span>') + "</td>" +
+      "<td>" + (last || "—") + "</td>" +
+      "<td>" + (p.lastGap < 0 ? "—" : num(p.lastGap)) + "</td>" +
+      "<td>" + num(p.cnt) + "</td>" +
+      "<td>" + num(p.days) + "</td>" +
+      "<td>" + eur(p.amt) + "</td>" +
+      money(p.ggr) + money(p.adj) +
+      "<td>" + esc2(p.prod) + "</td></tr>";
+  }).join("") + "</tbody>";
+
+  document.getElementById("drill").innerHTML = head + body;
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll("#drill th.sortable"),
+    function(th){
+      th.addEventListener("click", function(){
+        var key = th.getAttribute("data-key");
+        var c = DRILL_COLS.filter(function(x){ return x.key === key; })[0];
+        if (DRILL_SORT.key === key){
+          DRILL_SORT.dir = DRILL_SORT.dir === "desc" ? "asc" : "desc";
+        } else {
+          DRILL_SORT.key = key;
+          /* numbers and dates open biggest/newest first, names A-Z */
+          DRILL_SORT.dir = c && c.type === "str" ? "asc" : "desc";
+        }
+        renderDrillRows();
+      });
+    }
+  );
+}
+
+function openDrill(bucket, gband, aband){
+  if (gband === undefined) gband = -1;
+  if (aband === undefined) aband = -1;
+  DRILL_HITS = drill(bucket, gband, aband);
+  DRILL_SORT = { key:"amt", dir:"desc" };   /* every open starts from the same place */
+
+  var parts = [];
+  parts.push(bucket < 0 ? "All deposit counts"
+                        : BUCKETS[bucket] + (bucket === 0 ? " deposit" : " deposits"));
+  if (gband >= 0){
+    parts.push("GGR " + (gband === GGR_BANDS.length ? "not recorded" : GGR_BANDS[gband][0]));
+  }
+  if (aband >= 0){
+    parts.push("avg deposit " + AVG_BANDS[aband][0]);
+  }
+  DRILL_LABEL = parts.join(" · ");
+
+  document.getElementById("drillTitle").textContent = DRILL_LABEL;
+  document.getElementById("drillPanel").style.display = "";
+  renderDrillRows();
+
+  var noGgr = DRILL_HITS.filter(function(p){ return p.ggr === null; }).length;
+  var foot = "<b>Lifetime</b> figures span both eras, so a player bucketed on " +
+    ERAS[state.era].label.toLowerCase() + " deposits can show a higher lifetime count here. " +
+    "<b>Click any column to re-sort</b> — that re-selects the visible rows from all " +
+    num(DRILL_HITS.length) + " players in the cell, so sorting by GGR gives the biggest by GGR " +
+    "rather than the same rows reordered. Rows with no FTD or no GGR record sort last either way.";
+  if (noGgr) foot += " <b>" + num(noGgr) + "</b> of the " + num(DRILL_HITS.length) +
+    " have no GGR record — <code>players_totals_v</code> covers the post-migration population only.";
+  foot += " <b>Deposit days</b> counts distinct days a player deposited on, so it is at most the " +
+    "deposit count. FTD comes from <code>reports.player_ftd</code>, which reaches back to 2016 — " +
+    "earlier than the deposit data here, so an FTD date can precede the first deposit this page knows about.";
+  document.getElementById("drillFoot").innerHTML = foot;
+}
+
+function closeDrill(){ document.getElementById("drillPanel").style.display = "none"; }
+
+/* ---------- GGR x deposit-count cross-tab ----------
+   Rows are GGR ranges, columns are the same deposit-count buckets as the
+   table above, cells are player counts. GGR is lifetime and post-migration
+   only (bi.players_totals_v), so players with no GGR record get their own
+   row rather than being counted as zero — zero GGR is a real outcome and
+   "no data" is not. */
+var GGR_BANDS = [
+  ["< -€10k",        -Infinity,   -1000000],
+  ["-€10k to -€1k",  -1000000,    -100000],
+  ["-€1k to -€100",  -100000,     -10000],
+  ["-€100 to €0",    -10000,      0],
+  ["exactly €0",     0,           1],
+  ["€0 to €100",     1,           10000],
+  ["€100 to €500",   10000,       50000],
+  ["€500 to €1k",    50000,       100000],
+  ["€1k to €5k",     100000,      500000],
+  ["€5k to €10k",    500000,      1000000],
+  ["€10k to €50k",   1000000,     5000000],
+  ["€50k+",          5000000,     Infinity]
+];
+
+function crosstab(kind){
+  kind = kind || "ggr";
+  var isAvg = kind === "avg";
+  var nRows = isAvg ? AVG_BANDS.length : GGR_BANDS.length + 1;
+  var nN = RAW.nN, nO = RAW.nO, aN = RAW.aN, aO = RAW.aO,
+      gN = RAW.dN, gO = RAW.dO, F = RAW.f,
+      P = RAW.pr, R = RAW.rs, G = RAW.gg, H = RAW.hg;
+  var era = state.era, whale = state.whale, email = state.email, phone = state.phone,
+      status = state.status, prod = state.prod, churn = state.churn,
+      reason = state.reason, fraud = state.fraud;
+
+  var rows = [];
+  for (var r = 0; r < nRows; r++){
+    var cells = [];
+    for (var ci0 = 0; ci0 < 10; ci0++) cells.push(0);
+    rows.push({ cells: cells, total: 0 });
+  }
+  var colTot = [];
+  for (var c2 = 0; c2 < 10; c2++) colTot.push(0);
+  var grand = 0, noData = 0;
+
+  for (var i = 0; i < nN.length; i++){
+    var n, amt, gap;
+    if (era === "new"){ n = nN[i]; amt = aN[i]; gap = gN[i]; }
+    else if (era === "old"){ n = nO[i]; amt = aO[i]; gap = gO[i]; }
+    else {
+      n = nN[i] + nO[i]; amt = aN[i] + aO[i];
+      gap = gN[i] < 0 ? gO[i] : (gO[i] < 0 ? gN[i] : Math.min(gN[i], gO[i]));
+    }
+    if (n === 0) continue;
+
+    var f = F[i];
+    if (whale === "ex" && (f & F_WHALE)) continue;
+    if (email === "yes" && !(f & F_EMAIL)) continue;
+    if (email === "no"  &&  (f & F_EMAIL)) continue;
+    if (phone === "yes" && !(f & F_PHONE)) continue;
+    if (phone === "no"  &&  (f & F_PHONE)) continue;
+    if (status === "blocked" && !(f & F_BLOCKED)) continue;
+    if (status === "active"  &&  (f & F_BLOCKED)) continue;
+    if (prod >= 0 && P[i] !== prod) continue;
+    if (reason && !reasonPasses(R[i], reason)) continue;
+    if (fraud !== "all" && !fraudPasses(R[i], fraud)) continue;
+    if (churn && !gapPasses(gap, churn)) continue;
+
+    var col = bucketOf(n), ri;
+    if (isAvg){
+      ri = avgRowOf(n, amt);
+    } else if (!H[i]){
+      ri = GGR_BANDS.length; noData++;
+    } else {
+      ri = ggrRowOf(i);
+    }
+    rows[ri].cells[col]++;
+    rows[ri].total++;
+    colTot[col]++;
+    grand++;
+  }
+  return { rows: rows, colTot: colTot, grand: grand, noData: noData };
+}
+
+/* One renderer for both cross-tabs. cfg names the table, its row labels,
+   which drill dimension its rows map to, and how many leading rows are
+   "negative" for red labelling. */
+function renderCrosstab(cfg){
+  cfg = cfg || { kind:"ggr", table:"xtab", meta:"xtabMeta", note:"xtabNote",
+                 attr:"xd", head:"GGR (lifetime)", negRows:4 };
+  var X = crosstab(cfg.kind);
+  var labels = cfg.kind === "avg"
+    ? AVG_BANDS.map(function(b){ return b[0]; })
+    : GGR_BANDS.map(function(b){ return b[0]; }).concat(["no GGR record"]);
+
+  /* Heat step from the largest cell, so the shading means something under a
+     filter that leaves only a handful of players. */
+  var max = 0;
+  X.rows.forEach(function(r){ r.cells.forEach(function(v){ if (v > max) max = v; }); });
+  function heat(v){
+    if (v === 0) return "n0";
+    if (max <= 0) return "";
+    var step = Math.ceil(v / max * 8);
+    return "heat" + Math.min(8, Math.max(1, step));
+  }
+
+  var head = '<thead><tr><th>' + cfg.head + "</th>" +
+    BUCKETS.map(function(b){ return "<th>" + b + "</th>"; }).join("") +
+    '<th class="col-total">All</th></tr></thead>';
+
+  /* Every populated cell drills: a body cell to its band x bucket, a row
+     total to the whole band, a column total to the whole bucket, and the
+     grand total to everything the filters select. */
+  var tip = ' title="Click to list the players in this cell"';
+  var A = cfg.attr;
+
+  var body = "<tbody>";
+  X.rows.forEach(function(r, i){
+    if (r.total === 0 && cfg.kind === "ggr" && i === GGR_BANDS.length) return;  // hide empty no-data row
+    var neg = i < cfg.negRows ? " neg" : "";
+    body += '<tr class="' + (i % 2 === 1 ? "row-alt" : "") + neg + '"><th>' + labels[i] + "</th>" +
+      r.cells.map(function(v, ci){
+        var d = v > 0 ? " data-" + A + '="' + ci + "," + i + '"' + tip : "";
+        return '<td class="' + heat(v) + '"' + d + ">" + (v === 0 ? "—" : num(v)) + "</td>";
+      }).join("") +
+      '<td class="col-total"' + (r.total > 0 ? " data-" + A + '="-1,' + i + '"' + tip : "") + ">" +
+      (r.total === 0 ? "—" : num(r.total)) + "</td></tr>";
+  });
+  body += '<tr class="rowtot"><th>All players</th>' +
+    X.colTot.map(function(v, ci){
+      return "<td" + (v > 0 ? " data-" + A + '="' + ci + ',-1"' + tip : "") + ">" +
+             (v === 0 ? "—" : num(v)) + "</td>";
+    }).join("") +
+    '<td class="col-total"' + (X.grand > 0 ? " data-" + A + '="-1,-1"' + tip : "") + ">" +
+    num(X.grand) + "</td></tr>";
+  body += "</tbody>";
+
+  document.getElementById(cfg.table).innerHTML = head + body;
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll("#" + cfg.table + " td[data-" + A + "]"),
+    function(td){
+      td.addEventListener("click", function(){
+        var a = td.getAttribute("data-" + A).split(",");
+        var col = parseInt(a[0], 10), row = parseInt(a[1], 10);
+        if (cfg.kind === "avg") openDrill(col, -1, row);
+        else openDrill(col, row, -1);
+      });
+    }
+  );
+
+  document.getElementById(cfg.meta).textContent =
+    (cfg.kind === "avg" ? "players by average deposit size and deposit count · "
+                        : "players by lifetime GGR band and deposit count · ") +
+    num(X.grand) + " players" +
+    (state.prod >= 0 ? " · favourite product " + PRODS[state.prod] : " · all products");
+
+  var note = "Rows and columns both partition the selection, so every row sums across to <b>All</b> " +
+    "and every column sums down to <b>All players</b>. The bottom row matches the Players row of the buckets table.";
+  if (cfg.kind === "avg"){
+    note += " Average deposit is that player's <b>own</b> total divided by their own deposit count, " +
+      "computed over the selected era — so it is a per-player average, not the blended figure in the " +
+      "buckets table. Every depositor has one, so unlike GGR there is no missing-data row here.";
+  }
+  if (X.noData > 0){
+    note += " <b>" + num(X.noData) + "</b> of these players have no GGR record: <code>bi.players_totals_v</code> " +
+      "covers the post-migration population only, so pre-migration-only depositors have no GGR at all. " +
+      "They are shown as their own row rather than counted as zero — <b>zero GGR is a real outcome, missing data is not</b>. " +
+      "Switch the era to <b>Post-migration</b> for a view where every player has a GGR figure.";
+  }
+  note += " GGR is <b>lifetime and post-migration</b>, so like favourite product it does not change when you switch era.";
+  document.getElementById(cfg.note).innerHTML = note;
+}
+
+/* ---------- chart helpers ---------- */
+
+
+
+
+function render(){
+  AGG = aggregate();
+  document.getElementById("emptyMsg").innerHTML =
+    AGG.T.p === 0 ? '<div class="empty">No depositors match this filter combination — try widening it.</div>' : "";
+  renderNotes();
+  renderTable();
+  renderCrosstab();
+  renderCrosstab({ kind:"avg", table:"avgtab", meta:"avgMeta", note:"avgNote",
+                   attr:"ad", head:"Average deposit", negRows:0 });
+}
+
+function group(map, key){
+  Object.keys(map).forEach(function(id){
+    document.getElementById(id).addEventListener("click", function(){
+      state[key] = map[id];
+      Object.keys(map).forEach(function(o){ document.getElementById(o).classList.toggle("active", o === id); });
+      render();
+    });
+  });
+}
+group({ btnNew:"new", btnOld:"old", btnAll:"all" }, "era");
+group({ btnWEx:"ex", btnWInc:"inc" }, "whale");
+["btnNew","btnOld","btnAll"].forEach(function(id){
+  document.getElementById(id).addEventListener("click", function(){
+    /* Eras barely overlap, so a calendar year picked in one is usually absent
+       from the next. Rebuild the list; buildChurnOptions clears a selection
+       that no longer exists rather than silently showing an empty page.
+       Bands and thresholds always exist, so only years can vanish. */
+    var keep = state.churn;
+    buildChurnOptions();
+    buildReasonOptions();   /* counts are per era, so the labels move too */
+    if (keep && state.churn !== keep) render();
+  });
+});
+group({ btnEAll:"all", btnEYes:"yes", btnENo:"no" }, "email");
+group({ btnPAll:"all", btnPYes:"yes", btnPNo:"no" }, "phone");
+group({ btnSAll:"all", btnSActive:"active", btnSBlocked:"blocked" }, "status");
+group({ btnFAll:"all", btnFYes:"yes", btnFNo:"no" }, "fraud");
+
+var sel = document.getElementById("selProd");
+sel.innerHTML = '<option value="-1">All products</option>' +
+  PRODS.map(function(p, i){ return '<option value="' + i + '">' + p + "</option>"; }).join("");
+sel.addEventListener("change", function(){
+  state.prod = parseInt(this.value, 10);
+  this.classList.toggle("narrowed", state.prod >= 0);
+  render();
+});
+
+var selR = document.getElementById("selReason");
+function buildReasonOptions(){
+  var per = reasonCounts();
+  var html = '<option value="">Any status</option>' +
+             '<option value="nb">Not blocked — ' + num(per[0]) + " players</option>";
+
+  /* Fraud & abuse collapses to a single entry: its six reasons are one
+     concept operationally, and the standalone Fraud toggle already selects
+     exactly this set. Listing them separately made the same choice available
+     twice and buried the groups that are worth breaking out. */
+  var COLLAPSED = { "Fraud & abuse": 1 };
+
+  REASON_GROUPS.forEach(function(g, gi){
+    var members = g[1].filter(function(ri){ return per[ri] > 0; });
+    if (!members.length) return;
+    var total = members.reduce(function(a, ri){ return a + per[ri]; }, 0);
+
+    if (COLLAPSED[g[0]] || members.length === 1){
+      html += '<option value="g:' + gi + '">' + g[0] + " — " + num(total) + " players</option>";
+      return;
+    }
+    html += '<optgroup label="' + g[0] + '">';
+    html += '<option value="g:' + gi + '">All ' + g[0].toLowerCase() + " — " + num(total) + " players</option>";
+    members.forEach(function(ri){
+      html += '<option value="r:' + ri + '">' + REASONS[ri] + " — " + num(per[ri]) + " players</option>";
+    });
+    html += "</optgroup>";
+  });
+
+  selR.innerHTML = html;
+  selR.value = state.reason;
+  if (selR.selectedIndex < 0){ selR.value = ""; state.reason = ""; }
+  selR.classList.toggle("narrowed", state.reason !== "");
+}
+selR.addEventListener("change", function(){
+  state.reason = this.value;
+  this.classList.toggle("narrowed", state.reason !== "");
+  /* Picking a block reason while Status is Active asks for players who are
+     both blocked and not blocked, which is always empty. Widen Status rather
+     than render a blank page — the button moves, so the change is visible. */
+  if (state.reason && state.reason !== "nb" && state.status === "active"){
+    state.status = "all";
+    document.getElementById("btnSAll").classList.add("active");
+    document.getElementById("btnSActive").classList.remove("active");
+  }
+  if (state.reason === "nb" && state.status === "blocked"){
+    state.status = "all";
+    document.getElementById("btnSAll").classList.add("active");
+    document.getElementById("btnSBlocked").classList.remove("active");
+  }
+  render();
+});
+
+var selC = document.getElementById("selChurn");
+function buildChurnOptions(){
+  var o = churnOptions();
+  var html = '<option value="">Any recency</option>';
+
+  html += '<optgroup label="Days since last deposit (each player in one band)">';
+  o.bands.forEach(function(b){
+    var label = b.key === "0-30" ? "Last 30 days" :
+                b.key === "360+" ? "Over 360 days" : b.key + " days";
+    html += '<option value="b:' + b.key + '">' + label + " — " + num(b.n) + " players</option>";
+  });
+  html += "</optgroup>";
+
+  html += '<optgroup label="Churned — no deposit in N+ days (cumulative)">';
+  o.thresholds.forEach(function(t){
+    html += '<option value="c:' + t.days + '">Churned ' + t.days + "+ days — " +
+            num(t.n) + " players</option>";
+  });
+  html += "</optgroup>";
+
+  html += '<optgroup label="Calendar year of last deposit">';
+  o.years.forEach(function(y){
+    html += '<option value="y:' + y.year + '">' + y.year +
+            (y.year === LATEST ? " (still active)" : "") + " — " + num(y.n) + " players</option>";
+  });
+  html += "</optgroup>";
+
+  selC.innerHTML = html;
+  selC.value = state.churn;
+  if (selC.selectedIndex < 0){ selC.value = ""; state.churn = ""; }
+  selC.classList.toggle("narrowed", state.churn !== "");
+}
+selC.addEventListener("change", function(){
+  state.churn = this.value;
+  this.classList.toggle("narrowed", state.churn !== "");
+  render();
+});
+
+document.getElementById("btnReset").addEventListener("click", function(){
+  state.email = "all"; state.phone = "all"; state.status = "all";
+  state.prod = -1; state.churn = ""; state.reason = ""; state.fraud = "all";
+  ["btnEAll","btnPAll","btnSAll","btnFAll"].forEach(function(id){ document.getElementById(id).classList.add("active"); });
+  ["btnEYes","btnENo","btnPYes","btnPNo","btnSActive","btnSBlocked","btnFYes","btnFNo"]
+    .forEach(function(id){ document.getElementById(id).classList.remove("active"); });
+  sel.value = "-1"; sel.classList.remove("narrowed");
+  selC.value = ""; selC.classList.remove("narrowed");
+  selR.value = ""; selR.classList.remove("narrowed");
+  render();
+});
+
+/* Collapse / expand each section from its header. Clicks on the controls
+   that live inside a header (the Rows select, the Close button) must not
+   toggle it, or picking a row count would fold the table away. */
+Array.prototype.forEach.call(
+  document.querySelectorAll(".grp-header[data-collapse]"),
+  function(head){
+    head.addEventListener("click", function(e){
+      if (e.target.closest("select, button")) return;
+      var body = document.getElementById(head.getAttribute("data-collapse"));
+      if (!body) return;
+      var hidden = body.style.display !== "none";
+      body.style.display = hidden ? "none" : "";
+      head.classList.toggle("collapsed", hidden);
+      head.querySelector(".collapser").innerHTML = hidden ? "+" : "\u2212";
+    });
+  }
+);
+
+document.getElementById("drillClose").addEventListener("click", closeDrill);
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") closeDrill();
+});
+document.getElementById("drillRows").addEventListener("change", function(){
+  DRILL_LIMIT = parseInt(this.value, 10);
+  renderDrillRows();
+});
+
+buildChurnOptions();
+buildReasonOptions();
+
+window.DF = { state:state, aggregate:aggregate, render:render, BUCKETS:BUCKETS,
+              PRODS:PRODS, ERAS:ERAS, median:median, churnOptions:churnOptions,
+              REASONS:REASONS, REASON_GROUPS:REASON_GROUPS, reasonCounts:reasonCounts,
+              reasonLabel:reasonLabel, buildReasonOptions:buildReasonOptions,
+              crosstab:crosstab, GGR_BANDS:GGR_BANDS, ggrRowOf:ggrRowOf,
+              AVG_BANDS:AVG_BANDS, avgRowOf:avgRowOf, renderCrosstab:renderCrosstab,
+              FRAUD_SET:FRAUD_SET, fraudPasses:fraudPasses,
+              drill:drill, openDrill:openDrill, closeDrill:closeDrill,
+              dayToDate:dayToDate, DRILL_N:DRILL_N, DRILL_COLS:DRILL_COLS,
+              setDrillLimit:function(n){ DRILL_LIMIT = n; renderDrillRows(); },
+              get DRILL_LIMIT(){ return DRILL_LIMIT; },
+              sortHits:sortHits, renderDrillRows:renderDrillRows,
+              get DRILL_SORT(){ return DRILL_SORT; },
+              get DRILL_HITS(){ return DRILL_HITS; },
+              churnLabel:churnLabel, gapPasses:gapPasses, gaps:gaps,
+              buildChurnOptions:buildChurnOptions, LATEST:LATEST,
+              BANDS:BANDS, THRESHOLDS:THRESHOLDS, ANCHOR:ANCHOR, DEFAULTS:DEFAULTS,
+              get AGG(){ return AGG; }, RAW:RAW };
+render();
+</script>
+</body>
+</html>

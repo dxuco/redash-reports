@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIP Transfer Performance</title>
+<style>
+:root{
+  --bg:#f4f8f5; --panel:#ffffff; --ink:#12211a; --muted:#5a6f63; --line:#dce8e0;
+  --pre:#9db3a6; --post:#1f6f4a; --neg:#b3352c; --accent:#1f6f4a; --warn:#8a6d1f;
+  --chip:#e8f1eb; --colline:#e9f0eb; --shadow:0 1px 2px rgba(18,33,26,.06),0 1px 3px rgba(18,33,26,.05);
+}
+:root:not([data-theme="light"]) {}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e1512; --panel:#141d18; --ink:#e4efe8; --muted:#8fa79a; --line:#213029;
+  --pre:#5a7268; --post:#4fbf8b; --neg:#e0685c; --accent:#5fc99a; --warn:#c9a24e;
+  --chip:#1a2620; --colline:#1c2822; --shadow:none;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1512; --panel:#141d18; --ink:#e4efe8; --muted:#8fa79a; --line:#213029;
+  --pre:#5a7268; --post:#4fbf8b; --neg:#e0685c; --accent:#5fc99a; --warn:#c9a24e;
+  --chip:#1a2620; --colline:#1c2822; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:26px;margin:0 0 18px;letter-spacing:-.02em;color:var(--accent)}
+h2{font-size:16px;margin:34px 0 12px;letter-spacing:-.01em;color:var(--accent)}
+h2::before{content:'';display:inline-block;width:3px;height:13px;background:var(--accent);border-radius:2px;margin-right:9px;vertical-align:-1px}
+h2 .sub{font-weight:400;color:var(--muted);font-size:13px;margin-left:8px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:16px 18px}
+.neg{color:var(--neg)}
+.mut{color:var(--muted)}
+.pos{color:var(--post)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12.5px;table-layout:auto}
+th,td{padding:6px 7px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+/* headers and the free-text columns wrap so the table fits without sideways scrolling */
+thead th{white-space:normal;line-height:1.25}
+td.txt{white-space:normal;overflow-wrap:normal}
+/* rule only where one block of columns ends and the next begins */
+th.grp, td.grp{border-left:1px solid var(--colline)}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);font-weight:600;position:sticky;top:0;background:var(--panel);cursor:pointer;user-select:none}
+thead th.g{border-bottom:2px solid var(--line)}
+tbody tr:hover{background:var(--chip)}
+tr.pick{cursor:pointer}
+tr.pick.on{background:var(--chip);box-shadow:inset 3px 0 0 var(--accent)}
+tr.pick.on td:first-child{font-weight:600}
+.scroll{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.scroll table{width:100%}
+.tall{max-height:640px;overflow-y:auto}
+.bar{height:6px;border-radius:3px;background:var(--post);display:inline-block;vertical-align:middle}
+.chip{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--chip);font-size:11px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px;align-items:center}
+select,input{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink)}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.note{color:var(--muted);font-size:12.5px;margin-top:10px;max-width:90ch}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin:2px 0 10px;flex-wrap:wrap}
+.sw{width:11px;height:11px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+svg{display:block;width:100%;height:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:12.5px}
+</style>

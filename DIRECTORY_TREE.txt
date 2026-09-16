@@ -1,0 +1,196 @@
+General Report/                    (Your Reporting System)
+│
+├── 📄 QUICKSTART.md              ⭐ START HERE (30 seconds)
+├── 📄 SETUP_SUMMARY.md           What was organized & how to use
+├── 📄 DIRECTORY_STRUCTURE.md     Detailed file organization
+├── 📄 ARCHITECTURE.md            Data flow & design decisions
+├── 📄 README.md                  Original documentation
+│
+├── 📁 config/                    ⭐ CONFIGURATION & SECRETS
+│   ├── config.env                (Redash keys, Cloudflare token, auth)
+│   ├── bonus-groups.json         (Bonus categorization)
+│   ├── data-exclusions.json      (Filters)
+│   ├── affiliate-overrides.json  (Channel mapping)
+│   └── config.yml
+│
+├── 📁 scripts/                   ⭐ ALL BUILD AUTOMATION
+│   ├── 📁 build/                 Main Builders (1-5 min each)
+│   │   ├── build.js              (Bonus Cost — 9-15 min, Redash query)
+│   │   ├── build-ftd.js          (FTD Report — 2-3 min)
+│   │   ├── build-month.js        (Current Month — 1 min)
+│   │   ├── build_acquisition.py  (Acquisition CPA — 2 min)
+│   │   └── gen_2025.py           (2025 Comparison — 1 min)
+│   │
+│   ├── 📁 builders/              Report Source Code
+│   │   ├── 📁 overview/          Business Overview
+│   │   │   ├── build_overview.py
+│   │   │   ├── make_overview_html.py
+│   │   │   ├── build_mix.py
+│   │   │   ├── make_mix_html.py
+│   │   │   ├── build_drilldown.py
+│   │   │   ├── overview-template.html
+│   │   │   └── [test files]
+│   │   │
+│   │   ├── 📁 retention/         Retention Report
+│   │   │   ├── build_retention.py
+│   │   │   ├── make_retention_html.py
+│   │   │   └── retention-template.html
+│   │   │
+│   │   └── 📁 reactivation/      Reactivation Report
+│   │       ├── build_reactivation.py
+│   │       ├── make_reactivation_html.py
+│   │       └── reactivation-template.html
+│   │
+│   ├── 📁 utilities/             Helper Scripts
+│   │   ├── redash.js             (Redash API client)
+│   │   ├── server.js             (Local dev server)
+│   │   ├── publish-worker.js     (Deploy to Cloudflare)
+│   │   ├── verify-public.js      (Check live site)
+│   │   ├── make-standalone.js    (Embed data in HTML)
+│   │   ├── app.js                (Frontend code)
+│   │   ├── export-csv.js         (CSV exporter)
+│   │   ├── check-theme.js        (Theme validation)
+│   │   ├── [7 more utilities]
+│   │
+│   ├── 📁 maintenance/           Windows Automation
+│   │   ├── UPDATE-EVERYTHING.bat ⭐ MAIN BUILD (run this first)
+│   │   ├── INSTALL-DAILY-UPDATE.bat (Schedule daily 07:05 AM)
+│   │   ├── START-DAILY-UPDATE.bat   (Manual timer)
+│   │   ├── [20+ utility .bat files for specific tasks]
+│   │
+│   ├── 📁 tests/                 Validation
+│   │   ├── test-daily-chart.js
+│   │   ├── test-drilldown.js
+│   │   ├── [6 more test files]
+│   │
+│   └── 📁 deprecated/            Old scripts (safe to delete)
+│
+├── 📁 output/                    ⭐ GENERATED REPORTS & CACHE
+│   ├── 📁 reports/               Built HTML Reports (View these!)
+│   │   ├── acquisition-report/   Acquisition & CPA data
+│   │   ├── community-channels/   Channel breakdown
+│   │   ├── country-funnel/       Country-level funnel
+│   │   ├── country-traffic/      Traffic by country
+│   │   ├── deposit-frequency/    Deposit patterns
+│   │   ├── fiat-affiliate/       Fiat deposit affiliate
+│   │   ├── ftd-bonus-dashboard/  FTD bonus metrics
+│   │   ├── ftd-channels/         FTD by channel
+│   │   ├── manager-view/         Manager overview
+│   │   ├── pivot/                Pivot table
+│   │   ├── retention/            Retention cohort
+│   │   ├── retention-full/       Full retention data
+│   │   ├── streamers/            Streamer performance
+│   │   ├── us-360/               US market 360
+│   │   └── vip-transfer/         VIP transfer analysis
+│   │
+│   ├── 📁 cache/                 Cached Data (Speeds Up Builds!)
+│   │   ├── 📁 cache-bonus/       Monthly Redash exports
+│   │   │   ├── 2026-01.json
+│   │   │   ├── 2026-02.json
+│   │   │   └── ...
+│   │   │
+│   │   ├── 📁 ftd-report/        FTD Data (Powers All Reports)
+│   │   │   ├── 📁 cache/         Daily aggregates
+│   │   │   └── 📁 _stage/        Staging area
+│   │   │
+│   │   └── 📁 publish/           Published Files
+│   │       ├── acquisition-2025/
+│   │       ├── acquisition-2026/
+│   │       ├── bonus/
+│   │       ├── ftd/
+│   │       ├── ftd-share/
+│   │       ├── overview/
+│   │       ├── retention/
+│   │       └── ...
+│   │
+│   └── 📁 data/                  Processed JSON Data
+│       ├── data.json             (Full bonus cost — 15-20 MB)
+│       ├── overview-data.json    (Business Overview aggregates)
+│       ├── mix-data.json         (FTD Share breakdown)
+│       └── drilldown-data.json   (Detail data)
+│
+├── 📁 redash-kit/                Reusable Redash Library
+│   ├── redash.js                 (API client)
+│   ├── export-csv.js             (CSV tool)
+│   ├── config.env.example        (Template)
+│   └── README.md                 (Gotchas & quirks)
+│
+├── 📁 worker/                    Cloudflare Worker Code
+│   ├── worker.js                 (Worker entrypoint)
+│   ├── wrangler.toml             (Worker config)
+│   └── .wrangler/                (Build artifacts)
+│
+├── 📁 skills/                    Claude Code Skills
+│   ├── redash-report-builder/
+│   └── redash-report-builder-workspace/
+│
+├── 📁 docs/                      Documentation (expandable)
+│   ├── QUICKSTART.md
+│   ├── DIRECTORY_STRUCTURE.md
+│   ├── ARCHITECTURE.md
+│   └── [more docs as needed]
+│
+├── 📁 logs/                      Build Logs
+│   ├── update-all.log            (Latest run)
+│   ├── build-last.log            (Build logs)
+│   └── 📁 archive/               (Old logs)
+│
+├── 📁 _template/                 Template Assets
+│   ├── BRAND.md
+│   └── 📁 assets/
+│
+├── 🗑️  Cleanup Directories (Can Delete)
+│   ├── Claude outputs/           (Exploration)
+│   ├── _to_delete/               (Marked for deletion)
+│   ├── _cover-backup/            (Old backup)
+│   ├── _excluded-rows/           (Excluded data)
+│   ├── _offline/                 (Offline data)
+│   ├── _mcp-exports/             (Deprecated)
+│   ├── _artifact/                (Old artifacts)
+│   └── drive-download-*/         (Temp downloads)
+│
+├── 📦 package.json               (npm dependencies)
+├── 📦 package-lock.json
+└── 📁 node_modules/              (Dependencies — run: npm install)
+
+════════════════════════════════════════════════════════════════
+
+KEY COMMANDS:
+
+  npm install                    (Setup — run once)
+  
+  node scripts/build/build.js --probe
+                                (Test connection — 30 sec)
+  
+  scripts/maintenance/UPDATE-EVERYTHING.bat
+                                (Full build — 10-20 min)
+  
+  node scripts/utilities/server.js
+                                (Local dev server)
+  
+  node scripts/utilities/publish-worker.js
+                                (Publish to live)
+  
+  scripts/maintenance/INSTALL-DAILY-UPDATE.bat
+                                (Schedule daily builds - admin)
+
+════════════════════════════════════════════════════════════════
+
+FILE SIZES:
+
+  Typical generated reports: 20-25 MB (bonus cost)
+  Cache storage needed: ~100 MB
+  Node modules: ~500 MB
+  Total with cache: ~650 MB
+
+════════════════════════════════════════════════════════════════
+
+QUICK REFERENCE:
+
+  🎯 First Time:        QUICKSTART.md
+  📁 File Organization: DIRECTORY_STRUCTURE.md
+  🔄 Data Flow:         ARCHITECTURE.md
+  ⚙️  Settings:         config/config.env
+  ▶️  Main Script:       scripts/maintenance/UPDATE-EVERYTHING.bat
+  
+════════════════════════════════════════════════════════════════

@@ -1,0 +1,29 @@
+{
+  "name": "reports",
+  "main": "worker.js",
+  "compatibility_date": "2026-01-01",
+  "account_id": "448f87fe2dd6ba4178c3024242bb8b29",
+  "workers_dev": true,
+  "assets": {
+    "directory": "../publish",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": {
+    "AUTH_USERS": "Davit:DFgh1234, viewer:sCCHkCm1YRSoyh7RNWu9, spare:qOgpvfSwF0FZFxTWSVy0, Nuzi:NuziFJ, Dachi:Dachi123, Vako:Vako123, Levaniko:Levaniko123, Levani:Levani123, Giorgi:Giorgi123, Elene:Elene123, Nini:Nini123, Ani:Ani123, Ramaz:Ramaz123, Mate:Mate4321, Sophi:sophi123, Ana:ana123, Lizi:lizi123, Nikoloz:nikoloz123, vip:9qUQTyGdV72SbUXS",
+    "AUTH_SECRET": "e75d5d3da84f1cc37b33aecfb80c7f3521e85347917867aab3aee0cd06890c88",
+    "AUTH_SCOPES": "",
+    "ADMIN_USERS": "Davit",
+    "AUTH_PAGES": "vip:/vip-transfer",
+    "AUTH_HIDE": "vip:mbonus"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "PIVOT_LAYOUTS",
+      "id": "6f3c36105bb24396b874d6d117688d76"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

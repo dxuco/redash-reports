@@ -1,0 +1,2123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIP Transfer Performance</title>
+<style>
+:root{
+  /* house cover band, theme.css -- fixed, not theme-dependent: the band is
+     dark green in both light and dark mode on every other report */
+  --dark-green:#12703F; --green-dk:#0A5A30; --light-green:#C0DD97;
+  --bg:#f4f8f5; --panel:#ffffff; --ink:#12211a; --muted:#5a6f63; --line:#dce8e0;
+  --pre:#9db3a6; --post:#1f6f4a; --neg:#b3352c; --accent:#1f6f4a; --warn:#8a6d1f;
+  --chip:#e8f1eb; --colline:#e9f0eb; --shadow:0 1px 2px rgba(18,33,26,.06),0 1px 3px rgba(18,33,26,.05);
+}
+:root:not([data-theme="light"]) {}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e1512; --panel:#141d18; --ink:#e4efe8; --muted:#8fa79a; --line:#213029;
+  --pre:#5a7268; --post:#4fbf8b; --neg:#e0685c; --accent:#5fc99a; --warn:#c9a24e;
+  --chip:#1a2620; --colline:#1c2822; --shadow:none;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1512; --panel:#141d18; --ink:#e4efe8; --muted:#8fa79a; --line:#213029;
+  --pre:#5a7268; --post:#4fbf8b; --neg:#e0685c; --accent:#5fc99a; --warn:#c9a24e;
+  --chip:#1a2620; --colline:#1c2822; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1800px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:26px;margin:0 0 18px;letter-spacing:-.02em;color:var(--accent)}
+h2{font-size:16px;margin:34px 0 12px;letter-spacing:-.01em;color:var(--accent)}
+h2::before{content:'';display:inline-block;width:3px;height:13px;background:var(--accent);border-radius:2px;margin-right:9px;vertical-align:-1px}
+h2 .sub{font-weight:400;color:var(--muted);font-size:13px;margin-left:8px}
+/* The number sits where the accent bar does, so a numbered heading lines up
+   with an unnumbered one. */
+h2 .num{display:inline-block;min-width:1.35em;color:var(--muted);font-weight:600}
+
+/* --- cover band, matching business-overview (theme.css --cover-*) ---------- */
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);
+  color:#fff;padding:1.6rem 20px 1.4rem;line-height:1.45}
+/* Fixed height, not a floor. theme.css spells out why: a flex band grows when
+   the controls wrap to a second row or the subtitle wraps to a second line, and
+   no amount of matching padding prevents it -- which is exactly what happened
+   here when this copied the older min-height rule. Title and subtitle truncate
+   instead; the title shrinks before the buttons do, because losing sight of a
+   control is worse than a clipped word. */
+/* NOT overflow:hidden. The segment dropdown opens below the 60px band, and
+   clipping here swallowed it whole -- the button responded and the menu was
+   never visible. Truncation does not need it either: the ellipsis rules below
+   carry their own overflow:hidden on the title and subtitle themselves, which
+   is where it belongs. Do not add it back. */
+.cover-inner{max-width:1800px;margin:0 auto;height:60px;min-height:60px;
+  display:flex;align-items:center;flex-wrap:nowrap;overflow:visible;gap:14px}
+.cover-inner>*{min-width:0}
+.cover header{display:flex;flex-wrap:nowrap;align-items:center;gap:14px;
+  width:100%;justify-content:space-between;min-width:0;border:0;padding:0;margin:0}
+.cover h1,.cover p,.cover .sub{white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%}
+.cover header > div:first-child{flex:1 1 auto;min-width:0}
+.cover .controls{flex:0 0 auto}
+.cover h1{font-size:1.55rem;font-weight:700;margin:0 0 .25rem;letter-spacing:-.01em;color:#fff}
+.cover .sub{color:var(--light-green);font-size:.86rem;margin:0}
+.cover .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* the page's own .switch markup, restyled as the house pill group rather than
+   rebuilt: the click handlers key off `.on`, so changing the markup to
+   aria-pressed would have meant rewiring three switches for no gain */
+.cover .switch{display:inline-flex;background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:2px;overflow:visible;margin:0}
+.cover .switch button{background:transparent;color:#fff;font-weight:600;font-size:12px;
+  padding:5px 13px;border-radius:18px;white-space:nowrap;border:0}
+.cover .switch button + button{border-left:0}
+.cover .switch button:hover{background:rgba(255,255,255,.16)}
+.cover .switch button.on{background:#fff;color:var(--dark-green);font-weight:700}
+/* the segment picker is a dropdown, so it gets the outline-button treatment */
+.cover .checks{margin:0;gap:8px}
+.cover .checks .lbl{color:rgba(255,255,255,.75)}
+.cover .dd > button{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.6);
+  color:#fff;border-radius:20px;padding:5px 13px;font-size:12px}
+.cover .dd > button:hover{background:#fff;color:var(--dark-green)}
+.cover .dd.active > button{background:#fff;color:var(--dark-green);border-color:#fff}
+.cover .ddmenu{color:var(--ink)}
+.cover .checks > button{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.6);
+  color:#fff;border-radius:20px}
+h2.fold{cursor:pointer;user-select:none}
+h2.fold:hover{opacity:.82}
+h2 .caretf{display:inline-block;width:9px;margin-left:9px;color:var(--muted);font-size:11px;
+           transform:rotate(90deg);transition:transform .15s}
+h2.shut .caretf{transform:rotate(0deg)}
+h2.shut{margin-bottom:10px}
+.sect{overflow:hidden}
+.sect[hidden]{display:none}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:16px 18px}
+.neg{color:var(--neg)}
+.mut{color:var(--muted)}
+.pos{color:var(--post)}
+/* An outline chip, not a filled badge: colours come from the theme rather than
+   hard-coded hexes, so it holds up in both. (The .vpill / .vband / .vbar rules
+   that used to sit here went with the 30-day verdict.) */
+.rpill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;
+  border:1px solid var(--line);white-space:nowrap}
+.rpill.yes{color:var(--post);border-color:var(--post)}
+.rpill.no{color:var(--neg);opacity:.8}
+.rpill.none{color:var(--muted);border-color:transparent}
+.card .v .of{font-size:13px;font-weight:400;color:var(--muted);letter-spacing:0}
+/* Rows belonging to one of the 25 VIP-transfer offers. The rail carries the
+   signal; the tint stays faint so the numbers keep their contrast in both
+   themes, and the code is boxed so it can be read off at a glance. */
+tr.vipb td{background:color-mix(in srgb, var(--post) 9%, transparent)}
+tr.vipb td:first-child{box-shadow:inset 3px 0 0 var(--post)}
+tr.vipb td.code{font-weight:700;color:var(--post)}
+.vipkey{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--post);
+        vertical-align:-1px;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12.5px;table-layout:auto}
+th,td{padding:6px 7px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+/* headers and the free-text columns wrap so the table fits without sideways scrolling */
+thead th{white-space:normal;line-height:1.25}
+tfoot td{font-weight:600;position:sticky;bottom:0;background:var(--panel);border-top:2px solid var(--line)}
+td.txt{white-space:normal;overflow-wrap:normal}
+/* rule only where one block of columns ends and the next begins */
+th.grp, td.grp{border-left:1px solid var(--colline)}
+/* Contact Availability repeats the same five column names for onboarded and
+   pending players. With only a hairline between them it was impossible to tell
+   which half a number sat in, so the split gets a real rule, a spanning header
+   and a tint on the pending block. */
+#tContact th.split, #tContact td.split{border-left:2px solid var(--line)}
+#tContact th.pend, #tContact td.pend{background:color-mix(in srgb, var(--accent) 5%, transparent)}
+#tContact thead tr.groups th{font-size:11px;letter-spacing:.06em;padding-bottom:2px;
+  border-bottom:1px solid var(--colline);text-align:center;color:var(--accent)}
+#tContact thead tr.groups th.blank{border-bottom:0}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);font-weight:600;position:sticky;top:0;background:var(--panel);cursor:pointer;user-select:none}
+thead th.g{border-bottom:2px solid var(--line)}
+tbody tr:hover{background:var(--chip)}
+tr.pick{cursor:pointer}
+tr.pick.on{background:var(--chip);box-shadow:inset 3px 0 0 var(--accent)}
+tr.pick.on td:first-child{font-weight:600}
+/* A count that is also a filter. Underlined on hover rather than styled like a
+   button all the time: the column is a table of numbers first, and 60 dotted
+   cells would read as decoration. */
+td.cpick{cursor:pointer}
+td.cpick:hover{text-decoration:underline;text-underline-offset:2px}
+td.cpick.on{background:var(--accent);color:#fff;font-weight:600;border-radius:4px}
+/* Heatmap. The tint is set per cell as --h (0..1) and mixed into the accent, so
+   it follows the theme instead of carrying its own palette. Scaled on the square
+   root of the share, not the share itself: one cell here holds 257 of 521
+   players and a linear ramp would leave every other cell indistinguishable from
+   white. The number keeps its own colour -- tinting the text as well as the
+   ground is how a heatmap stops being readable at the dark end. */
+/* Week markers: a filled pip is a week with a deposit. Numbered rather than
+   plain dots so "which week" is readable without counting positions. */
+.wk{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;
+  border-radius:50%;font-size:10px;margin-right:3px;border:1px solid var(--line);
+  color:var(--muted);cursor:help}
+.wk.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#tMBonus tr.mbrow{cursor:pointer}
+#tMBonus tr.mbrow:hover{background:var(--chip)}
+#tMBonus tr.mbsub td{font-weight:600;border-top:1px solid var(--line);
+  border-bottom:2px solid var(--line);background:var(--panel)}
+td.gpick{cursor:pointer;background:color-mix(in srgb, var(--accent) calc(var(--h,0) * 55%), transparent)}
+td.gpick:hover{outline:1.5px solid var(--accent);outline-offset:-1.5px}
+td.gpick.on{background:var(--accent);color:#fff;font-weight:600}
+/* The percentage bands run left to right as a scale; No GGR / Not measurable /
+   New are not points on it. A heavier rule says so -- without it the eye reads
+   257 as the far end of a decline. */
+#tGrid th.brk, #tGrid td.brk{border-left:2px solid var(--line)}
+/* the same break on the row axis: the first off-scale row gets the rule above it */
+#tGrid tr.offscale.first td{border-top:2px solid var(--line)}
+.scroll{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.scroll table{width:100%}
+.tall{max-height:640px;overflow-y:auto}
+/* compact geometry for the long table */
+#tPlayers{font-size:12px}
+#tPlayers th,#tPlayers td{padding:3px 6px;line-height:1.25}
+#tPlayers thead th{font-size:10px;letter-spacing:.03em}
+.bar{height:6px;border-radius:3px;background:var(--post);display:inline-block;vertical-align:middle}
+.chip{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--chip);font-size:11px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px;align-items:center}
+select,input{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink)}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.note{color:var(--muted);font-size:12.5px;margin-top:10px;max-width:90ch}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin:2px 0 10px;flex-wrap:wrap}
+.sw{width:11px;height:11px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+svg{display:block;width:100%;height:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:12.5px}
+
+.switch{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:0 0 6px}
+.switch button{font:inherit;font-weight:600;font-size:12.5px;padding:7px 15px;border:0;background:var(--panel);color:var(--muted);cursor:pointer}
+.switch button.on{background:var(--accent);color:#fff}
+.switch button + button{border-left:1px solid var(--line)}
+.checks{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 2px}
+.checks .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:2px}
+.dd{position:relative;display:inline-block}
+.dd > button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;cursor:pointer;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);
+  display:inline-flex;align-items:center;gap:8px}
+.dd > button:hover{border-color:var(--accent)}
+.dd.active > button{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dd .caret{opacity:.7;font-size:10px}
+.ddmenu{position:absolute;top:calc(100% + 4px);left:0;z-index:40;min-width:210px;max-height:320px;
+  overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);padding:4px}
+.ddmenu[hidden]{display:none}
+.ddmenu label{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:6px 9px;border-radius:7px;
+  cursor:pointer;user-select:none;color:var(--ink)}
+.ddmenu label:hover{background:var(--chip)}
+.ddmenu label.on{font-weight:600;color:var(--accent)}
+.ddmenu label span:first-of-type{flex:1}
+.ddmenu input{margin:0;accent-color:var(--accent)}
+.ddmenu .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.checks button{font:inherit;font-size:12px;font-weight:600;padding:5px 10px;border:1px solid var(--line);
+  border-radius:999px;background:transparent;color:var(--muted);cursor:pointer}
+.expo{font:inherit;font-size:12px;font-weight:600;padding:5px 12px;margin-left:12px;vertical-align:2px;
+  border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--accent);cursor:pointer}
+.expo:hover{border-color:var(--accent)}
+.modal{position:fixed;inset:0;background:rgba(8,16,12,.55);display:flex;align-items:center;
+  justify-content:center;padding:24px;z-index:50}
+.modal[hidden]{display:none}
+.sheet{background:var(--bg);border:1px solid var(--line);border-radius:12px;width:min(1120px,100%);
+  max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+/* Tightened throughout. Twelve cards, two chip rows and two tables had pushed
+   the useful part of this panel below the fold on a laptop; the space between
+   things was carrying no meaning, so it went. Type sizes are unchanged where
+   they carry the numbers -- compact should cost scrolling, not legibility. */
+.mhead{display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line)}
+.mhead h3{margin:0;font-size:15.5px;color:var(--accent);letter-spacing:-.01em}
+.msub{color:var(--muted);font-size:12px;margin-top:2px}
+.mhead button{margin-left:auto;font:inherit;font-size:20px;line-height:1;padding:1px 8px;cursor:pointer;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--muted)}
+.mhead button:hover{border-color:var(--accent);color:var(--accent)}
+.mbody{overflow:auto;padding:12px 16px 16px}
+.mbody h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  margin:14px 0 6px;font-weight:600}
+.mbody h4:first-of-type{margin-top:0}
+/* 104px fits six cards per row at this width instead of four, so twelve
+   measures take two rows rather than three. */
+.mkpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:6px;margin-bottom:2px}
+.mkpi div{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:5px 8px}
+/* Wrap, do not clip. An ellipsis here hid the half of the label that says which
+   side of the split it is -- "BONUS BEFOR..." and "BONUS AFTER..." are the same
+   card until you read the end of them. */
+.mkpi .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+  line-height:1.25;min-height:2.5em}
+.mkpi .v{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:1px}
+/* The modal's own tables sit tighter than the page's: they are read a screen at
+   a time, not scanned across. */
+.mbody table th,.mbody table td{padding:3px 7px}
+.mbody .scroll.tall{max-height:230px}
+/* Header facts as chips rather than one long middot-separated line: at a glance
+   a reader wants "which segment, which VA, which tier", and a run-on sentence
+   makes each of those a search. */
+.mchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.mchip{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);
+  color:var(--muted);white-space:nowrap}
+.mchip b{color:var(--ink);font-weight:600}
+.mchip.key{border-color:var(--accent);color:var(--accent)}
+.mchip.key b{color:var(--accent)}
+/* A VA note is a quotation, so it is set as one: a rule down the left, the
+   manager's name above it, and the text at reading width rather than stretched
+   across the full panel. */
+/* the weekly chart: sized by viewBox, scaled by CSS, so no resize handler */
+.mchart{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  padding:8px 10px 2px;margin-bottom:10px}
+.mchart[hidden]{display:none}
+.mchart svg{display:block;width:100%;height:auto}
+.mchart .lg{display:flex;flex-wrap:wrap;gap:13px;font-size:11px;color:var(--muted);padding:0 2px 5px}
+.mchart .lg i{display:inline-block;width:10px;height:8px;vertical-align:0;margin-right:5px;border-radius:1px}
+.mchart .lg i.dash{height:0;width:12px;border-top:2px dashed currentColor;vertical-align:3px}
+#nmodal,#smodal{z-index:60}
+/* The answers are paragraphs, not figures: left-aligned, wrapping, and the
+   question column held narrow so the two answers get the width. */
+table.qa td,table.qa th{white-space:normal;vertical-align:top;padding:7px 9px}
+table.qa td.q{width:24%;font-weight:600;color:var(--ink)}
+table.qa td{font-size:12.5px;line-height:1.45}
+.sheet.narrow{width:min(720px,100%)}
+.notesbtn{margin-left:auto;font:inherit;font-size:12px;font-weight:600;padding:4px 11px;
+  cursor:pointer;border:1px solid var(--accent);border-radius:999px;
+  background:var(--bg);color:var(--accent);white-space:nowrap}
+.notesbtn:hover{background:var(--accent);color:#fff}
+.notesbtn[hidden]{display:none}
+/* the close button used to take the slack from margin-left:auto; with the notes
+   button there too, only the first of the pair should */
+.mhead .notesbtn + button{margin-left:8px}
+.note{border-left:2px solid var(--accent);padding:2px 0 2px 10px;margin:0 0 8px}
+.note:last-child{margin-bottom:2px}
+.note .who{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--accent);font-weight:600}
+.note .who .st{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
+.note .tx{font-size:12.5px;line-height:1.45;margin-top:2px;max-width:78ch;
+  white-space:pre-wrap}
+#tPlayers tbody tr{cursor:pointer}
+tr.split td{border-top:2px solid var(--accent)}
+.pill2{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;background:var(--chip);color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="cover-inner">
+<header>
+  <div>
+    <h1>VIP Transfer Performance</h1>
+    <p class="sub" id="asof">&nbsp;</p>
+  </div>
+  <div class="controls">
+    <div class="switch" id="periodSwitch">
+      <button data-period="jul" class="on">Since 1 Jul</button>
+      <button data-period="jun">Since 1 Jun</button>
+      <button data-period="all">All requests</button>
+    </div>
+    <div class="switch" id="basisSwitch">
+      <button data-basis="req" class="on">From request</button>
+      <button data-basis="onb">From onboarding</button>
+    </div>
+    <div class="switch" id="srcSwitch">
+      <button data-src="all">All sources</button>
+      <button data-src="streamer">Streamer</button>
+      <button data-src="nonstreamer" class="on">Non-streamer</button>
+    </div>
+    <div id="segFilter" class="checks"></div>
+  </div>
+</header>
+</div></div>
+
+<div class="wrap">
+
+
+<p class="note" id="basisNote" style="margin:14px 2px -6px"></p>
+
+<h2>By Managers</h2>
+<div class="scroll"><table id="tVA"></table></div>
+
+<h2>By Segment</h2>
+<div class="scroll"><table id="tSeg"></table></div>
+
+<h2>By Contacts</h2>
+<div class="scroll"><table id="tContact"></table></div>
+
+<h2>By Funnel</h2>
+<div class="panel"><div id="tree"></div>
+</div>
+<h2>By Bonus Types<span class="sub" id="bdNote"></span></h2>
+<div class="scroll" style="margin-top:14px"><table id="tBonusDist"></table></div>
+
+<h2>By Growth<span class="sub" id="gridNote"></span></h2>
+<div class="scroll" style="margin-top:14px"><table id="tGrid"></table></div>
+
+<h2>By Players<button id="csv" class="expo">Export CSV</button></h2>
+<div class="scroll tall"><table id="tPlayers"></table></div>
+
+<!-- Last on purpose: it is the only section that ignores the filters above it,
+     so it sits after everything they do control rather than in the middle.
+
+     data-section names it so a viewer can be shown the page without it; see
+     the __HIDE block at the end of the script. -->
+<h2 data-section="mbonus">By Manager Bonus<span class="sub" id="bonusNote"></span></h2>
+<div class="scroll tall" data-section="mbonus"><table id="tMBonus"></table></div>
+
+<div id="smodal" class="modal" hidden>
+  <div class="sheet narrow" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+    <div class="mhead">
+      <div><h3 id="sTitle"></h3><div class="msub" id="sSub"></div></div>
+      <button id="sClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="mbody" id="sBody"></div>
+  </div>
+</div>
+
+<div id="nmodal" class="modal" hidden>
+  <div class="sheet narrow" role="dialog" aria-modal="true" aria-labelledby="nTitle">
+    <div class="mhead">
+      <div><h3 id="nTitle"></h3><div class="msub" id="nSub"></div></div>
+      <button id="nClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="mbody" id="nBody"></div>
+  </div>
+</div>
+
+<div id="modal" class="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mhead">
+      <div><h3 id="mTitle"></h3><div class="msub" id="mSub"></div></div>
+      <button id="mNotesBtn" class="notesbtn" hidden></button>
+      <button id="mSurveyBtn" class="notesbtn" hidden></button>
+      <button id="mClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="mbody">
+      <div id="mKpi" class="mkpi"></div>
+      <h4 id="mWeekH" hidden>By week<span class="sub"> · deposits and adjusted GGR, weeks counted from the split</span></h4>
+      <div class="mchart" id="mWeek" hidden></div>
+      <h4>Daily history</h4>
+      <div class="scroll tall"><table id="mDaily"></table></div>
+      <h4>Bonuses by offer<span class="sub"> · one row per offer, counting tickets · taken means the player activated it</span></h4>
+      <div class="scroll" id="mBsumWrap"><table id="mBsum"></table></div>
+      <h4>Every bonus, newest first<span class="sub"> · code is the reward_config_family_id · <span class="vipkey"></span>VIP-transfer offer · newest 150</span></h4>
+      <div class="scroll" id="mBonusWrap"><table id="mBonus"></table></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const D = __DATA__;
+const eur = n => (n<0?'-':'') + '€' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const pct = n => (Math.abs(n)<1 && n!==0 ? '<1%' : Math.round(n)+'%');
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PROD = { 'Provably Fair':'PF', 'Live Casino':'LC' };
+/* VA names are the widest column in the summary tables, so show them as
+   Firstname_Initial. Two Giorgis share an initial, so the surname part grows
+   until every label is distinct. Bucket rows ("Not. Onb") keep their
+   wording. Built per render, since the VA list changes with the cohort. */
+function initialsMap(names){
+  const out = {}, byLabel = {};
+  const plain = n => /onboard|^Not\. Onb$|^—/i.test(n) || String(n).trim().split(/\s+/).length < 2;
+  for(const n of names){
+    if(plain(n)) { out[n] = n; continue; }
+    const [first, ...rest] = String(n).trim().split(/\s+/);
+    const sur = rest.join('');
+    let len = 1, label;
+    do {
+      label = first + '_' + sur.slice(0, len).replace(/^./, c=>c.toUpperCase());
+      len++;
+    } while (byLabel[label] && byLabel[label] !== n && len <= sur.length);
+    byLabel[label] = n; out[n] = label;
+  }
+  return n => out[n] || n;
+}
+
+/* The population switcher is gone: the page always covers every transfer
+   requester, split on the request date. The onboarded-only and never-onboarded
+   views, and with them the onboarding-date split, are still built by the
+   builder (cohorts onb / non / onb_o) if they are ever wanted back. */
+const POP = 'all';
+const DEFAULT_PERIOD = 'jul';
+/* Segments the page opens WITHOUT. Vip and Elit between them are most of the
+   money, so leaving them in makes every average a story about a few dozen
+   people; the checklist puts them back in one tick.
+
+   Held as an exclusion list rather than a list of what to select, because
+   naming the selected ones froze the page at whatever segments existed the day
+   it was written -- a segment added later would silently vanish from the page.
+   The default is computed from the data each load: everything except these. */
+const EXCLUDED_BY_DEFAULT = ['Vip', 'Elit'];
+const ALL_SEGMENTS = () => [...new Set(D.rows.map(r => r.segment || '—'))];
+const DEFAULT_SEGMENTS = () => ALL_SEGMENTS().filter(s => !EXCLUDED_BY_DEFAULT.includes(s));
+let PERIOD = DEFAULT_PERIOD;
+/* Where the player came from. aff_type is the warehouse's own classification --
+   Streamer, Affiliate, Direct, or blank when nobody is credited -- so this is a
+   filter over a field, not a rule of ours. "non-streamer" therefore means
+   everything else INCLUDING the 248 with no affiliate at all, which is what you
+   want when the question is "how do streamer players compare to the rest". */
+let SRC = 'nonstreamer';
+/* Which event the before/after windows hang off.
+
+   "req"  every requester, measured either side of the day they asked.
+   "onb"  only the players a VA actually onboarded, measured either side of the
+          onboarding date. It cannot include anyone else: a player no VA touched
+          has no onboarding date to split on, and silently falling back to the
+          request date would put two different events in one column. So the
+          onboarding view is a smaller cohort as well as a different split, and
+          the page says so next to the switch. */
+let BASIS = 'req';
+const KEY = () => BASIS === 'onb' ? 'onb_o' : 'all';
+const P   = () => D.periods[PERIOD];
+const C   = () => P()[KEY()];
+const TAG = () => C().tag;
+
+/* A percentage off a base of near-zero is arithmetically true and practically
+   meaningless, so anything under EUR 10/month counts as coming from nothing. */
+const BASE_FLOOR = 10;
+function delta(before, after){
+  if(before <= 0 && after === 0) return {t:'—', c:'', v:-Infinity};
+  if(before <= 0) return before < 0 ? {t:'n/m', c:'mut', v:-Infinity}
+                                    : {t:'new', c:after>0?'pos':'neg', v:Infinity};
+  if(before < BASE_FLOOR && after > before)
+    return {t:'new', c:'pos', v:Infinity, title:`from only ${eur(before)}/mo`};
+  const p = 100*(after-before)/before, capped = Math.abs(p) > 999;
+  return {t:(capped ? (p>0?'>+999%':'<-999%') : (p>=0?'+':'')+pct(p)), c:p<0?'neg':'pos', v:p,
+          title: capped ? `exactly ${(p>=0?'+':'')+Math.round(p).toLocaleString('en-US')}%` : ''};
+}
+/* Bonus cost against adjusted GGR. Meaningless when the house is behind. */
+const bcRatio = (bc, adj) => adj > 0 ? pct(100*bc/adj) : 'n/m';
+/* Never project. The /mo columns divide by the months of exposure, but the
+   divisor is floored at one month -- so a player 17 days in reports what they
+   actually deposited, not what a full month would have looked like. Once past a
+   month the figure becomes a true monthly average. */
+const MONTH_FLOOR = 1;
+/* Dates as "11 Aug", with a 2-digit year only when it is not the current one.
+   The year cannot simply be dropped: FTD dates reach back to 2015 and requests
+   start in Aug 2025, so a bare "11 Aug" would silently claim this year. */
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const THIS_YEAR = String(D.today).slice(0, 4);
+function shortDate(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ''));
+  if(!m) return s || '';
+  const [ , y, mo, dd ] = m;
+  return (+dd) + ' ' + MON[+mo - 1] + (y === THIS_YEAR ? '' : ' ' + y.slice(2));
+}
+/* The player table is 18 columns wide, so money is abbreviated there and the
+   exact figure moves to the tooltip. Summary tables keep full numbers -- they
+   have ten rows, not four hundred, and the precision is worth the width. */
+function shortEur(n){
+  const a = Math.abs(n), s = n < 0 ? '-' : '';
+  if(a === 0)      return '—';
+  if(a >= 1e6)     return s + '€' + (a/1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M';
+  if(a >= 1e4)     return s + '€' + Math.round(a/1e3) + 'k';
+  if(a >= 1e3)     return s + '€' + (a/1e3).toFixed(1) + 'k';
+  return s + '€' + Math.round(a);
+}
+const rate = (v, mo) => mo > 0 ? v/Math.max(mo, MONTH_FLOOR) : 0;
+
+/* ---------- the filtered cohort ----------
+
+   The builder packs a set of pre-aggregated views (by VA, by segment, the
+   funnel, the tree, the bonus table, contact reach) for the whole period. That
+   was fine while the segment picker only narrowed the player list, but it means
+   every one of those views ignored the picker -- tick "Vip" off and the tables
+   above went on counting Vip players.
+
+   With the page now OPENING with segments excluded, that gap would have been a
+   lie on load rather than a corner case. So the views below are recomputed in
+   the browser from the rows currently visible. Each mirrors the function of the
+   same name in build_vip_transfer.py; if a bucket changes there, it has to
+   change here too.  */
+// wd (withdrawals) is summed alongside the rest so net deposit can be totalled
+// for a group, not just per player
+const MONEY_KEYS = ['dep','wd','ggr','ngr','bc','adj'];
+
+/* Row-clicks narrow the player list, not the summaries: clicking a VA must not
+   leave the By VA table showing a single row. The period, the basis and the
+   segment checklist do apply. */
+function cohortRows(opts){
+  const keepTree = !!(opts && opts.tree);
+  const keep = { va: F.va, month: F.month, tree: F.tree, grid: F.grid,
+                 offer: F.offer, offerSt: F.offerSt, offerAny: F.offerAny };
+  F.va = ''; F.month = ''; F.offer = ''; F.offerSt = ''; F.offerAny = ''; F.grid = null;
+  if(!keepTree) F.tree = null;
+  const rs = visibleRows();
+  Object.assign(F, keep);
+  return rs;
+}
+
+function aggRows(rs, tag){
+  const n = rs.length || 1;
+  const o = { players: rs.length,
+              depositors: rs.filter(r => r[tag+'_aft_dep'] > 0).length,
+              /* "Player Replied?" from the tracker sheet. Counted against the
+                 rows the sheet has an ANSWER for, not against the whole group:
+                 a blank there is an unworked row, and folding those into the
+                 denominator would report a VA's backlog as players ignoring
+                 them. Both numbers are kept so the column can say which. */
+              replied_yes: rs.filter(r => r.replied === 'Yes').length,
+              replied_known: rs.filter(r => r.replied).length,
+              silent: rs.filter(r => r[tag+'_aft_dep'] === 0 && r[tag+'_aft_ggr'] === 0).length };
+  for(const m of MONEY_KEYS){
+    const b = rs.reduce((a,r)=>a + (r[tag+'_bef_'+m]||0), 0);
+    const a2 = rs.reduce((a,r)=>a + (r[tag+'_aft_'+m]||0), 0);
+    o['t_bef_'+m] = b;   o['t_aft_'+m] = a2;
+    o['bef_'+m]   = b/n; o['aft_'+m]   = a2/n;
+  }
+  /* Deposit activity on the same matched windows as the money: dd is days with
+     a deposit, dc is the transaction count. No summary column shows either now
+     -- the three Deps columns were dropped -- but By Players shows dd and its
+     tooltip shows dc, and these group totals are what a summary column would
+     need if one ever comes back. */
+  for(const m of ['dc','dd']){
+    o['t_bef_'+m] = rs.reduce((a,r)=>a + (r[tag+'_bef_'+m]||0), 0);
+    o['t_aft_'+m] = rs.reduce((a,r)=>a + (r[tag+'_aft_'+m]||0), 0);
+    o['bef_'+m]   = o['t_bef_'+m]/n;  o['aft_'+m] = o['t_aft_'+m]/n;
+  }
+  return o;
+}
+function groupRows(rs, key, tag){
+  const by = new Map();
+  for(const r of rs){ const k = r[key] || '—'; (by.get(k) || by.set(k, []).get(k)).push(r); }
+  return [...by].map(([name, v]) => Object.assign({ name }, aggRows(v, tag)))
+                .sort((x, y) => y.t_aft_dep - x.t_aft_dep);
+}
+
+/* ---------- growth bands ----------
+   Deposit growth against GGR growth, per player, both measured across the same
+   matched windows the rest of the page uses -- so a cell here agrees with the
+   Δ Dep and Δ GGR columns in By Players rather than being a second opinion.
+
+   Bands come off delta() for the same reason: it already decides what "new" and
+   "not measurable" mean, and re-deciding here is how two parts of one page start
+   disagreeing. Its verdict maps straight on --
+     +Infinity  nothing before, something after            -> 'new'
+     -Infinity  nothing either side, or a negative before   -> 'n/m'
+     otherwise  a percentage
+   A negative "before" is genuinely not measurable, not a 100% fall: a player who
+   cost us money before and made us money after has no base to grow from. Those
+   sit in their own band instead of being scored as if they had. */
+/* "No Deposit" is tested first and outranks every percentage. A player who
+   deposited before and nothing after is arithmetically -100%, which lands in
+   "−75% or worse" alongside someone who merely fell off a cliff -- but stopping
+   dead and slowing down are different questions for a VA, so the stop gets its
+   own band. It also absorbs the players who never deposited on either side,
+   who used to be filed under "Not measurable" for want of anywhere better.
+   What is left in "Not measurable" is then only the genuine case: a negative
+   before, which has no base to grow from. That is nearly all GGR, since
+   deposits cannot be negative. */
+const BANDS = [
+  { k:'up2',  label:'+100% or more',  hint:'more than doubled' },
+  { k:'up1',  label:'+25% to +100%',  hint:'clearly up' },
+  { k:'flat', label:'Flat ±25%',      hint:'within a quarter either way' },
+  { k:'dn1',  label:'−25% to −75%',   hint:'clearly down' },
+  { k:'dn2',  label:'−75% or worse',  hint:'all but gone, but still something' },
+  { k:'zero', label:'No Deposit',     hint:'not one deposit after the split',
+              ggr:'No GGR',           ggrHint:'no gross revenue after the split' },
+  { k:'nm',   label:'Not measurable', hint:'negative before, so there is no base to grow from' },
+  { k:'new',  label:'New',            hint:'nothing before, activity after' },
+];
+// the two axes measure different things, so one band reads differently on each
+const bandName = (k, axis) => {
+  const b = BANDS.find(x => x.k === k) || {};
+  return (axis === 'ggr' && b.ggr) || b.label || k;
+};
+const bandHint = (b, axis) => (axis === 'ggr' && b.ggrHint) || b.hint;
+function bandOf(before, after){
+  if(!after) return 'zero';            // nothing at all on the after side
+  const v = delta(before, after).v;
+  if(v ===  Infinity) return 'new';
+  if(v === -Infinity) return 'nm';
+  if(v >=  100) return 'up2';
+  if(v >=   25) return 'up1';
+  if(v >=  -25) return 'flat';
+  if(v >=  -75) return 'dn1';
+  return 'dn2';
+}
+const depBand = r => { const g = TAG(); return bandOf(r[g+'_bef_dep'], r[g+'_aft_dep']); };
+const ggrBand = r => { const g = TAG(); return bandOf(r[g+'_bef_ggr'], r[g+'_aft_ggr']); };
+
+const medianOf = xs => { const s = xs.slice().sort((a,b)=>a-b); return s.length ? s[Math.floor(s.length/2)] : 0; };
+const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+
+function funnelOf(rs){
+  const tr = rs.filter(r => r.tracked), ntr = rs.filter(r => !r.tracked);
+  const lag = tr.filter(r => r.onboard && r.first_req)
+                .map(r => daysBetween(r.first_req, r.onboard)).filter(v => v >= 0);
+  const wait = ntr.filter(r => r.first_req).map(r => daysBetween(r.first_req, D.today));
+  return { requested: rs.length, onboarded: tr.length, pending: ntr.length,
+           onboarded_pct: rs.length ? Math.round(1000*tr.length/rs.length)/10 : 0,
+           lag_median: medianOf(lag), wait_median: medianOf(wait),
+           pending_over_30: wait.filter(w => w > 30).length,
+           deposited_after: rs.filter(r => r.r_aft_dep > 0).length,
+           tb_got: rs.filter(r => r.tb_got).length,
+           tb_act: rs.filter(r => r.tb_act).length,
+           tb_done: rs.filter(r => r.tb_done).length };
+}
+
+function scopeOf(rs){
+  const n = k => rs.filter(r => r[k]).length;
+  return { g1941: n('hd1941'),  r1941: n('fs1941'),
+           g2034: n('hd2034'),  r2034: n('fs2034'),
+           gwheel: n('hdwheel'), rwheel: n('fswheel'),
+           gcb: n('hdcb'),      rcb: n('cb'),
+           cb_eur: rs.filter(r => r.cb).reduce((a,r)=>a + (r.cb_eur||0), 0),
+           spins: rs.reduce((a,r)=>a + (r.spins||0), 0) };
+}
+
+/* Reachability per VA. This grouped by segment until it was asked to group by
+   manager, and that change collapsed the table: the old layout had an
+   "Onboarded by a VA" half and a "Still pending" half, but once the rows ARE
+   VAs the split has nothing left to say -- every row except the untracked
+   bucket is onboarded by definition, and the pending half would be one row wide
+   with the rest blank. So it is one block now, and players no VA has taken keep
+   their own "Not. Onb" row so the column still sums to the whole cohort. */
+function contactOf(rs){
+  const by = new Map();
+  for(const x of rs){
+    const name = x.va_group || '—';
+    if(!by.has(name)) by.set(name, { name, n:0, tg:0, ph:0, any:0, none:0 });
+    const s = by.get(name);
+    s.n++;
+    if(x.tg)    s.tg++;
+    if(x.phone) s.ph++;
+    if(x.tg || x.phone) s.any++; else s.none++;
+  }
+  const rows = [...by.values()].sort((a,b) => b.n - a.n);
+  const tot = { name: 'Total' };
+  for(const k of ['n','tg','ph','any','none']) tot[k] = rows.reduce((a,v)=>a + v[k], 0);
+  return { rows, total: tot };
+}
+
+function bonusDistOf(rs){
+  const out = new Map();
+  for(const x of rs) for(const [fi, given, act, done] of (x.tbf || [])){
+    if(!out.has(fi)) out.set(fi, { name: D.tb_names[fi], code: (D.tb_codes||[])[fi] || 0,
+                                   given:0, activated:0, completed:0, first:'', last:'' });
+    const o = out.get(fi);
+    o.given++; if(act) o.activated++; if(done) o.completed++;
+    if(given){ o.first = o.first ? (given < o.first ? given : o.first) : given;
+               o.last  = given > o.last ? given : o.last; }
+  }
+  const rows = [...out.values()].sort((a,b) => b.given - a.given);
+  const firsts = rows.map(r=>r.first).filter(Boolean), lasts = rows.map(r=>r.last).filter(Boolean);
+  return { rows, total: { name: 'Any transfer offer', code: 0,
+      given: rs.filter(r=>r.tb_got).length,
+      activated: rs.filter(r=>r.tb_act).length,
+      completed: rs.filter(r=>r.tb_done).length,
+      first: firsts.length ? firsts.reduce((a,b)=>a<b?a:b) : '',
+      last:  lasts.length  ? lasts.reduce((a,b)=>a>b?a:b)  : '' } };
+}
+
+/* The deposit tree, mirroring deptree() in the builder: same partitions, same
+   priority order, same `q` filters so a box still lists its own players. */
+function deptreeOf(rs){
+  const EUR = n => eur(Math.round(n));
+  /* Empty branches are dropped, and so are "No ..." ones: they restated an
+     absence and then carried the same head count through two or three more
+     boxes at 100% each. What did not happen is readable as the gap between a
+     box and its parent's count. */
+  const node = (label, g, of, q, sub='', dead=false, kids=null, bad=false) =>
+    ({ label, n: g.length, of, q, sub, dead, bad,
+       kids: (kids||[]).filter(k => k.n && !k.label.startsWith('No ')) });
+  const q = (base, extra) => Object.assign({}, base, extra);
+  const dep = rs.filter(x => x.dep1);
+  const depOf = base => (('onb' in base)
+      ? rs.filter(x => !!x.tracked === !!base.onb && x.dep1) : dep);
+
+  /* The "never opened" boxes were removed on request. A minted-but-unopened
+     ticket and no ticket at all are the same outcome for the player -- nothing
+     arrived -- so they share a box. Merged rather than dropped, or the children
+     would no longer sum to their parent. */
+  const cash = (g, base, dead) => {
+    const got  = g.filter(x => x.cb);
+    const none = g.filter(x => !x.cb);
+    const amt  = got.reduce((a,x)=>a + (x.cb_eur||0), 0);
+    return [node('1925 Cashback paid', got, g.length, q(base,{cb:'got'}), amt ? EUR(amt) : '', false),
+            node('No 1925 cashback',   none, g.length, q(base,{cb:'none'}), '', dead)];
+  };
+  const source = (g, base) => {
+    const wh  = g.filter(x => x.fswheel);
+    const o41 = g.filter(x => !x.fswheel && x.fs1941);
+    const o34 = g.filter(x => !x.fswheel && !x.fs1941);
+    return [node('1926-34 Wheel tiers', wh,  g.length, q(base,{src:'wheel'}), '', false, wh.length  ? cash(wh,  q(base,{src:'wheel'}), false) : null),
+            node('1941 $1,000 offer',   o41, g.length, q(base,{src:'o1941'}), '', !o41.length, o41.length ? cash(o41, q(base,{src:'o1941'}), false) : null),
+            node('2034 New offer',      o34, g.length, q(base,{src:'o2034'}), '', !o34.length, o34.length ? cash(o34, q(base,{src:'o2034'}), false) : null)];
+  };
+  const missing = (g, base) =>
+    [node('No free spins from these offers', g, g.length, q(base,{nof:'any'}), '', true,
+          cash(g, q(base,{nof:'any'}), true))];
+  const branch = (g, label, base) => {
+    const fs = g.filter(x => x.tfs), no = g.filter(x => !x.tfs);
+    const qf = q(base,{tfs:1}), qn = q(base,{tfs:0});
+    const spins = fs.reduce((a,x)=>a + (x.spins||0), 0);
+    /* What reached the 1941 condition in time. The offer wants a $1,000 deposit
+       and its ticket expires after about a week, so the all-time largest deposit
+       this used to show could not answer the question it appeared to: money that
+       arrived after the ticket lapsed never counted. */
+    const held = g.filter(x => x.b41_from), ok = held.filter(x => x.b41_ok);
+    const sub = held.length
+      ? EUR(held.reduce((a,x)=>a + (x.b41_dep||0), 0)) + ' deposited while the 1941 ticket was live'
+        + ' \u00b7 ' + ok.length + ' of ' + held.length + ' held one'
+      : '';
+    return node(label, g, depOf(base).length, base, sub, false,
+                [node('Free spins arrived', fs, g.length, qf,
+                      spins ? spins.toLocaleString('en-US') + ' spins' : '', false, source(fs, qf)),
+                 node('No free spins', no, g.length, qn, '', true, missing(no, qn))]);
+  };
+  const side = (g, label, base) => {
+    const d = g.filter(x => x.dep1), n = g.filter(x => !x.dep1);
+    const qd = q(base,{dep:1});
+    return node(label, g, rs.length, base, '', false, [
+      node('Deposited after requesting', d, g.length, qd, '', false,
+           /* "In time" = while the 1941 ticket was still alive. The fork used to
+              count any EUR 1,000 deposit since the request, including ones made
+              long after the offer had expired. */
+           [branch(d.filter(x => x.big),  '€1,000+ in one go, in time', q(qd,{big:1})),
+            branch(d.filter(x => !x.big), 'Never €1,000 in time',       q(qd,{big:0}))]),
+      node('Never deposited', n, g.length, q(base,{dep:0}), '', true)]);
+  };
+  return node('Transfer requests', rs, null, {}, '', false, [
+    side(rs.filter(x => x.tracked),  'Onboarded by a VA', {onb:1}),
+    side(rs.filter(x => !x.tracked), 'Never onboarded',   {onb:0})]);
+}
+
+/* The 30-day verdict (Potential / In Trial / Low Value / Idle) was removed on
+   request, along with the bands above the player table and the Potential
+   column. The builder still emits the t30_* fields it was computed from --
+   t30_dep, t30_adj, t30_bc, t30_net, t30_days, t30_done, t30_left -- so the
+   rule can be brought back from git without another data build. Nothing on the
+   page reads them now. */
+
+/* ---------- summary tables ---------- */
+function summaryTable(id, list, firstHead, shortName){
+  /* The /user columns are the group total over its head count. With before and
+     after spanning the same days for everyone, that is the only division that
+     adds anything: it separates a VA with a few big players from one with many
+     small ones. */
+  const head = `<thead><tr><th class="l">${firstHead}</th><th>Players</th><th>Deposited</th><th>Replied</th>
+    <th class="grp">Dep. Bef</th><th>Dep. Aft</th><th>Δ Dep</th>
+    <th class="grp">Dep. Bef/user</th><th>Dep. Aft/user</th><th>Δ Dep/user</th>
+    <th class="grp">GGR Bef</th><th>GGR Aft</th><th>Δ GGR</th>
+    <th class="grp">GGR Bef/user</th><th>GGR Aft/user</th><th>Δ GGR/user</th>
+    <th class="grp">BC / adj GGR Bef</th><th>BC / adj GGR Aft</th></tr></thead>`;
+  const money = (x,sign,g)=>`<td class="${sign&&x<0?'neg':''}${g?' grp':''}">${eur(x)}</td>`;
+  /* One Δ beside each pair it describes. The totals Δ and the /user Δ will
+     always read the same: both sides are divided by the same head count, so it
+     cancels and the percentage is identical. They are shown twice on purpose --
+     a reader scanning the /user block should not have to look back across four
+     columns for its change. The tooltip carries the money moved, which is the
+     fact the percentage cannot: +91% and +EUR 45,755 are different things. */
+  const pctCell = (b, a) => {
+    const d = delta(b, a), moved = (a || 0) - (b || 0);
+    return `<td class="${d.c}" title="${d.title ? d.title + ' — ' : ''}`
+         + `${eur(b||0)} → ${eur(a||0)}, ${moved > 0 ? '+' : ''}${eur(moved)}">${d.t}</td>`;
+  };
+  const row = (v, bold) =>
+    `<tr${bold?' style="font-weight:600"':` class="pick" data-name="${esc(v.name)}"`}>`
+      + `<td class="l txt"${shortName?` title="${esc(v.name)}"`:''}>${esc(shortName ? shortName(v.name) : v.name)}</td><td>${v.players}</td><td>${v.depositors}</td>`
+      + `<td title="${v.replied_yes} replied of ${v.replied_known} row${v.replied_known===1?'':'s'} `
+      +   `the sheet has an answer for`
+      +   `${v.replied_known < v.players ? `; ${v.players - v.replied_known} not recorded` : ''}">`
+      +   `${v.replied_known ? v.replied_yes + '<span class="mut">/' + v.replied_known + '</span>' : '—'}</td>`
+      + money(v.t_bef_dep,false,1) + money(v.t_aft_dep,false) + pctCell(v.t_bef_dep, v.t_aft_dep)
+      + money(v.bef_dep,false,1) + money(v.aft_dep,false) + pctCell(v.bef_dep, v.aft_dep)
+      + money(v.t_bef_ggr,true,1) + money(v.t_aft_ggr,true) + pctCell(v.t_bef_ggr, v.t_aft_ggr)
+      + money(v.bef_ggr,true,1) + money(v.aft_ggr,true) + pctCell(v.bef_ggr, v.aft_ggr)
+      + `<td class="grp">${bcRatio(v.bef_bc, v.bef_adj)}</td><td>${bcRatio(v.aft_bc, v.aft_adj)}</td></tr>`;
+  // sum what is on screen: with segments excluded the packed total would be
+  // the whole book and would contradict every row above it
+  const tot = Object.assign({name:'Total'}, aggRows(cohortRows(), TAG()));
+  document.getElementById(id).innerHTML = head + '<tbody>' + list.map(v=>row(v,false)).join('') + '</tbody>'
+    + '<tfoot>' + row(tot, true) + '</tfoot>';
+}
+
+/* ---------- player table ---------- */
+const PCOLS = [
+  // ID and Affiliate live in the drill-down instead: the id is the modal's
+  // title and the affiliate its subtitle, and neither is worth a column you
+  // scan past on every row.
+  ['username','Player','l'],['tier','Loyalty Tier','l'],['replied','Replied','l'],
+  ['ftd_date','FTD date','l'],['first_req','Requested','l'],
+  ['onboard','Onboarded','l'],['last_dep','Last deposit','l'],
+  ['days_aft','Days after',''],   // label rewritten per basis in renderPlayers
+  // One row is one player, so a per-player column would just repeat the total.
+  ['t_bef_dep','Dep. Bef','t'],['t_aft_dep','Dep. Aft','t'],['d_dep','Δ Dep','d'],
+  ['t_bef_dd','Dep. Days Bef','n'],['t_aft_dd','Dep. Days Aft','n'],
+  ['t_bef_ggr','GGR Bef','t'],['t_aft_ggr','GGR Aft','t'],['d_ggr','Δ GGR','d'],
+  ['t_bef_bc','BC Bef','t'],['t_aft_bc','BC Aft','t'],
+  /* The ratio on both sides, not just after. A player on 300% after means little
+     until you know they were on 280% before -- the transfer did not make them
+     expensive, they always were. */
+  ['bc_ratio_bef','BC/adj Bef','r'],['bc_ratio','BC/adj Aft','r']
+];
+// which window an 'r' column reads; every other key is the "after" side
+const rSide = k => k.endsWith('_bef') ? 'bef' : 'aft';
+/* "Player Replied?" comes from column P of the tracker sheet and has three
+   states, not two. A blank is not a No: 39 of the 225 rows are blank and nearly
+   all are assignments nobody has worked yet, so showing them as "No" would
+   blame the player for the VA's backlog. They get their own label and sort to
+   the bottom. Any value the sheet grows later falls through to a plain chip
+   rather than being quietly bucketed. */
+const REPLIED = {
+  'Yes': { txt:'Yes',  cls:'yes',  tip:'Replied to the VA' },
+  'No':  { txt:'No',   cls:'no',   tip:'Contacted, no reply' },
+  '':    { txt:'—',    cls:'none', tip:'Not recorded on the tracker sheet — usually a new assignment nobody has worked yet, not a player who ignored us' },
+};
+const REPLIED_RANK = { 'Yes': 3, 'No': 2, '': 1 };
+const repliedOf = v => REPLIED[v] || { txt:v, cls:'none', tip:'Unrecognised value on the tracker sheet' };
+const GRP = new Set(['t_bef_dep','t_bef_dd','t_bef_ggr','t_bef_bc']);
+/* offer  = one offer by name; offerSt narrows it to '' (given) | 'act' | 'done'
+   offerAny = the same three depths on the footer row, where no single offer is
+   named and the answer comes from the player-level tb_got / tb_act / tb_done
+   flags. The two are mutually exclusive -- picking either clears the other. */
+const F = { va:'', month:'', offer:'', offerSt:'', offerAny:'', tree:null, treeLabel:'',
+            grid:null,          // {dep, ggr} band keys picked in By Growth
+            segments:new Set(DEFAULT_SEGMENTS()) };
+let KEEP_SEG_OPEN = false;
+// Opens on money after the split, biggest first: with the verdict column gone
+// that is the closest thing to "who is worth looking at". -1 is descending.
+let sortKey='t_aft_dep', sortDir=-1;
+let LAST = { rows: [], cols: [] };   // what the table is currently showing, for the CSV
+
+const val = (r,k) => {              // resolve a display key against the active basis
+  const g = TAG();
+  if(k === 'days_aft') return r[g + '_days_aft'];
+  if(k.startsWith('t_')) return r[g + '_' + k.slice(2)];
+  if(k.startsWith('bef_')||k.startsWith('aft_')) {
+    const side = k.slice(0,3), m = k.slice(4);
+    return rate(r[g+'_'+side+'_'+m], r[g+'_mo_'+(side==='bef'?'bef':'aft')]);
+  }
+  return r[k];
+};
+
+/* The tree's boxes are cuts of the player list, so clicking one has to
+   reproduce the same cut here. Kept next to visibleRows on purpose: if a bucket
+   in the builder changes, this is the other half that must change with it. */
+function treeMatch(r, q){
+  if('onb' in q && !!r.tracked !== !!q.onb) return false;
+  if('dep' in q && !!r.dep1  !== !!q.dep) return false;
+  if('big' in q && !!r.big   !== !!q.big) return false;
+  if('tfs' in q && !!r.tfs   !== !!q.tfs) return false;
+  if(q.src){
+    const wheel = !!r.fswheel, o1941 = !wheel && !!r.fs1941;
+    if(q.src === 'wheel' && !wheel) return false;
+    if(q.src === 'o1941' && !o1941) return false;
+    if(q.src === 'o2034' && (wheel || o1941)) return false;
+  }
+  /* 'nof' used to split holders of an unopened ticket from players with none.
+     That box is gone, so the only value left is 'any' -- everyone in the parent
+     -- and it filters nothing. Kept as a key so older saved selections do not
+     silently match the wrong people. */
+  if(q.nof && q.nof !== 'any') return false;
+  if(q.cb){
+    const got = !!r.cb;
+    if(q.cb === 'got'  && !got) return false;
+    if(q.cb === 'none' &&  got) return false;
+  }
+  return true;
+}
+
+function visibleRows(){
+  let rs = D.rows;
+  /* One cut-off per period, read from the data rather than written here twice.
+     'all' has no floor. Anything unrecognised also has none, so a period button
+     added to the markup without a date shows everything instead of nothing. */
+  const FLOOR = { jul: D.since, jun: D.since_jun };
+  if(FLOOR[PERIOD]) rs = rs.filter(r => r.first_req >= FLOOR[PERIOD]);
+  if(BASIS==='onb')  rs = rs.filter(r => r.tracked && r.onboard);
+  if(F.segments.size) rs = rs.filter(r=>F.segments.has(r.segment||'—'));
+  if(F.va)     rs = rs.filter(r=>r.va_group===F.va);
+  if(F.month)  rs = rs.filter(r=>r.req_month===F.month);
+  /* An offer can be picked at three depths: everyone it was given to, only those
+     who activated it, only those who finished it. The status has to be tested on
+     the SAME ticket as the name, not on the player -- `some(name) && some(done)`
+     would match a player who was given 1941 and completed something else
+     entirely, which is how a 11-player cell would list 40 people. */
+  if(F.offer)  rs = rs.filter(r=>(r.tbf||[]).some(f =>
+                  D.tb_names[f[0]] === F.offer
+                  && (F.offerSt === 'act' ? f[2] : F.offerSt === 'done' ? f[3] : true)));
+  if(F.offerAny) rs = rs.filter(r => F.offerAny === 'act'  ? r.tb_act
+                                   : F.offerAny === 'done' ? r.tb_done : r.tb_got);
+  if(F.grid) rs = rs.filter(r => depBand(r) === F.grid.dep && ggrBand(r) === F.grid.ggr);
+  if(SRC === 'streamer')    rs = rs.filter(r => (r.aff_type||'').toLowerCase() === 'streamer');
+  if(SRC === 'nonstreamer') rs = rs.filter(r => (r.aff_type||'').toLowerCase() !== 'streamer');
+  if(F.tree)   rs = rs.filter(r=>treeMatch(r, F.tree));
+  return rs;
+}
+
+function renderPlayers(){
+  const g = TAG();
+  // no untracked player has an onboarding date, so the column is dead weight there
+  const cols = PCOLS.filter(([k]) => !(k === 'onboard' && BASIS === 'non'));
+  let rs = visibleRows().slice();
+  // the sorted column may have just been hidden; fall back to a key that is
+  // actually in PCOLS ('aft_dep' never was, so this used to sort by undefined)
+  if(!cols.some(c=>c[0]===sortKey)) sortKey = 't_aft_dep';
+  const kind = (cols.find(c=>c[0]===sortKey)||[])[2];
+  const sv = r => {
+    if(kind==='d'){ const b = sortKey==='d_dep'?'t_bef_dep':'t_bef_ggr', a = sortKey==='d_dep'?'t_aft_dep':'t_aft_ggr';
+                    return delta(val(r,b), val(r,a)).v; }
+    if(kind==='r'){ const s = rSide(sortKey), adj = r[g+'_'+s+'_adj'];
+                    return adj>0 ? r[g+'_'+s+'_bc']/adj : -Infinity; }
+    if(sortKey==='tier')    return r.tier_no || 0;   // ladder order, not alphabetical
+    if(sortKey==='replied') return REPLIED_RANK[r.replied] ?? 0;
+    return val(r, sortKey);
+  };
+  rs.sort((a,b)=>{
+    const x=sv(a), y=sv(b);
+    if(typeof x==='number'&&typeof y==='number') return (x-y)*sortDir;
+    return String(x||'').localeCompare(String(y||''))*sortDir;
+  });
+  /* The header just says "Since"; which event it counts from is already stated
+     by the basis switch and the note under it, and the full phrase was the
+     widest header in the table. It stays in the tooltip, and the CSV keeps the
+     long name -- a column called "Since" in a spreadsheet means nothing. */
+  const dayLabel = BASIS==='onb' ? 'Days since onboarding' : 'Days since request';
+  const head = '<thead><tr>' + cols.map(([k,l,c])=>
+    (k==='days_aft' ? [k, 'Since', c, dayLabel] : [k,l,c,''])).map(([k,l,c,tip])=>
+    `<th class="${c==='l'?'l':''}${GRP.has(k)?' grp':''}" data-k="${k}"`
+    + `${tip?` title="${esc(tip)}"`:''}>${l}${sortKey===k?(sortDir<0?' ▾':' ▴'):''}</th>`).join('') + '</tr></thead>';
+  const body = rs.map(r=>'<tr>' + cols.map(([k,l,c])=>{
+    const gc = GRP.has(k) ? ' grp' : '';
+    if(c==='d'){
+      const b = k==='d_dep'?'t_bef_dep':'t_bef_ggr', a = k==='d_dep'?'t_aft_dep':'t_aft_ggr';
+      const x = delta(val(r,b), val(r,a));
+      return `<td class="${x.c}${gc}" title="${x.title||''}">${x.t}</td>`;
+    }
+    if(c==='r'){ const s = rSide(k), adj = r[g+'_'+s+'_adj'];
+                 return `<td class="${gc.trim()}" title="${eur(r[g+'_'+s+'_bc']||0)} of bonus`
+                      + ` against ${eur(adj||0)} adjusted GGR">${bcRatio(r[g+'_'+s+'_bc'], adj)}</td>`; }
+    if(c==='n'){
+      const v = val(r,k) || 0;
+      const days = k.includes('bef') ? r[g+'_days_bef'] : r[g+'_days_aft'];
+      // days with a deposit, and the transaction count beside it -- the two
+      // differ whenever someone tops up twice in a day, and the drill-down's
+      // per-day "#" column is the transaction count
+      const tx = r[g + (k.includes('bef') ? '_bef_dc' : '_aft_dc')] || 0;
+      return `<td class="${gc}" title="deposited on ${v} of ${days} day${days===1?'':'s'}`
+           + `${tx !== v ? ` — ${tx.toLocaleString('en-US')} deposits in total` : ''}">`
+           + `${v ? v.toLocaleString('en-US') : '—'}</td>`;
+    }
+    if(c==='m'||c==='t'){
+      const v = val(r,k), sign = k.includes('ggr');
+      const days = k.includes('bef') ? r[g+'_days_bef'] : r[g+'_days_aft'];
+      const note = (c==='m' && days < 30) ? ` — under a month, so this is the total for ${days} day${days===1?'':'s'}` : '';
+      return `<td class="${sign&&v<0?'neg':''}${gc}" title="${eur(v)} over ${days} days${note}">${shortEur(v)}</td>`;
+    }
+    let v = (k === 'days_aft') ? val(r, k) : r[k];
+    if(k==='ftd_date'||k==='first_req'||k==='onboard'||k==='last_active'||k==='last_dep')
+      return `<td class="l${gc}" title="${esc(v||'')}">${esc(v ? shortDate(v) : '—')}</td>`;
+    if(k==='replied'){
+      const s = repliedOf(r.replied);
+      /* A blank means two different things and the tooltip has to say which.
+         For a player on the tracker it is a row nobody has worked yet; for one
+         who was never onboarded there is no VA and so no outreach to reply to.
+         Reading the second as "did not reply" would count 398 players against
+         VAs who were never given them. */
+      const tip = r.replied ? s.tip
+                : (r.tracked ? 'On a VA\u2019s book, but the tracker sheet has no answer yet'
+                             : 'Never onboarded \u2014 no VA, so there was no outreach to reply to');
+      return `<td class="l${gc}" title="${esc(tip)}"><span class="rpill ${s.cls}">${esc(s.txt)}</span></td>`;
+    }
+    if(k==='tier') return `<td class="l${gc}" title="${r.points ? r.points.toLocaleString('en-US') + ' loyalty points' : 'no loyalty record'}">${esc(v || '—')}</td>`;
+    if(k==='fav_product') return `<td class="l txt${gc}" title="${esc(v)}">${esc(PROD[v]||v)||'—'}</td>`;
+    if(k==='username')    return `<td class="l${gc}">${esc(v)}</td>`;
+    return `<td class="${c==='l'?'l':''}${gc}">${esc(v===''||v==null?'—':v)}</td>`;
+  }).join('') + '</tr>').join('');
+  /* Footer totals the rows actually on screen, so it moves with the filters.
+     Deltas and the bonus ratio are recomputed from the summed totals rather
+     than averaged across players -- averaging ratios would be wrong. */
+  const sum = k => rs.reduce((a, r) => a + (val(r, k) || 0), 0);
+  const tDepB = sum('t_bef_dep'), tDepA = sum('t_aft_dep');
+  const tGgrB = sum('t_bef_ggr'), tGgrA = sum('t_aft_ggr');
+  const tBc   = rs.reduce((a,r)=>a + (r[g+'_aft_bc']  || 0), 0);
+  const tAdj  = rs.reduce((a,r)=>a + (r[g+'_aft_adj'] || 0), 0);
+  const tBcB  = rs.reduce((a,r)=>a + (r[g+'_bef_bc']  || 0), 0);
+  const tAdjB = rs.reduce((a,r)=>a + (r[g+'_bef_adj'] || 0), 0);
+  const avgDays = rs.length ? Math.round(rs.reduce((a,r)=>a + (val(r,'days_aft')||0), 0) / rs.length) : 0;
+  const tDdB = sum('t_bef_dd'), tDdA = sum('t_aft_dd');
+  const dD = delta(tDepB, tDepA), dG = delta(tGgrB, tGgrA);
+  const foot = '<tfoot><tr>' + cols.map(([k,l,c])=>{
+    const gc = GRP.has(k) ? ' grp' : '';
+    // the head count lived on the Potential column; with that gone it moves
+    // here, so the footer still says how many rows are being summed
+    if(k==='username')  return `<td class="l${gc}">Total &middot; ${rs.length.toLocaleString('en-US')} players</td>`;
+    if(k==='replied'){
+      const y = rs.filter(r=>r.replied==='Yes').length, kn = rs.filter(r=>r.replied).length;
+      return `<td class="l${gc.trim()}" title="${y} replied of ${kn} rows the sheet has an answer for`
+           + `${kn<rs.length ? `; ${rs.length-kn} not recorded` : ''}">`
+           + `${kn ? y + '/' + kn : '—'}</td>`;
+    }
+    if(k==='days_aft')  return `<td class="${gc.trim()}" title="average across the ${rs.length} rows shown">${avgDays || '—'}</td>`;
+    if(k==='t_bef_dep') return `<td class="${gc}">${shortEur(tDepB)}</td>`;
+    if(k==='t_aft_dep') return `<td class="${gc}">${shortEur(tDepA)}</td>`;
+    if(k==='t_bef_dd')  return `<td class="${gc}">${tDdB.toLocaleString('en-US')}</td>`;
+    if(k==='t_aft_dd')  return `<td class="${gc}">${tDdA.toLocaleString('en-US')}</td>`;
+    if(k==='t_bef_ggr') return `<td class="${tGgrB<0?'neg':''}${gc}">${shortEur(tGgrB)}</td>`;
+    if(k==='t_aft_ggr') return `<td class="${tGgrA<0?'neg':''}${gc}">${shortEur(tGgrA)}</td>`;
+    if(k==='d_dep')     return `<td class="${dD.c}${gc}">${dD.t}</td>`;
+    if(k==='d_ggr')     return `<td class="${dG.c}${gc}">${dG.t}</td>`;
+    if(k==='t_bef_bc')  return `<td class="${gc}">${shortEur(tBcB)}</td>`;
+    if(k==='t_aft_bc')  return `<td class="${gc}">${shortEur(tBc)}</td>`;
+    // a ratio of the sums, never an average of per-player ratios
+    if(k==='bc_ratio_bef') return `<td class="${gc.trim()}">${bcRatio(tBcB, tAdjB)}</td>`;
+    if(k==='bc_ratio')     return `<td class="${gc.trim()}">${bcRatio(tBc, tAdj)}</td>`;
+    return `<td class="${c==='l'?'l':''}${gc}"></td>`;
+  }).join('') + '</tr></tfoot>';
+  document.getElementById('tPlayers').innerHTML = head + '<tbody>' + body + '</tbody>' + foot;
+  document.querySelectorAll('#tPlayers tbody tr').forEach((tr, i) => {
+    if(rs[i]) tr.onclick = () => openPlayer(rs[i]);
+  });
+  LAST = { rows: rs, cols: cols };
+  if(!rs.length) document.getElementById('tPlayers').innerHTML =
+    head + '<tbody><tr><td class="l mut" colspan="' + cols.length + '">No players match this combination of filters.</td></tr></tbody>';
+  document.querySelectorAll('#tPlayers thead th').forEach(th=>th.onclick=()=>{
+    const k = th.dataset.k;
+    if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=-1; }
+    renderPlayers();
+  });
+}
+
+/* Per-player drill-down. The history is packed as arrays keyed off a day
+   number from D.day0, so 65k daily rows do not triple the size of the page. */
+const DAY0 = new Date(D.day0 + 'T00:00:00Z');
+const dayStr = n => new Date(DAY0.getTime() + n * 86400000).toISOString().slice(0, 10);
+
+function openPlayer(r){
+  const g = TAG();
+  const split = g === 'o' ? r.onboard : r.first_req;
+  document.getElementById('mTitle').textContent = r.username + '  ·  ' + r.player_id;
+  /* Chips, not a sentence. Each fact is a thing a reader looks for by name --
+     which segment, which VA, which tier -- and a middot-separated line makes
+     every one of them a search. The two that decide how the page reads (the
+     split event, and whether a VA ever took this player) are highlighted. */
+  const chip = (label, value, key) => !value ? '' :
+    `<span class="mchip${key ? ' key' : ''}">${esc(label)} <b>${esc(value)}</b></span>`;
+  document.getElementById('mSub').innerHTML =
+    '<div class="mchips">'
+    + chip('', r.country) + chip('', r.segment)
+    + chip('Tier', r.tier)
+    + (r.va ? chip('VA', r.va, true) : '<span class="mchip">no VA &mdash; never onboarded</span>')
+    + chip('from', r.casino)
+    + chip('affiliate', r.aff ? r.aff + (r.aff_type ? ' (' + r.aff_type + ')' : '') : '')
+    + chip('replied', r.replied)
+    + chip('registered', r.reg_date) + chip('requested', r.first_req)
+    + (r.onboard ? chip('onboarded', r.onboard) : '')
+    + chip('split on', (g === 'o' ? 'onboarding' : 'request') + ' date', true)
+    + '</div>'
+    /* The cards below use the same matched windows as the tables: after runs
+       from the split to today, before covers the same number of days ending the
+       day before it. Worth saying here, because for a player who registered
+       shortly before requesting the matched "before" and an all-time "before"
+       are the same number, and nothing on the card would tell you which it is. */
+    /* One line, not three: the two day counts are always equal by construction,
+       so printing both was saying the same number twice. */
+    + '<div style="margin-top:4px">matched windows of '
+    + (r[g+'_days_aft'] || 0).toLocaleString('en-US')
+    + ' days either side of the split</div>';
+
+  const win = (r[g+'_days_aft'] || 0) + 'd';
+  /* Every measure is shown on both sides. A one-sided card invites the reader to
+     compare it against nothing: "bonus after €1,259" says little until you know
+     whether the player was already taking €1,200 a month before. Net deposit is
+     deposits minus withdrawals over the same window -- the money the casino
+     actually kept hold of, which is what a VA is usually being asked about. */
+  const nd = s => (r[g+'_'+s+'_dep']||0) - (r[g+'_'+s+'_wd']||0);
+  /* The bonus ratio is the same measure as the BC/adjGGR column in the tables,
+     and it is computed from the summed sides rather than averaged -- a ratio of
+     sums, never a sum of ratios. It reads 'n/m' when adjusted GGR is zero or
+     negative, because a cost over a loss has no meaningful percentage: a player
+     who was given 200 and lost the casino money is not "200% of revenue", the
+     denominator simply is not there. */
+  const bcr = s => bcRatio(r[g+'_'+s+'_bc'], r[g+'_'+s+'_adj']);
+  const TIP = {
+    nd:  'deposits minus withdrawals over the same window',
+    bcr: 'bonus cost as a share of adjusted GGR, both summed over the same window'
+         + ' — n/m when adjusted GGR is not positive',
+  };
+  const k = [['Dep. before',     r[g+'_bef_dep']], ['Dep. after',     r[g+'_aft_dep']],
+             ['Net dep. before', nd('bef'), 'nd'], ['Net dep. after', nd('aft'), 'nd'],
+             ['GGR before',      r[g+'_bef_ggr']], ['GGR after',      r[g+'_aft_ggr']],
+             ['NGR before',      r[g+'_bef_ngr']], ['NGR after',      r[g+'_aft_ngr']],
+             ['Bonus before',    r[g+'_bef_bc']],  ['Bonus after',    r[g+'_aft_bc']],
+             ['BC/adj GGR before', bcr('bef'), 'bcr'],
+             ['BC/adj GGR after',  bcr('aft'), 'bcr']];
+  document.getElementById('mKpi').innerHTML = k.map(([l,v,kind])=>{
+    const neg = kind !== 'bcr' && v < 0;
+    const txt = kind === 'bcr' ? v : eur(v);
+    const tip = (kind ? esc(TIP[kind]) + ' — ' : '') + win + ' window';
+    return `<div title="${tip}">`
+         + `<div class="l">${l}</div><div class="v${neg?' neg':''}">${txt}</div></div>`;
+  }).join('');
+
+  /* ---------- what the VA wrote ----------
+     Straight from their own tab of the tracker sheet, verbatim. This is the only
+     thing on the page that explains a number rather than reporting one -- "most
+     likely fraud, device match with another VIP" is not derivable from any
+     table -- so it sits directly under the cards rather than at the foot.
+     Verbatim includes the Georgian: translating a VA's note would put words in
+     their mouth, and the people reading this page read both. */
+  (function(){
+    const btn = document.getElementById('mNotesBtn');
+    const notes = r.notes || [];
+    btn.hidden = !notes.length;
+    if(!notes.length) return;
+    btn.textContent = 'Notes \u00b7 ' + notes.length;
+    btn.title = 'What the VA wrote about this player';
+    btn.onclick = () => openNotes(r);
+  })();
+  (function(){
+    const btn = document.getElementById('mSurveyBtn');
+    const rows = r.survey || [];
+    btn.hidden = !rows.length;
+    if(!rows.length) return;
+    btn.textContent = 'Survey';
+    btn.title = 'What this player said about their old casino and what they expect here';
+    btn.onclick = () => openSurvey(r);
+  })();
+
+  /* ---------- weeks ----------
+     Bars, not a line, and bucketed in sevens counted OUT FROM THE SPLIT rather
+     than by calendar week. A calendar week that straddles the split would mix
+     before and after in one bar, which is the one thing this chart must not do:
+     every other number on the page is split-relative.
+
+     Deposits and adjusted GGR share one euro axis and a real zero line. GGR goes
+     negative and deposits do not, so a second axis would let a EUR 50 GGR bar
+     and a EUR 50,000 deposit bar look the same height. */
+  (function(){
+    const head = document.getElementById('mWeekH'), box = document.getElementById('mWeek');
+    const hist = r.hist || [];
+    const splitN = split ? Math.round((new Date(split + 'T00:00:00Z') - DAY0) / 86400000) : null;
+    if(!hist.length || splitN === null){ head.hidden = box.hidden = true; return; }
+    const todayN = Math.round((new Date(D.today + 'T00:00:00Z') - DAY0) / 86400000);
+    const CAP = 13;                                   // a quarter either side, at most
+    const wAft = Math.min(CAP, Math.max(4, Math.ceil((todayN - splitN + 1) / 7)));
+    const wBef = Math.min(CAP, Math.max(4, wAft));
+
+    const wk = [];                                    // oldest first
+    for(let b = -wBef; b < wAft; b++)
+      wk.push({ b, from: splitN + b*7, dep: 0, adj: 0 });
+    for(const row of hist){
+      const i = Math.floor((row[0] - splitN) / 7) + wBef;
+      if(i >= 0 && i < wk.length){ wk[i].dep += row[1]; wk[i].adj += row[8]; }
+    }
+    if(!wk.some(w => w.dep || w.adj)){ head.hidden = box.hidden = true; return; }
+    head.hidden = box.hidden = false;
+
+    const W = 900, H = 158, P = { t: 15, r: 8, b: 22, l: 52 };
+    const hi = Math.max(1, ...wk.map(w => Math.max(w.dep, w.adj)));
+    const lo = Math.min(0, ...wk.map(w => w.adj));
+    const y  = v => P.t + (H - P.t - P.b) * (1 - (v - lo) / (hi - lo));
+    const bw = (W - P.l - P.r) / wk.length;           // one week's slot
+    const barW = Math.max(2, bw / 2 - 2);
+    /* Values are printed on the bars, but only where they fit. At 26 weeks a
+       slot is 32px wide and "EUR 1.5k" is not, so a label is drawn only when the
+       bar is worth at least a tenth of the scale -- the ones a reader is
+       actually trying to read. Everything else keeps its tooltip. */
+    const MINLBL = 0.10 * Math.max(hi, Math.abs(lo));
+    const bar = (i, v, cls) => {
+      if(!v) return '';
+      const x = P.l + i*bw + (cls === 'bd' ? bw/2 - barW - 1 : bw/2 + 1);
+      const y0 = y(0), y1 = y(v);
+      const rect = `<rect class="${cls}" x="${x.toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}"`
+           + ` width="${barW.toFixed(1)}" height="${Math.max(1, Math.abs(y1-y0)).toFixed(1)}"`
+           + `><title>week ${wk[i].b < 0 ? wk[i].b : '+' + (wk[i].b + 1)} `
+           + `(${dayStr(wk[i].from)}) — ${cls === 'bd' ? 'deposits' : 'adjusted GGR'} ${eur(v)}</title></rect>`;
+      if(Math.abs(v) < MINLBL) return rect;
+      // above a positive bar, below a negative one, so the label never sits on it
+      const ly = v >= 0 ? y1 - 3 : y1 + 9;
+      return rect + `<text class="bl ${cls}" x="${(x + barW/2).toFixed(1)}" y="${ly.toFixed(1)}"`
+           + ` text-anchor="middle">${shortEur(v)}</text>`;
+    };
+    const splitX = (P.l + wBef*bw).toFixed(1);
+    box.innerHTML =
+      `<div class="lg"><span style="color:var(--accent)"><i style="background:currentColor"></i>Deposits</span>`
+      + `<span style="color:var(--warn)"><i style="background:currentColor"></i>Adjusted GGR</span>`
+      + `<span><i class="dash"></i>${g === 'o' ? 'Onboarding' : 'Request'}</span></div>`
+      + `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Deposits and adjusted GGR by week">`
+      + `<style>.gl{stroke:var(--line);stroke-width:1}.zl{stroke:var(--muted);stroke-width:1;opacity:.6}
+                .ax{fill:var(--muted);font-size:10px}
+                .sp{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 3;opacity:.9}
+                rect.bd{fill:var(--accent)} rect.bg{fill:var(--warn)}
+                text.bl{font-size:8.5px;font-weight:600}
+                text.bl.bd{fill:var(--accent)} text.bl.bg{fill:var(--warn)}</style>`
+      + [lo, 0, hi].filter((v,i,a) => a.indexOf(v) === i).map(v =>
+          `<line x1="${P.l}" y1="${y(v).toFixed(1)}" x2="${W-P.r}" y2="${y(v).toFixed(1)}" class="${v===0?'zl':'gl'}"/>`
+          + `<text x="${P.l-6}" y="${(y(v)+3).toFixed(1)}" class="ax" text-anchor="end">`
+          +   `${v === 0 ? '\u20ac0' : shortEur(v)}</text>`).join('')
+      + `<line x1="${splitX}" y1="${P.t}" x2="${splitX}" y2="${H-P.b}" class="sp"/>`
+      + wk.map((w,i) => bar(i, w.dep, 'bd') + bar(i, w.adj, 'bg')).join('')
+      + `<text x="${P.l}" y="${H-6}" class="ax">${wBef} weeks before</text>`
+      + `<text x="${W-P.r}" y="${H-6}" class="ax" text-anchor="end">${wAft} weeks after</text>`
+      + `</svg>`;
+  })();
+
+  // bonuses
+  const bons = r.bon || [];
+  const STATUS_HELP = {
+    'completed'      : 'played through to the end',
+    'voided after use': 'the player activated it, then it was cancelled — usually with balance still on it',
+    'not taken'      : 'offered and cancelled without the player ever activating it',
+    'active'         : 'activated and still running',
+    'expired'        : 'never activated, and the offer ran out',
+    'offered'        : 'sitting in the account, not yet taken',
+    'never opened'   : 'the ticket was minted and never made available — the player could not use it',
+  };
+  /* Summary above the ledger. The detail table is the record, but nobody reads
+     150 rows to answer "what has this player actually been given?" -- so this
+     rolls the tickets up per offer.
+     Taken means the player activated it (completed, still active, or voided
+     after use). Everything else -- offered, expired, not taken, never opened --
+     was minted and never used, and the amount on those is not money that ever
+     reached the player. That is why amount is split into taken and offered
+     rather than shown as one number: two of the transfer families mint tickets
+     that almost never open, and a single total would read as a cost. */
+  const TAKEN = new Set(['completed', 'active', 'voided after use']);
+  (function(){
+    const by = new Map();
+    for(const [dn, bi, amt, st, src, ki, sp, tk, code, vip] of bons){
+      const key = bi + '|' + (code || '');
+      let o = by.get(key);
+      if(!o) by.set(key, o = { name: D.bonus_names[bi], code: code || '', vip: !!vip,
+                               kind: (D.bonus_kinds||[])[ki] || '', n:0, bef:0, aft:0,
+                               taken:0, amtT:0, amtO:0, spinsT:0, spinsO:0, last:'' });
+      const q = tk > 1 ? tk : 1, ds = dayStr(dn), got = TAKEN.has(st);
+      o.n += q;
+      if(ds >= split) o.aft += q; else o.bef += q;
+      if(got){ o.taken += q; o.amtT += (amt||0)*q; o.spinsT += (sp||0)*q; }
+      else   {              o.amtO += (amt||0)*q; o.spinsO += (sp||0)*q; }
+      if(ds > o.last) o.last = ds;
+      if(vip) o.vip = true;
+    }
+    const rows = [...by.values()].sort((a,b)=> b.amtT - a.amtT || b.n - a.n);
+    const t = (x, l) => `<td title="${esc(l)}">${x}</td>`;
+    const tot = rows.reduce((a,o)=>({ n:a.n+o.n, bef:a.bef+o.bef, aft:a.aft+o.aft,
+      taken:a.taken+o.taken, amtT:a.amtT+o.amtT, amtO:a.amtO+o.amtO,
+      spinsT:a.spinsT+o.spinsT, spinsO:a.spinsO+o.spinsO }),
+      { n:0,bef:0,aft:0,taken:0,amtT:0,amtO:0,spinsT:0,spinsO:0 });
+    /* Five columns. Type, the before/after split, spins, never-activated and the
+       last date were dropped on request; the counts behind them are still on the
+       object, so a column can come back without touching the rollup above. */
+    const cells = o => t(o.n, `${o.n} ticket${o.n===1?'':'s'}`)
+      + t(o.taken || '—', `${o.taken} of ${o.n} activated by the player`)
+      + t(o.amtT ? eur(o.amtT) : '—', 'face value of the tickets the player activated'
+          + (o.amtO ? ` — a further ${eur(o.amtO)} sat on tickets never activated` : ''));
+    document.getElementById('mBsum').innerHTML = rows.length
+      ? '<thead><tr><th class="l">Offer</th><th>Code</th>'
+        + '<th>Tickets</th><th>Taken</th><th>Amount</th></tr></thead><tbody>'
+        + rows.map(o => `<tr${o.vip ? ' class="vipb"' : ''}>`
+            + `<td class="l txt">${esc(o.name)}</td>`
+            + `<td class="${o.vip ? 'code' : 'mut'}">${esc(o.code) || '—'}</td>`
+            + cells(o) + '</tr>').join('')
+        + '</tbody><tfoot><tr style="font-weight:600">'
+        + `<td class="l">${rows.length} offer${rows.length===1?'':'s'}</td><td></td>`
+        + cells(tot) + '</tr></tfoot>'
+      : '<tbody><tr><td class="l mut">No bonuses on record.</td></tr></tbody>';
+  })();
+
+  document.getElementById('mBonus').innerHTML = bons.length
+    ? '<thead><tr><th class="l">Date</th><th>Code</th><th class="l">Bonus</th><th class="l">Type</th><th>Amount</th>'
+      + '<th>Spins</th><th class="l">Status</th><th class="l">Granted by</th></tr></thead><tbody>'
+      + bons.map(([dn, bi, amt, st, src, ki, sp, tk, code, vip]) => {
+          const ds = dayStr(dn);
+          const cls = [ds >= split ? 'aft' : '', vip ? 'vipb' : ''].filter(Boolean).join(' ');
+          return `<tr${cls ? ` class="${cls}"` : ''}><td class="l">${esc(ds)}</td>`
+               + `<td class="${vip ? 'code' : 'mut'}">${code || '—'}</td>`
+               + `<td class="l txt">${esc(D.bonus_names[bi])}`
+               + `${tk > 1 ? ` <span class="mut">×${tk}</span>` : ''}</td>`
+               + `<td class="l mut">${esc((D.bonus_kinds||[])[ki] || '—')}</td>`
+               + `<td>${amt ? eur(amt) : '—'}</td>`
+               + `<td>${sp ? sp.toLocaleString('en-US') : '—'}</td>`
+               + `<td class="l"><span class="pill2" title="${esc(STATUS_HELP[st]||'')}">${esc(st)}</span></td>`
+               + `<td class="l txt mut">${esc(src||'—')}</td></tr>`; }).join('')
+      + '</tbody>'
+    : '<tbody><tr><td class="l mut">No bonuses on record.</td></tr></tbody>';
+
+  // daily history, newest first, with a rule where the split falls
+  const h = (r.hist || []).slice().reverse();
+  let marked = false;
+  document.getElementById('mDaily').innerHTML =
+    '<thead><tr><th class="l">Date</th><th>Deposits</th><th>#</th><th>Withdrawn</th>'
+    + '<th>Bet</th><th>GGR</th><th>NGR</th><th>Bonus</th></tr></thead><tbody>'
+    + (h.length ? h.map(([dn, dep, dc, wd, bet, ggr, ngr, bc]) => {
+        const ds = dayStr(dn);
+        const first = !marked && ds < split;      // first row on the "before" side
+        if (first) marked = true;
+        return `<tr${first ? ' class="split"' : ''}><td class="l">${esc(ds)}</td>`
+             + `<td>${dep ? eur(dep) : '—'}</td><td>${dc || '—'}</td>`
+             + `<td>${wd ? eur(wd) : '—'}</td><td>${bet ? eur(bet) : '—'}</td>`
+             + `<td class="${ggr<0?'neg':''}">${ggr ? eur(ggr) : '—'}</td>`
+             + `<td class="${ngr<0?'neg':''}">${ngr ? eur(ngr) : '—'}</td>`
+             + `<td>${bc ? eur(bc) : '—'}</td></tr>`; }).join('')
+      : '<tr><td class="l mut" colspan="8">No activity on record.</td></tr>')
+    + '</tbody>';
+  document.getElementById('modal').hidden = false;
+}
+function closeModal(){ document.getElementById('modal').hidden = true; }
+
+/* The VA notes get their own window rather than a block inside the player one.
+   They are long, multi-paragraph and often in Georgian, and inline they pushed
+   the daily history off screen for the 142 players who have one while leaving a
+   gap for the 400 who do not. A button that appears only when there is
+   something to read is the honest version of that. */
+function openNotes(r){
+  const notes = r.notes || [];
+  document.getElementById('nTitle').textContent = 'Notes on ' + r.username;
+  document.getElementById('nSub').innerHTML =
+    notes.length + ' note' + (notes.length === 1 ? '' : 's')
+    + ' &middot; from the manager\u2019s own tab of the tracker, verbatim';
+  document.getElementById('nBody').innerHTML = notes.map(([va, text, status]) =>
+    '<div class="note"><div class="who">' + esc(va)
+    + (status ? ' <span class="st">' + esc(status) + '</span>' : '')
+    + '</div><div class="tx">' + esc(text) + '</div></div>').join('');
+  document.getElementById('nmodal').hidden = false;
+}
+function closeNotes(){ document.getElementById('nmodal').hidden = true; }
+
+/* The onboarding survey, in its own window for the same reason as the notes:
+   five long free-text answers belong nowhere near the daily history.
+   Rendered as the form itself reads -- question, what they had, what they
+   expect -- rather than as a table of columns, because the two answers are a
+   pair and a reader compares them line by line. */
+function openSurvey(r){
+  const rows = r.survey || [];
+  document.getElementById('sTitle').textContent = 'Survey \u00b7 ' + r.username;
+  document.getElementById('sSub').innerHTML =
+    rows.length + ' answer' + (rows.length === 1 ? '' : 's')
+    + ' &middot; what they had at their old casino, and what they expect here';
+  document.getElementById('sBody').innerHTML =
+    '<table class="qa"><thead><tr><th class="l">Question</th>'
+    + '<th class="l">At their current casino</th><th class="l">Expected from us</th></tr></thead><tbody>'
+    + rows.map(([q, have, expect]) =>
+        '<tr><td class="l q">' + esc(q) + '</td>'
+        + '<td class="l">' + (have   ? esc(have)   : '<span class="mut">\u2014</span>') + '</td>'
+        + '<td class="l">' + (expect ? esc(expect) : '<span class="mut">\u2014</span>') + '</td></tr>').join('')
+    + '</tbody></table>';
+  document.getElementById('smodal').hidden = false;
+}
+function closeSurvey(){ document.getElementById('smodal').hidden = true; }
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('modal').onclick = e => { if(e.target.id === 'modal') closeModal(); };
+document.getElementById('nClose').onclick = closeNotes;
+document.getElementById('nmodal').onclick = e => { if(e.target.id === 'nmodal') closeNotes(); };
+/* Escape closes the top window only. Shutting both at once would lose the
+   player panel the reader was in the middle of. */
+document.getElementById('sClose').onclick = closeSurvey;
+document.getElementById('smodal').onclick = e => { if(e.target.id === 'smodal') closeSurvey(); };
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if(!document.getElementById('smodal').hidden)      closeSurvey();
+  else if(!document.getElementById('nmodal').hidden) closeNotes();
+  else                                               closeModal();
+});
+
+function bindPick(tableId, key){
+  document.querySelectorAll('#'+tableId+' tr.pick').forEach(tr=>{
+    const name = tr.dataset.name;
+    const sel = key==='segments' ? F.segments.has(name) : F[key] === name;
+    if(sel) tr.classList.add('on');
+    tr.onclick = () => {
+      const already = key==='segments' ? F.segments.has(name) : F[key] === name;
+      // filters stack: picking a VA keeps whatever segment or month is already set
+      if(key==='segments'){ already ? F.segments.delete(name) : F.segments.add(name); }
+      else { F[key] = already ? '' : name; }
+      /* Picking a whole offer row means "everyone who got it", so drop any
+         Activated/Completed narrowing left over from a cell click -- otherwise
+         it would silently keep applying to the newly picked offer. */
+      if(key==='offer'){ F.offerSt = ''; F.offerAny = ''; }
+      render();
+      // open By Players before scrolling: every section starts collapsed, so
+      // otherwise the page slides to a closed heading and appears to do nothing
+      const tp = document.getElementById('tPlayers');
+      if(!already && tp){ openSection(tp); tp.scrollIntoView({behavior:'smooth', block:'start'}); }
+    };
+  });
+}
+
+function fillSegments(){
+  const box = document.getElementById('segFilter');
+  const segs = C().by_segment;
+  // a segment can vanish when the cohort narrows; drop it rather than filter to nothing
+  [...F.segments].forEach(s => { if(!segs.some(x=>x.name===s)) F.segments.delete(s); });
+  const anyFilter = F.va || F.month || F.offer || F.offerAny || F.tree || F.grid || F.segments.size;
+  const label = !F.segments.size ? 'All segments'
+              : F.segments.size === 1 ? [...F.segments][0]
+              : F.segments.size + ' segments';
+  box.innerHTML =
+    '<span class="lbl">Segment</span>'
+    + `<div class="dd${F.segments.size ? ' active' : ''}">`
+    +   `<button id="segBtn" aria-expanded="false">${esc(label)}<span class="caret">▾</span></button>`
+    +   '<div class="ddmenu" id="segMenu" hidden>'
+    +     segs.map(s => {
+            const on = F.segments.has(s.name);
+            return `<label class="${on?'on':''}"><input type="checkbox" value="${esc(s.name)}"${on?' checked':''}>`
+                 + `<span>${esc(s.name)}</span><span class="n">${s.players}</span></label>`;
+          }).join('')
+    +   '</div>'
+    + '</div>'
+    + (anyFilter ? '<button id="segClear">Clear all filters</button>' : '');
+
+  const menu = document.getElementById('segMenu'), btn = document.getElementById('segBtn');
+  btn.onclick = e => {
+    e.stopPropagation();
+    const open = menu.hidden;
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  };
+  menu.onclick = e => e.stopPropagation();
+  /* Close on an outside click, but only while the menu is open, and remove the
+     listener again — otherwise every render leaves another one behind. */
+  document.addEventListener('click', function close(){ menu.hidden = true;
+    btn.setAttribute('aria-expanded','false');
+    document.removeEventListener('click', close); });
+  menu.querySelectorAll('input').forEach(cb => cb.onchange = () => {
+    cb.checked ? F.segments.add(cb.value) : F.segments.delete(cb.value);
+    KEEP_SEG_OPEN = true;          // stay open so several can be ticked in a row
+    render();
+  });
+  if(KEEP_SEG_OPEN){ menu.hidden = false; btn.setAttribute('aria-expanded','true'); KEEP_SEG_OPEN = false; }
+  const clr = document.getElementById('segClear');
+  if(clr) clr.onclick = () => { F.va=''; F.month=''; F.offer=''; F.offerSt=''; F.offerAny='';
+                               F.tree=null; F.treeLabel=''; F.grid=null;
+                               F.segments = new Set(DEFAULT_SEGMENTS()); render(); };
+}
+
+function basisNote(){
+  const el = document.getElementById('basisNote');
+  if(!el) return;
+  el.innerHTML = BASIS === 'onb'
+    ? 'Measuring from the <b>VA onboarding date</b>. Only the '
+      + C().n.toLocaleString('en-US') + ' players a VA actually onboarded appear below &mdash; '
+      + 'the rest have no onboarding date to split on. Sheet dates average 52 days after the request '
+      + 'and a few precede it, so treat this basis as a read on the VA programme rather than on the player.'
+    : 'Measuring from the <b>transfer request date</b>, every requester included.';
+}
+
+/* Number the sections as they are actually shown, rather than writing the
+   numbers into the markup: a heading that gets hidden or reordered would
+   otherwise leave the sequence running 1, 3, 4. */
+function numberSections(){
+  let n = 0;
+  document.querySelectorAll('.wrap > h2').forEach(h => {
+    let tag = h.querySelector('.num');
+    if(!tag){ tag = document.createElement('span'); tag.className = 'num'; h.prepend(tag); }
+    tag.textContent = h.hidden ? '' : (++n) + '.';
+  });
+}
+
+/* The whole thing as one nested tree: who deposited, how big the biggest single
+   deposit was, whether the free spins arrived, where they came from, and whether
+   the cashback was ever paid. Laid out bottom-up -- a parent is exactly as tall
+   as its children plus the gaps -- so nothing overlaps and the boxes add up by
+   eye. Every box is a cut of the player list; clicking one applies it. */
+function bonusTree(){
+  const ROOT = deptreeOf(cohortRows());
+  const PAD = 16, GAP = 7, MINH = 30, COLGAP = 26;
+  const COLW = [150, 168, 176, 196, 176, 178, 176];
+  const XS = []; COLW.forEach((w, i) => XS.push(i ? XS[i-1] + COLW[i-1] + COLGAP : PAD));
+  const W = XS[XS.length-1] + COLW[COLW.length-1] + PAD;
+
+  // scale so the finished tree lands near 470px even after the height floor
+  const leafCounts = [];
+  (function walk(n){ n.kids && n.kids.length ? n.kids.forEach(walk) : leafCounts.push(n.n); })(ROOT);
+  let k = 1;
+  for(let i = 0; i < 40; i++){
+    const h = leafCounts.reduce((a, n) => a + Math.max(n * k, MINH) + GAP, -GAP) + GAP * 6;
+    if(Math.abs(h - 470) < 4) break;
+    k *= 470 / h;
+  }
+  const hOf = n => Math.max(n * k, MINH);
+
+  let y = PAD;
+  const boxes = [];
+  (function place(n, depth){
+    const b = { d: n, x: XS[depth], w: COLW[depth] };
+    boxes.push(b);
+    if(!n.kids || !n.kids.length){ b.y = y; b.h = hOf(n.n); y += b.h + GAP; return b; }
+    const kids = n.kids.map(kd => place(kd, depth + 1));
+    if(depth <= 2) y += GAP;                       // a little air between the big groups
+    b.y = kids[0].y;
+    b.h = kids[kids.length-1].y + kids[kids.length-1].h - b.y;
+    b.kids = kids;
+    return b;
+  })(ROOT, 0);
+  const H = y - GAP + PAD;
+
+  const clip = (str, px) => { const max = Math.floor(px / 6.0);
+                              return str.length > max ? str.slice(0, max-1) + '\u2026' : str; };
+  const same = (a, b) => a && b && JSON.stringify(a) === JSON.stringify(b);
+  let links = '', rects = '';
+  boxes.forEach((b, i) => {
+    (b.kids || []).forEach(kd => {
+      links += `<path d="M${b.x+b.w},${b.y+b.h/2} C${(b.x+b.w+kd.x)/2},${b.y+b.h/2}`
+             + ` ${(b.x+b.w+kd.x)/2},${kd.y+kd.h/2} ${kd.x},${kd.y+kd.h/2}"`
+             + ` fill="none" stroke="var(--line)" stroke-width="1.5"`
+             + `${kd.d.dead ? ' stroke-dasharray="3 3"' : ''}/>`;
+    });
+    const n = b.d, share = n.of ? Math.round(100 * n.n / n.of) + '%' : '';
+    const on = same(n.q, F.tree);
+    // a ticket minted and never opened is a failure of delivery, so it is red
+    // rather than the grey used for "this simply did not happen"
+    const fill = n.bad ? 'var(--neg)' : n.dead ? 'var(--pre)' : 'var(--post)';
+    rects += `<g class="tnode" data-i="${i}" style="cursor:pointer">`
+           + `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="6"`
+           + ` fill="${fill}"${n.dead && !n.bad ? ' opacity=".45"' : ''}`
+           + `${on ? ' stroke="var(--ink)" stroke-width="2.5"' : ''}>`
+           + `<title>${esc(n.label)}: ${n.n.toLocaleString('en-US')}`
+           + `${share ? ' \u2014 ' + share + ' of the box to its left' : ''}`
+           + `${n.sub ? ' \u00b7 ' + esc(n.sub) : ''} \u2014 click to list these players</title></rect>`;
+    const cy = b.y + b.h/2;
+    if(b.h >= 44 && n.sub){
+      rects += `<text x="${b.x+9}" y="${cy-9}" font-size="11" font-weight="600" fill="#fff">${esc(clip(n.label, b.w-18))}</text>`
+             + `<text x="${b.x+9}" y="${cy+5}" font-size="10.5" fill="#fff" opacity=".9">`
+             + `${n.n.toLocaleString('en-US')}${share ? '  \u00b7  ' + share : ''}</text>`
+             + `<text x="${b.x+9}" y="${cy+18}" font-size="10" fill="#fff" opacity=".72">${esc(clip(n.sub, b.w-18))}</text>`;
+    } else if(b.h >= 30){
+      rects += `<text x="${b.x+9}" y="${cy-3}" font-size="11" font-weight="600" fill="#fff">${esc(clip(n.label, b.w-18))}</text>`
+             + `<text x="${b.x+9}" y="${cy+12}" font-size="10.5" fill="#fff" opacity=".9">`
+             + `${n.n.toLocaleString('en-US')}${share ? '  \u00b7  ' + share : ''}</text>`;
+    } else {
+      rects += `<text x="${b.x+9}" y="${cy+4}" font-size="10" fill="#fff">${esc(clip(n.label + '  ' + n.n, b.w-18))}</text>`;
+    }
+    rects += '</g>';
+  });
+
+  const host = document.getElementById('tree');
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Deposit size, free spins and cashback">`
+                 + links + rects + '</svg>';
+  host.querySelectorAll('g.tnode').forEach(g => {
+    g.onclick = () => {
+      const n = boxes[+g.dataset.i].d;
+      const off = same(n.q, F.tree) || !Object.keys(n.q).length;   // re-click, or the root
+      F.tree      = off ? null : n.q;
+      F.treeLabel = off ? ''   : n.label;
+      render();
+      if(!off){
+        const tbl = document.getElementById('tPlayers');
+        openSection(tbl);
+        tbl.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    };
+  });
+}
+
+function bonusDistTable(){
+  /* Bonus distribution answers "and what were those players given", so it
+     follows a click in the funnel above. It ignores the offer row-click, which
+     narrows the player list -- honouring that here would collapse this table to
+     the single row you just clicked. */
+  const bd = bonusDistOf(cohortRows({ tree: true }));
+  const pc = (n, d) => d ? Math.round(100 * n / d) + '%' : '—';
+  /* The three count cells are their own filters. Clicking the row picks the
+     offer; clicking "Completed 11" picks the eleven players who finished it.
+     Without that, the only way to see who is behind a number is to pick the
+     offer and then eyeball 621 rows for the eleven that matter. The footer's
+     cells work the same way, against the player-level flags. */
+  const cell = (n, name, st, any, cls) => {
+    // '' means "given to"; the footer stores that as 'got' so the three states
+    // are all truthy and one comparison covers them
+    const on = any ? F.offerAny === (st || 'got')
+                   : F.offer === name && F.offerSt === st;
+    return `<td class="${cls}${n ? ' cpick' : ''}${on ? ' on' : ''}"`
+         + (n ? ` data-st="${st}" data-any="${any ? 1 : 0}" data-nm="${esc(name)}"`
+              + ` title="${n.toLocaleString('en-US')} player${n===1?'':'s'} — click to list them below"` : '')
+         + `>${n ? n.toLocaleString('en-US') : '—'}</td>`;
+  };
+  const row = (v, bold) => `<tr${bold ? ' style="font-weight:600"' : ''}${bold ? '' : ` class="pick" data-name="${esc(v.name)}"`}>`
+    + `<td class="mut">${v.code || '—'}</td>`
+    + `<td class="l txt">${esc(v.name)}</td>`
+    + cell(v.given, v.name, '', bold, 'grp')
+    /* "Eligible" is the sheet's word for a completed ticket -- the player met
+       the offer's conditions and has earned whatever it promised. Activation is
+       no longer shown: starting an offer is not a result, and the column sat
+       between two that are. It is still the middle step in the funnel above. */
+    + cell(v.completed, v.name, 'done', bold, 'grp')
+    + `<td class="mut">${pc(v.completed, v.given)}</td></tr>`;
+  const bdNote = document.getElementById('bdNote');
+  const ST_WORD = { act:'activated', done:'became eligible on', got:'given' };
+  const pick = F.offer ? (F.offerSt ? `players who <b>${esc(ST_WORD[F.offerSt])}</b> ${esc(F.offer)}`
+                                    : `players given <b>${esc(F.offer)}</b>`)
+             : F.offerAny ? `players who <b>${esc(ST_WORD[F.offerAny])}</b> any transfer offer`
+             : '';
+  if(bdNote) bdNote.innerHTML = pick
+    ? ' &middot; listing ' + pick + ' below &mdash; click the same cell again to clear'
+    : (F.treeLabel
+        ? '<b>' + esc(F.treeLabel) + '</b> only &mdash; click that box again to show everyone'
+        : '');
+  document.getElementById('tBonusDist').innerHTML =
+      '<thead><tr><th>Code</th><th class="l">Transfer offer</th><th class="grp">Given to</th>'
+    + '<th class="grp">Eligible</th><th>%</th></tr></thead>'
+    + '<tbody>' + bd.rows.map(v => row(v, false)).join('') + '</tbody>'
+    + '<tfoot>' + row(bd.total, true) + '</tfoot>';
+  bindPick('tBonusDist', 'offer');
+  /* Bound after bindPick and stopping propagation, so a cell click does not also
+     fire the row handler underneath it and immediately widen what it just
+     narrowed. Clicking the same cell again clears it. */
+  document.querySelectorAll('#tBonusDist td.cpick').forEach(td => {
+    td.onclick = e => {
+      e.stopPropagation();
+      const st = td.dataset.st, any = td.dataset.any === '1', nm = td.dataset.nm;
+      const already = any ? (F.offerAny === (st || 'got'))
+                          : (F.offer === nm && F.offerSt === st);
+      F.offer = ''; F.offerSt = ''; F.offerAny = '';
+      if(!already){ if(any) F.offerAny = st || 'got'; else { F.offer = nm; F.offerSt = st; } }
+      render();
+      const tp = document.getElementById('tPlayers');
+      if(!already && tp){ openSection(tp); tp.scrollIntoView({behavior:'smooth', block:'start'}); }
+    };
+  });
+}
+
+/* Deposit growth down the side, GGR growth across the top, head count inside.
+   Built from cohortRows so picking a cell does not shrink the grid that
+   produced it -- the same rule the offer table follows.
+
+   The interesting reading is off-diagonal. Deposits up while GGR is flat or
+   down means the player is depositing more and we are keeping less of it, which
+   is usually bonus cost or a run of luck rather than a healthier player. Down
+   the diagonal the two move together and there is nothing to explain. */
+function growthTable(){
+  const rs = cohortRows();
+  const cell = new Map();                     // "dep|ggr" -> players
+  const rowTot = {}, colTot = {};
+  for(const r of rs){
+    const d = depBand(r), g = ggrBand(r), k = d + '|' + g;
+    cell.set(k, (cell.get(k) || 0) + 1);
+    rowTot[d] = (rowTot[d] || 0) + 1;
+    colTot[g] = (colTot[g] || 0) + 1;
+  }
+  // an empty band is noise, not information: drop it from both axes
+  const rowsUsed = BANDS.filter(b => rowTot[b.k]);
+  const colsUsed = BANDS.filter(b => colTot[b.k]);
+  const note = document.getElementById('gridNote');
+  if(note) note.innerHTML = F.grid
+    ? ' &middot; listing <b>' + esc(bandName(F.grid.dep, 'dep')) + '</b> deposits &times; <b>'
+      + esc(bandName(F.grid.ggr, 'ggr')) + '</b> GGR below &mdash; click the same cell again to clear'
+    : ' &middot; deposit growth down, GGR growth across &mdash; click any count to list those players';
+
+  if(!rowsUsed.length){
+    document.getElementById('tGrid').innerHTML =
+      '<tbody><tr><td class="l mut">No players in the current selection.</td></tr></tbody>';
+    return;
+  }
+  /* Where the percentage scale ends. Everything from "No GGR" on is a state,
+     not a point on the ramp, so the first of those carries the rule. */
+  const OFF_SCALE = new Set(['zero','nm','new']);
+  const brk = (list, k) => {
+    const i = list.findIndex(x => OFF_SCALE.has(x.k));
+    return i >= 0 && list[i].k === k ? ' brk' : '';
+  };
+  // Scale the tint on the biggest cell, ignoring cells that are off the scale:
+  // No Deposit x No GGR holds half the book and would flatten everything else.
+  const peak = Math.max(1, ...rowsUsed.flatMap(b => colsUsed.map(c =>
+    (OFF_SCALE.has(b.k) && OFF_SCALE.has(c.k)) ? 0 : (cell.get(b.k+'|'+c.k) || 0))));
+
+  const head = '<thead><tr><th class="l">Deposit ↓ / GGR →</th>'
+    + colsUsed.map(c => `<th class="${brk(colsUsed,c.k)}" title="${esc(bandHint(c,'ggr'))}">`
+        + `${esc(bandName(c.k,'ggr'))}</th>`).join('')
+    + '<th class="grp">All</th></tr></thead>';
+  const firstOff = (rowsUsed.find(x => OFF_SCALE.has(x.k)) || {}).k;
+  const body = rowsUsed.map(b => `<tr${OFF_SCALE.has(b.k)
+        ? ' class="offscale' + (b.k === firstOff ? ' first' : '') + '"' : ''}>`
+    + `<td class="l txt" title="${esc(bandHint(b,'dep'))}">${esc(bandName(b.k,'dep'))}</td>`
+    + colsUsed.map(c => {
+        const n = cell.get(b.k + '|' + c.k) || 0;
+        const on = F.grid && F.grid.dep === b.k && F.grid.ggr === c.k;
+        // sqrt so the mid-sized cells stay visible against the one huge one
+        const h = n ? Math.sqrt(Math.min(n, peak) / peak).toFixed(3) : 0;
+        return `<td class="${n ? 'gpick' : 'mut'}${on ? ' on' : ''}${brk(colsUsed,c.k)}"`
+             + (n ? ` style="--h:${h}" data-d="${b.k}" data-g="${c.k}"`
+                  + ` title="${n} player${n===1?'':'s'}: deposits ${esc(bandName(b.k,'dep'))},`
+                  + ` GGR ${esc(bandName(c.k,'ggr'))} — click to list them"` : '')
+             + `>${n || '—'}</td>`;
+      }).join('')
+    + `<td class="grp">${rowTot[b.k].toLocaleString('en-US')}</td></tr>`).join('');
+  const foot = '<tfoot><tr style="font-weight:600"><td class="l">All</td>'
+    + colsUsed.map(c => `<td class="${brk(colsUsed,c.k)}">${colTot[c.k].toLocaleString('en-US')}</td>`).join('')
+    + `<td class="grp">${rs.length.toLocaleString('en-US')}</td></tr></tfoot>`;
+  document.getElementById('tGrid').innerHTML = head + '<tbody>' + body + '</tbody>' + foot;
+
+  document.querySelectorAll('#tGrid td.gpick').forEach(td => {
+    td.onclick = () => {
+      const d = td.dataset.d, g = td.dataset.g;
+      const already = F.grid && F.grid.dep === d && F.grid.ggr === g;
+      F.grid = already ? null : { dep: d, ggr: g };
+      render();
+      // open By Players first: every section starts collapsed, so scrolling to a
+      // hidden table lands the reader on nothing
+      const tp = document.getElementById('tPlayers');
+      if(!already && tp){ openSection(tp); tp.scrollIntoView({behavior:'smooth', block:'start'}); }
+    };
+  });
+}
+
+/* ---------- manager bonus, as the scheme is written ----------
+
+   Only players whose 30 days are up appear: a cycle still running has no final
+   deposit total, and paying on a partial one would pay twice or pay early. The
+   window is the 30 days from the TRANSFER REQUEST, not from onboarding -- the
+   request date comes from loyalty_transfer_request and is reliable, while the
+   tracker's onboarding dates are not (one VA's entire book reads 7 Jan 2026).
+
+   The bands and coefficients are the sheet's, reproduced exactly, including the
+   parts I would argue with. Band edges are read as [10k,30k), [30k,100k),
+   [100k+) -- the sheet has 30k in both bands and something had to be chosen.
+
+   The last two columns are not part of the scheme. They are what the house kept
+   on the same players over the same 30 days, and they are here because the
+   scheme pays on deposits alone: without them a row can show a bonus earned on
+   a player who cost money, and nothing on the page would say so. */
+/* The scheme is written in DOLLARS. Every other figure on this page is euro,
+   because the warehouse view reports euro -- so the band is read against
+   o30_usd, taken straight from deposit_transactions.amount_usd rather than
+   converted. A rate conversion would be wrong twice over: the rate moves, and a
+   tenth of all deposit-days carry a dollar deposit with no euro row at all to
+   convert. The base and the payout stay in euro, which is how VAs are paid. */
+const MB_BANDS = [
+  { min: 100000, base: 1000, label: '$100k+'    },
+  { min:  30000, base:  500, label: '$30k-100k' },
+  { min:  10000, base:  300, label: '$10k-30k'  },
+];
+const usd = n => (n < 0 ? '-' : '') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+/* Week 1 is assumed active by the sheet -- all eight of its rows have it -- so a
+   player whose first deposit falls later has no row there. Rather than invent
+   one, the coefficient is keyed on weeks 2-4 exactly as written, and players
+   with no week-1 deposit are shown with the pattern they actually have and no
+   coefficient, so the gap is visible instead of guessed at. */
+const MB_COEFF = { '000': 0, '001': 70, '010': 50, '011': 90,
+                   '100': 30, '110': 60, '101': 80, '111': 100 };
+const MB_MIN_DEP = 100;          // "Min Deposit - 100$"
+
+function mbandOf(dep){ return MB_BANDS.find(b => dep >= b.min) || null; }
+/* Scored on the 30 days from ONBOARDING (o30_*), not from the transfer request.
+   The request-anchored window measured a quarter of every book on a period the
+   VA had no part in -- 90 of 357 onboarded players were taken on more than 30
+   days after asking, so their cycle had already closed before the manager
+   touched them. */
+function mbonusOf(r){
+  const wk = r.o30_wk || [false,false,false,false];
+  const band = mbandOf(r.o30_usd || 0);
+  const key = (wk[1]?'1':'0') + (wk[2]?'1':'0') + (wk[3]?'1':'0');
+  const coeff = wk[0] ? MB_COEFF[key] : null;      // null = week 1 empty, undefined by the scheme
+  // a cycle that closed before the player even requested cannot be transfer work
+  const pay = (band && coeff != null && !r.o30_before_req) ? Math.round(band.base * coeff / 100) : 0;
+  return { band, coeff, pay, wk, key, bad: !!r.o30_before_req };
+}
+
+function managerBonusTable(){
+  /* This table sets its own scope and ignores the page filters. Money owed to a
+     manager is not a view of the data -- it is either payable or it is not, and
+     a segment checkbox or a period button must not change it. The page defaults
+     alone were enough to empty this table completely: 15 of the 19 qualifying
+     players are Vip or Elit, and 14 requested before 1 July.
+     Two exclusions, and both are about whose work the deposit was.
+
+     Streamers, because those deposits are the stream's: 9% of the cohort, 44%
+     of deposits, and -EUR 69,667 of GGR.
+
+     And players nobody onboarded. A manager bonus on a player no manager ever
+     took is a payment with no payee -- 13 of the first 18 qualifiers were
+     "Not. Onb", which is not an edge case but most of the table. A VA name has
+     to be there too: `tracked` with a blank VA is the tracker sheet knowing a
+     player without saying whose they are, and that is still nobody to pay. */
+  const base = D.rows.filter(r => (r.aff_type || '').toLowerCase() !== 'streamer'
+                                  && r.tracked && r.va);
+  const rs = base.filter(r => r.o30_done && mbandOf(r.o30_usd || 0));
+  const note = document.getElementById('bonusNote');
+  const eligible = base.filter(r => r.o30_done).length;
+
+  const by = new Map();
+  for(const r of rs){
+    const k = r.va_group || '—';
+    if(!by.has(k)) by.set(k, []);
+    by.get(k).push(r);
+  }
+  const groups = [...by.entries()]
+    .map(([name, list]) => ({ name, list: list.slice().sort((a,b) => mbonusOf(b).pay - mbonusOf(a).pay) }))
+    .map(g => Object.assign(g, {
+      pay:  g.list.reduce((a,r) => a + mbonusOf(r).pay, 0),
+      dep:  g.list.reduce((a,r) => a + (r.o30_usd || 0), 0),
+      net:  g.list.reduce((a,r) => a + (r.o30_net || 0), 0),
+    }))
+    .sort((a,b) => b.pay - a.pay);
+
+  const grand = { pay: groups.reduce((a,g)=>a+g.pay,0), dep: groups.reduce((a,g)=>a+g.dep,0),
+                  net: groups.reduce((a,g)=>a+g.net,0), n: rs.length };
+  if(note) note.innerHTML = ' &middot; <b>onboarded players only, streamers excluded</b> &middot; 30 days from <b>onboarding</b>, whatever '
+    + 'the filters above say &middot; ' + rs.length.toLocaleString('en-US') + ' of '
+    + eligible.toLocaleString('en-US') + ' finished 30-day cycles reach a band &mdash; '
+    + '<b>' + eur(grand.pay) + '</b> payable on ' + usd(grand.dep) + ' deposited, '
+    + 'of which the house kept <b class="' + (grand.net < 0 ? 'neg' : 'pos') + '">'
+    + eur(grand.net) + '</b>';
+
+  if(!rs.length){
+    document.getElementById('tMBonus').innerHTML =
+      '<tbody><tr><td class="l mut">No onboarded player has finished 30 days since '
+      + 'onboarding reaching the $10,000 band.</td></tr></tbody>';
+    return;
+  }
+  // same abbreviation as the other tables, so a VA reads identically everywhere
+  const short = initialsMap(groups.map(g => g.name));
+  const dots = wk => wk.map((on,i) =>
+    `<span class="wk${on?' on':''}" title="week ${i+1}${i===3?' (9 days: 30 days is four weeks and two)':''}: `
+    + `${on?'deposited':'nothing'}">${i+1}</span>`).join('');
+
+  const head = '<thead><tr><th class="l">VA</th><th class="l">Player</th>'
+    + '<th class="grp">30d deposits $<br><span class="mut">from onboarding</span></th><th>Band</th><th>Base</th>'
+    + '<th class="l">Weeks</th><th>Coefficient</th><th>Bonus</th>'
+    + '<th class="grp">Net dep.</th><th>Kept (adj GGR − BC)</th></tr></thead>';
+
+  const body = groups.map(g => {
+    const rows = g.list.map(r => {
+      const m = mbonusOf(r), net = r.o30_net || 0;
+      return `<tr class="mbrow" data-va="${esc(g.name)}" data-pid="${r.player_id}"`
+        + ` title="Open ${esc(r.username)} — daily history, bonuses and the before/after cards">`
+        + `<td class="l mut">${esc(short[g.name] || g.name)}</td>`
+        + `<td class="l txt">${esc(r.username)}</td>`
+        + `<td class="grp" title="${eur(r.o30_dep || 0)} over the same window">${usd(r.o30_usd || 0)}</td>`
+        + `<td class="mut">${m.band.label}</td>`
+        + `<td>${m.band.base}</td>`
+        + `<td class="l">${dots(m.wk)}</td>`
+        + `<td class="${m.coeff == null || m.bad ? 'mut' : ''}" title="${m.bad
+             ? 'the 30 days from onboarding closed before this player requested a transfer — check the onboarding date'
+             : m.coeff == null
+             ? 'no deposit in week 1 — the scheme does not define this case'
+             : 'weeks 2-4 pattern ' + m.key}">${
+             m.bad ? 'date?' : m.coeff == null ? 'n/d' : m.coeff + '%'}</td>`
+        + `<td${m.pay ? ' style="font-weight:600"' : ' class="mut"'}>${m.pay ? eur(m.pay) : '—'}</td>`
+        + `<td class="grp${(r.o30_dep||0) - (r.o30_wd||0) < 0 ? ' neg' : ''}">`
+        +   `${eur((r.o30_dep||0) - (r.o30_wd||0))}</td>`
+        + `<td class="${net < 0 ? 'neg' : ''}">${eur(net)}</td></tr>`;
+    }).join('');
+    const sub = `<tr class="mbsub"><td class="l">${esc(short[g.name] || g.name)}</td>`
+      + `<td class="l mut">${g.list.length} player${g.list.length===1?'':'s'}</td>`
+      + `<td class="grp">${usd(g.dep)}</td><td></td><td></td><td></td><td></td>`
+      + `<td>${eur(g.pay)}</td><td class="grp"></td>`
+      + `<td class="${g.net < 0 ? 'neg' : ''}">${eur(g.net)}</td></tr>`;
+    return rows + sub;
+  }).join('');
+
+  const foot = '<tfoot><tr style="font-weight:600"><td class="l">Total</td>'
+    + `<td class="l">${grand.n} player${grand.n===1?'':'s'}</td>`
+    + `<td class="grp">${usd(grand.dep)}</td><td></td><td></td><td></td><td></td>`
+    + `<td>${eur(grand.pay)}</td><td class="grp"></td>`
+    + `<td class="${grand.net < 0 ? 'neg' : ''}">${eur(grand.net)}</td></tr></tfoot>`;
+
+  const tbl = document.getElementById('tMBonus');
+  tbl.innerHTML = head + '<tbody>' + body + '</tbody>' + foot;
+  /* One handler on the table rather than one per row: delegation survives the
+     innerHTML above being replaced on the next render, and it still works if a
+     click lands on a cell's inner span (the week pips) rather than the row. */
+  const byId = new Map(rs.map(r => [String(r.player_id), r]));
+  tbl.onclick = e => {
+    const tr = e.target.closest && e.target.closest('tr.mbrow');
+    if(!tr) return;                       // subtotal, footer or header
+    const r = byId.get(tr.dataset.pid);
+    if(r) openPlayer(r);
+  };
+}
+
+function contactTable(){
+  const c = contactOf(cohortRows());
+  const pc = (n, d) => d ? `<span class="mut"> ${Math.round(100*n/d)}%</span>` : '';
+  // same abbreviation as By Managers, so a VA reads the same in both tables
+  const short = initialsMap(c.rows.map(v => v.name));
+  /* Rows pick the same F.va the By Managers table sets, so clicking a VA here
+     narrows By Players below exactly as it does there -- one filter, two ways in.
+     The Total row stays inert; there is nothing to filter to. */
+  const row = (v, bold) => `<tr${bold ? ' style="font-weight:600"'
+                                      : ` class="pick" data-name="${esc(v.name)}"`}>`
+    + `<td class="l txt"${bold ? '' : ` title="${esc(v.name)}"`}>`
+    +   `${esc(bold ? v.name : (short[v.name] || v.name))}</td>`
+    + `<td class="grp">${v.n || '—'}</td>`
+    + `<td>${v.tg || '—'}</td><td>${v.ph || '—'}</td>`
+    + `<td>${v.any || '—'}${pc(v.any, v.n)}</td>`
+    + `<td class="${v.none ? 'neg' : ''}">${v.none || '—'}${pc(v.none, v.n)}</td></tr>`;
+  document.getElementById('tContact').innerHTML =
+      '<thead><tr><th class="l">VA</th>'
+    +   '<th class="grp">Players</th><th>Telegram</th><th>Phone</th>'
+    +   '<th>Either</th><th>No contact</th></tr></thead>'
+    + '<tbody>' + c.rows.map(v => row(v, false)).join('') + '</tbody>'
+    + '<tfoot>' + row(c.total, true) + '</tfoot>';
+  bindPick('tContact', 'va');
+}
+
+/* Say out loud how current the page is. The money view closes a day in arrears
+   while the bonus tables are live, so one date would be a lie either way. */
+function stamp(){
+  const c = D.covers || {};
+  const el = document.getElementById('asof');
+  if(!el) return;
+  el.innerHTML = 'Money through <b>' + esc(c.money || '—') + '</b>'
+    + ' &middot; bonuses through <b>' + esc(c.bonus || '—') + '</b>'
+    + ' &middot; last request ' + esc(c.request || '—')
+    + ' &middot; built ' + esc(D.generated);
+}
+
+function render(){
+  const c = C();
+  numberSections();
+  basisNote();
+  bonusTree();
+  bonusDistTable();
+  managerBonusTable();
+  growthTable();
+  contactTable();
+  const live = cohortRows(), tag = TAG();
+  const byVA = groupRows(live, 'va_group', tag);
+  summaryTable('tVA',   byVA,        'VA', initialsMap(byVA.map(v=>v.name)));
+  summaryTable('tSeg',  groupRows(live, 'segment', tag), 'Segment');
+  fillSegments();
+  bindPick('tVA','va'); bindPick('tSeg','segments');
+  renderPlayers();
+}
+
+/* Exports exactly what is on screen -- same filters, same sort, same columns --
+   plus the tracker fields that are not shown as columns. Money goes out raw so
+   a spreadsheet can add it up; a delta with no meaningful base exports its
+   label ("new", "n/m") rather than a fake number. */
+function toCSV(){
+  const g = TAG();
+  const extra = [['va','VA'],['casino','Source casino'],['aff_type','Affiliate type'],['segment','Segment'],
+                 ['country','Country'],['reg_date','Registered'],['req_count','Requests']];
+  const dayLabel = BASIS==='onb' ? 'Days since onboarding' : 'Days since request';
+  const head = LAST.cols.map(c=>c[0]==='days_aft' ? dayLabel : c[1]).concat(extra.map(e=>e[1]));
+  const cell = (r,[k,l,c]) => {
+    if(c==='d'){                       // deltas compare monthly rates, same as the table
+      const b = k==='d_dep'?'bef_dep':'bef_ggr', a = k==='d_dep'?'aft_dep':'aft_ggr';
+      const x = delta(val(r,b), val(r,a));
+      return Number.isFinite(x.v) ? Math.round(x.v*10)/10 : x.t;
+    }
+    if(c==='r'){ const s = rSide(k), adj = r[g+'_'+s+'_adj'];
+                 return adj>0 ? Math.round(1000*r[g+'_'+s+'_bc']/adj)/10 : 'n/m'; }
+    if(c==='n') return val(r,k) || 0;
+    if(c==='t'||c==='m') return Math.round(val(r,k)*100)/100;
+    if(k==='days_aft') return val(r,k);
+    return r[k] == null ? '' : r[k];
+  };
+  const esc = v => {
+    const s = String(v);
+    return /[",\n;]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const lines = [head.map(esc).join(',')];
+  for(const r of LAST.rows)
+    lines.push(LAST.cols.map(c=>esc(cell(r,c))).concat(extra.map(e=>esc(r[e[0]] ?? ''))).join(','));
+  return '\ufeff' + lines.join('\r\n');       // BOM so Excel reads it as UTF-8
+}
+document.getElementById('csv').onclick = () => {
+  const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const bits = ['vip-transfer', {jul:'since-jul', jun:'since-jun'}[PERIOD] || 'all-time',
+                SRC === 'all' ? '' : SRC,
+                BASIS==='onb' ? 'onboard-split' : 'request-split'];
+  // name the active filter too, so two exports never collide
+  if(F.va)            bits.push(slug(F.va));
+  if(F.month)         bits.push(F.month);
+  if(F.treeLabel)     bits.push(slug(F.treeLabel));
+  if(F.segments.size) bits.push([...F.segments].map(slug).join('+'));
+  bits.push(D.today);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([toCSV()], {type:'text/csv;charset=utf-8'}));
+  a.download = bits.join('_') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+};
+
+function wire(sel, apply){
+  document.querySelectorAll(sel).forEach(b=>b.onclick=()=>{
+    apply(b);
+    document.querySelectorAll(sel).forEach(x=>x.classList.toggle('on', x===b));
+    F.va=''; F.month=''; F.offer=''; F.offerSt=''; F.offerAny='';
+    F.tree=null; F.treeLabel=''; F.grid=null;
+    F.segments = new Set(DEFAULT_SEGMENTS());
+    render();
+  });
+}
+wire('.switch [data-period]', b => { PERIOD = b.dataset.period; });
+wire('.switch [data-basis]',  b => { BASIS  = b.dataset.basis;  });
+wire('.switch [data-src]',    b => { SRC    = b.dataset.src;    });
+
+/* Every h2 folds away the block under it.
+
+   The page always opens with every section collapsed, and nothing is
+   remembered between visits. It used to keep the set you had opened in
+   localStorage, which read as a bug: you asked for a page that opens quiet, got
+   one, opened two sections to look at them, and every later visit showed those
+   two open with no way to tell why. Folding still works for the whole visit;
+   it just does not follow you back. */
+function foldable(){
+  const open = new Set();
+  document.querySelectorAll('.wrap > h2').forEach((h, i) => {
+    /* Everything up to the next heading belongs to this section -- EXCEPT the
+       modal. It is a page-level overlay that happens to be written at the foot
+       of the markup, so it was swept into whichever section came last and
+       inherited that section's hidden state. Sections start collapsed, so
+       clicking a player set modal.hidden = false inside a display:none parent
+       and nothing appeared. Skipped by class, not by position, so moving a
+       section again cannot bring this back. */
+    const body = [];
+    for(let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling)
+      if(!el.classList.contains('modal')) body.push(el);
+    if(!body.length) return;
+    const sect = document.createElement('div');
+    sect.className = 'sect';
+    h.after(sect);
+    body.forEach(el => sect.appendChild(el));
+    // the heading's own words only: the sub-spans carry a live player count, and
+    // keying off that would hand each filter its own fold state
+    const id = (h.firstChild && h.firstChild.nodeType === 3 ? h.firstChild.textContent : '')
+                 .trim().slice(0, 24) || ('s' + i);
+    h.classList.add('fold');
+    h.insertAdjacentHTML('beforeend', '<span class="caretf">\u25b8</span>');
+    h.setAttribute('role', 'button');
+    const paint = () => {
+      const off = !open.has(id);
+      sect.hidden = off;
+      h.classList.toggle('shut', off);
+      h.setAttribute('aria-expanded', String(!off));
+    };
+    h.dataset.fold = id;
+    h.__open = () => { if(!open.has(id)){ open.add(id); paint(); } };
+    h.onclick = ev => {
+      // the header carries live controls (Export CSV); let those act normally
+      if(ev.target.closest('button, input, select, a, label')) return;
+      open.has(id) ? open.delete(id) : open.add(id);
+      paint();
+    };
+    paint();
+  });
+  // drop what older versions stored, so a stale entry cannot reopen a section
+  try { localStorage.removeItem('vipTransferOpen');
+        localStorage.removeItem('vipTransferFolded'); } catch(e){}
+}
+function openSection(el){
+  const sect = el.closest('.sect');
+  if(sect && sect.previousElementSibling && sect.previousElementSibling.__open)
+    sect.previousElementSibling.__open();
+}
+
+render();
+stamp();
+foldable();
+</script>
+<script>
+/* Sections this viewer should not be shown.
+ *
+ * The Worker injects window.__HIDE from AUTH_HIDE in config.env — a list of
+ * section names for the person logged in. Anything tagged data-section with a
+ * matching name is removed from the document.
+ *
+ * COSMETIC ONLY. The figures are still in this file; removing the element does
+ * not remove the data behind it, and anyone can read it with view-source. This
+ * exists to give someone a shorter page, not to keep a number from them. If a
+ * number genuinely must not reach someone, it has to be stripped from the data
+ * before the page is built, not hidden here.
+ */
+(function () {
+  var hide = window.__HIDE;
+  if (!hide || !hide.length) return;
+  hide.forEach(function (name) {
+    document.querySelectorAll('[data-section="' + name + '"]')
+      .forEach(function (el) { el.remove(); });
+  });
+})();
+</script>
+</body>
+</html>

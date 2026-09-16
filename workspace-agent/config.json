@@ -1,0 +1,109 @@
+{
+  "app_url": "https://app.k-ai.talk",
+  "token": "ws_i3Qczdd3zY8X2hL1yrH48IWQvBMtca-TpSZ0XEcO",
+  "redash_url": "https://redash.veis.tech",
+  "redash_config_env": "C:\\redash-page\\config.env",
+  "_note": "Query 1732's date column is transaction_date. Heavy columns (betslip_positions, game_name, bonus names, block/KYC fields) are left out to keep the Neon free tier from filling up. Add a column back by putting it in include_columns.",
+  "jobs": [
+    {
+      "name": "ftd-current-month",
+      "dataset": "fj-1732",
+      "create_name": "FTD detail (Redash 1732)",
+      "query_id": 1732,
+      "parameters": {
+        "date_range": {
+          "start": "{{month_start}}",
+          "end": "{{month_end}}"
+        },
+        "Current Segment": "All"
+      },
+      "mode": "replace_range",
+      "range": {
+        "column": "transaction_date",
+        "from": "{{month_start}}",
+        "to": "{{month_end}}"
+      },
+      "include_columns": [
+        "transaction_date",
+        "player_id",
+        "player_country",
+        "aff_type",
+        "aff_username",
+        "aff_source",
+        "player_segment",
+        "current_segment",
+        "financial_segment",
+        "ftd_type",
+        "reg_date",
+        "first_deposit_date",
+        "sign_up",
+        "is_crypto",
+        "ftd",
+        "blockchain",
+        "deposit",
+        "deposit_count",
+        "withdraw",
+        "game_product",
+        "bet",
+        "ggr",
+        "ngr",
+        "adjusted_ggr",
+        "bonus_id",
+        "bonus_cost",
+        "favourite_product",
+        "loyalty_level",
+        "click_count"
+      ]
+    },
+    {
+      "name": "ftd-previous-month",
+      "disabled": true,
+      "dataset": "fj-1732",
+      "query_id": 1732,
+      "parameters": {
+        "date_range": {
+          "start": "{{prev_month_start}}",
+          "end": "{{prev_month_end}}"
+        },
+        "Current Segment": "All"
+      },
+      "mode": "replace_range",
+      "range": {
+        "column": "transaction_date",
+        "from": "{{prev_month_start}}",
+        "to": "{{prev_month_end}}"
+      },
+      "include_columns": [
+        "transaction_date",
+        "player_id",
+        "player_country",
+        "aff_type",
+        "aff_username",
+        "aff_source",
+        "player_segment",
+        "current_segment",
+        "financial_segment",
+        "ftd_type",
+        "reg_date",
+        "first_deposit_date",
+        "sign_up",
+        "is_crypto",
+        "ftd",
+        "blockchain",
+        "deposit",
+        "deposit_count",
+        "withdraw",
+        "game_product",
+        "bet",
+        "ggr",
+        "ngr",
+        "adjusted_ggr",
+        "bonus_id",
+        "bonus_cost",
+        "favourite_product",
+        "loyalty_level",
+        "click_count"
+      ]
+    }
+  ]
+}

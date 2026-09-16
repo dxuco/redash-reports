@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamer FTD cohort — 2026</title>
+<style>
+:root{
+  --dark-green:#0B6E3A; --green-dk:#0A5A30; --sage:#4E9D5C; --light-green:#C0DD97;
+  --band:#E3F3E8; --row-alt:#F3F7F3; --navy:#0F2A43; --slate:#5B7285; --muted:#677181;
+  --axis:#C3CCD4; --border:#E5E5E5; --bar-bg:#EEF1F4; --surface:#FFFFFF; --plane:#F4F6F5;
+  --panel:#FAFBF9; --divider:#D8DEE0; --warning:#E67E22; --critical:#C0392B;
+  --grey-2:#8B93A1; --grey-3:#B8C0C8; --grey-5:#C6CED4; --grey:#B7C3CF; --tint-1:#E7F1E9;
+  --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --cover-padding:1.6rem 20px 1.4rem; --cover-title:1.55rem; --cover-subtitle:.86rem;
+  --page-width:1800px; --cover-line-height:1.45; --cover-inner-min:60px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--navy);font-family:var(--font-body);
+     font-size:14px;line-height:1.45}
+.cover{background:linear-gradient(135deg,var(--dark-green) 0%,var(--green-dk) 100%);
+       color:#fff;padding:1.6rem 20px 1.4rem;line-height:1.45}
+.cover-inner{max-width:1800px;margin:0 auto;height:60px;line-height:1.45;display:flex;
+       align-items:center;justify-content:space-between;gap:24px;flex-wrap:nowrap}
+.cover h1{font-size:1.55rem;font-weight:700;margin:0 0 .25rem;letter-spacing:-.01em;
+       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cover p{color:var(--light-green);font-size:.86rem;margin:0;white-space:nowrap;
+       overflow:hidden;text-overflow:ellipsis}
+.ctl{display:flex;gap:18px;align-items:center;flex-shrink:0}
+.grp{display:flex;flex-direction:column;gap:4px}
+.grp .lbl{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;
+       color:var(--light-green);opacity:.85}
+.grp .btns{display:flex}
+button{font:inherit;font-size:.78rem;padding:.3rem .7rem;background:rgba(255,255,255,.1);
+       color:#fff;border:1px solid rgba(255,255,255,.35);cursor:pointer}
+button+button{border-left:none}
+button[aria-pressed="true"]{background:#fff;color:var(--dark-green);font-weight:600}
+.wrap{max-width:1800px;margin:0 auto;padding:18px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--border);margin-bottom:18px}
+.card>h2{font-size:.95rem;margin:0;padding:.7rem 16px;border-bottom:1px solid var(--border);
+       background:var(--panel);display:flex;justify-content:space-between;gap:16px;align-items:baseline}
+.card>h2 .sub{font-weight:400;font-size:.76rem;color:var(--muted)}
+.card>.body{padding:14px 16px 18px}
+.cap{color:var(--muted);font-size:.76rem;margin:.6rem 0 0;max-width:120ch}
+.strip{display:flex;flex-wrap:wrap;gap:30px;padding:0 0 12px;margin-bottom:10px;
+       border-bottom:1px solid var(--border)}
+.strip.big{gap:38px;border-bottom:none;padding-bottom:0;margin-bottom:0}
+.fig .k{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--grey-2)}
+.fig .v{font-size:1.32rem;font-weight:700;letter-spacing:-.02em}
+.strip.big .fig .v{font-size:1.75rem}
+.fig .s{font-size:.72rem;color:var(--muted)}
+.neg{color:var(--critical)}
+.pos{color:var(--dark-green)}
+.legend{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.lg{display:flex;gap:6px;align-items:center;font-size:.78rem;cursor:pointer;
+    padding:2px 7px;border:1px solid transparent}
+.lg[data-off="1"]{opacity:.35}
+.lg .sw{width:11px;height:11px;border-radius:2px;display:inline-block}
+.lg .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.lg.showall{border:1px dashed var(--grey-5);color:var(--slate)}
+svg{display:block;overflow:visible}
+#tt{position:fixed;pointer-events:none;opacity:0;transition:opacity .08s;z-index:50;
+    background:#fff;border:1px solid var(--divider);box-shadow:0 6px 22px rgba(15,42,67,.16);
+    padding:9px 11px;font-size:.78rem;min-width:190px;max-width:340px}
+#tt b{display:block;margin-bottom:5px}
+#tt .r{display:flex;justify-content:space-between;gap:18px;padding:1.5px 0}
+#tt .r.sep{border-top:1px solid var(--border);margin-top:4px;padding-top:4px}
+#tt .sw{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px}
+table{border-collapse:collapse;width:100%;font-size:.74rem}
+th,td{padding:.24rem .5rem;text-align:right;border-bottom:1px solid var(--border);
+      white-space:nowrap;font-variant-numeric:tabular-nums}
+th{background:var(--panel);color:var(--slate);font-size:.63rem;letter-spacing:.04em;
+   text-transform:uppercase;position:sticky;top:0;cursor:pointer;user-select:none;z-index:2}
+th.l,td.l{text-align:left;font-variant-numeric:normal}
+td.l{max-width:150px;overflow:hidden;text-overflow:ellipsis}
+th[aria-sort]{color:var(--dark-green)}
+th[aria-sort]::after{content:" \25BC"}
+th[aria-sort="ascending"]::after{content:" \25B2"}
+tbody tr:hover{background:var(--band)}
+tfoot td{position:sticky;bottom:0;background:var(--row-alt);font-weight:700;
+      border-top:1.5px solid var(--slate);border-bottom:none;z-index:1}
+.scroll{max-height:640px;overflow:auto;border:1px solid var(--border)}
+.tbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.chip{font-size:.72rem;border:1px solid var(--grey-5);background:var(--panel);
+      padding:.22rem .6rem;cursor:pointer;color:var(--slate)}
+.chip[aria-pressed="true"]{background:var(--dark-green);border-color:var(--dark-green);
+      color:#fff;font-weight:600}
+input[type=search]{font:inherit;font-size:.78rem;padding:.24rem .5rem;border:1px solid var(--grey-5);
+      background:var(--surface);color:var(--navy);min-width:200px}
+.mini{display:inline-block;height:9px;vertical-align:middle}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:1100px){.split{grid-template-columns:1fr}}
+.rank{font-size:.8rem}
+.rank .row{display:grid;grid-template-columns:minmax(120px,1fr) 1fr 96px;gap:10px;
+      align-items:center;padding:.24rem 0}
+.rank .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .bar{background:var(--bar-bg);height:11px;position:relative}
+.rank .bar i{position:absolute;top:0;bottom:0;display:block}
+.rank .amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.foot{color:var(--muted);font-size:.74rem;margin-top:26px;border-top:1px solid var(--border);
+      padding-top:12px;max-width:120ch}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="cover-inner">
+  <div>
+    <h1>Streamer FTD cohort — 2026</h1>
+    <p id="sub"></p>
+  </div>
+  <div class="ctl">
+    <div class="grp"><span class="lbl">Cohort quality</span><span class="btns">
+      <button data-var="all" aria-pressed="true">All FTDs</button>
+      <button data-var="q" aria-pressed="false">Qualified +</button>
+      <button data-var="sq" aria-pressed="false">Super Qualified</button>
+    </span></div>
+    <div class="grp"><span class="lbl">Money shown</span><span class="btns">
+      <button data-money="adj" aria-pressed="true">Adjusted GGR</button>
+      <button data-money="ngr" aria-pressed="false">NGR</button>
+    </span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+  <div class="card"><div class="body">
+    <div class="strip big" id="head"></div>
+  </div></div>
+
+  <div class="card">
+    <h2>How many streamers we tested, and what they delivered
+        <span class="sub">first deposits placed on the month they were acquired</span></h2>
+    <div class="body">
+      <div class="strip" id="totFtd"></div>
+      <svg id="chartFtd"></svg>
+      <div class="legend" id="legFtd"></div>
+      <p class="cap">Bars sit on the acquisition month; the deposits line sits on the month the
+        money moved. Click a tier to isolate it.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span id="mnyTitle">Adjusted GGR</span>, split by whether the streamer ended up in profit
+        <span class="sub">summed over the month it was earned</span></h2>
+    <div class="body">
+      <div class="strip" id="totAdj"></div>
+      <svg id="chartAdj"></svg>
+      <div class="legend" id="legAdj"></div>
+      <p class="cap" id="adjCap"></p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="card">
+      <h2>Streamers in profit <span class="sub" id="posSub"></span></h2>
+      <div class="body"><div class="rank" id="rankPos"></div></div>
+    </div>
+    <div class="card">
+      <h2>Streamers in loss <span class="sub" id="negSub"></span></h2>
+      <div class="body"><div class="rank" id="rankNeg"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Every streamer <span class="sub" id="tblSub"></span></h2>
+    <div class="body">
+      <div class="tbar">
+        <button class="chip" data-res="all" aria-pressed="true">All</button>
+        <button class="chip" data-res="pos" aria-pressed="false">In profit</button>
+        <button class="chip" data-res="neg" aria-pressed="false">In loss</button>
+        <input type="search" id="q" placeholder="filter by streamer or country…">
+        <span class="cap" id="tblCount"></span>
+      </div>
+      <div class="scroll"><table id="tbl">
+        <thead><tr>
+          <th class="l" data-s="a">Streamer</th>
+          <th class="l" data-s="ctry">Country</th>
+          <th data-s="ftd" title="First depositors acquired">FTDs</th>
+          <th data-s="sq" title="Super Qualified FTDs">SQ</th>
+          <th data-s="avg" title="Average first-deposit value">Avg FTD</th>
+          <th data-s="inv" title="Paid to this streamer, from the CPA deal sheet">Invested</th>
+          <th data-s="cpf" title="Invested ÷ FTDs">Cost / FTD</th>
+          <th data-s="dep" title="Total deposits from this cohort">Deposits</th>
+          <th data-s="dpf" title="Deposits ÷ FTDs">Dep / FTD</th>
+          <th data-s="r7p" title="Deposited again within 7 days">D7</th>
+          <th data-s="r30p" title="Deposited again within 30 days">D30</th>
+          <th data-s="ggrPos" title="GGR from players who finished up">+ GGR</th>
+          <th data-s="ngrNeg" title="NGR from players who finished down">− NGR</th>
+          <th data-s="mny" aria-sort="descending" id="thMny">Adj GGR</th>
+          <th data-s="ngrDep" title="NGR ÷ deposits">NGR / Dep</th>
+          <th data-s="mo" title="Months with cohort activity">Mo</th>
+        </tr></thead>
+        <tbody></tbody>
+        <tfoot><tr></tr></tfoot>
+      </table></div>
+      <p class="cap" id="tblCap"></p>
+    </div>
+  </div>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<div id="tt"></div>
+
+<script>
+const DATA = __DATA__;
+
+/* ---------- formatting ---------- */
+const fmt = n => Math.round(n).toLocaleString('en-US');
+/* The sign goes before the currency symbol: -$5,000, never $-5,000. Adjusted
+   GGR is negative for a third of these streamers, so this is not hypothetical. */
+const money = n => (n < 0 ? '-' : '') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
+function moneyShort(n){
+  const a = Math.abs(n), sign = n < 0 ? '-' : '';
+  if (a >= 1e6) return sign + '$' + (a/1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/,'') + 'M';
+  if (a >= 1e3) return sign + '$' + Math.round(a/1e3) + 'k';
+  return sign + '$' + Math.round(a);
+}
+/* whole-number percentages, with <1% rather than 0% for a real small value */
+function pctW(x){
+  if (x === null || x === undefined || !isFinite(x)) return '—';
+  const r = Math.round(x);
+  if (r === 0 && x > 0) return '<1%';
+  if (r === 0 && x < 0) return '>-1%';
+  return r + '%';
+}
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const shortM = ym => MON[+ym.slice(5,7) - 1];
+const longM  = ym => MON[+ym.slice(5,7) - 1] + ' ' + ym.slice(0,4);
+
+const COLOR = {
+  'Non Qualified': '#B7C3CF',
+  'Qualified':     '#4E9D5C',
+  'Super Qualified': '#0B6E3A',
+  pos: '#0B6E3A',
+  neg: '#C0392B'
+};
+const LINE_COLOR = '#0F2A43';
+
+const VAR_LABEL = {
+  all: 'every first deposit',
+  q:   'Qualified and Super Qualified first deposits only',
+  sq:  'Super Qualified first deposits only'
+};
+const MONEY_LABEL = { adj: 'Adjusted GGR', ngr: 'NGR' };
+
+const state = { variant: 'all', money: 'adj', res: 'all', q: '',
+                sort: { key: 'mny', dir: -1 },
+                off: { ftd: new Set(), adj: new Set() } };
+
+const V = () => DATA.variants[state.variant];
+
+/* ---------- rows for the current view ---------- */
+/* `mny` is whichever money column the header toggle selects, so every chart,
+   ranking and sort below reads one field and the toggle cannot leave half the
+   page on the other metric. */
+function rows(){
+  return V().streamers.map(s => Object.assign({}, s, {
+    mny: state.money === 'adj' ? s.adj : s.ngr,
+    sqp: s.ftd ? s.sq / s.ftd * 100 : 0,
+    avg: s.ftd ? s.ftdv / s.ftd : 0,
+    dpf: s.ftd ? s.dep / s.ftd : 0,
+    /* Always NGR over deposits, whichever metric the money toggle is showing.
+       It is one fixed ratio people quote at each other, so it must not change
+       meaning underneath the same column heading. */
+    ngrDep: s.dep > 0 ? s.ngr / s.dep * 100 : null,
+    cpf: s.inv !== null && s.ftd ? s.inv / s.ftd : null,
+    /* A rate below the eligibility floor is noise, not a small number, so it
+       sorts and prints as absent rather than as zero. */
+    r7p:  s.r7n  >= DATA.minEligible ? s.r7  / s.r7n  * 100 : null,
+    r30p: s.r30n >= DATA.minEligible ? s.r30 / s.r30n * 100 : null,
+    mo:  s.m.length
+  }));
+}
+function split(rs){
+  return { pos: rs.filter(r => r.mny > 0).sort((a,b) => b.mny - a.mny),
+           neg: rs.filter(r => r.mny < 0).sort((a,b) => a.mny - b.mny),
+           zero: rs.filter(r => r.mny === 0) };
+}
+
+/* ---------- charts ---------- */
+function niceStep(max, targetTicks){
+  const raw = max / targetTicks;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  const norm = raw / mag;
+  const step = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10;
+  return step * mag;
+}
+
+/* One drawer, both charts. Stacked bars on the left axis, an optional overlay
+   line on the right. Positive and negative segments stack in OPPOSITE
+   directions from a darkened zero rule — adjusted GGR goes negative and
+   clamping it, or stacking it on top of the positives, would both be lies. The
+   right axis is pinned to the left axis's zero so the line is never drawn
+   underneath a bar several times its size. */
+function drawChart(cfg){
+  const svg = document.getElementById(cfg.svgId);
+  const off = state.off[cfg.key];
+  const shown = cfg.stacks.filter(s => !off.has(s.key));
+  const showLine = cfg.line && !off.has('__line');
+  const days = cfg.days;
+
+  const PAD = {t:26, r: showLine ? 78 : 20, b:38, l: cfg.leftFmt === moneyShort ? 74 : 62};
+  const W = Math.max(880, svg.parentNode.clientWidth || 1200);
+  const H = 400;
+  const iw = W - PAD.l - PAD.r, ih = H - PAD.t - PAD.b;
+
+  const posTot = days.map((_,i) => shown.reduce((s,d) => s + Math.max(0, d.values[i]), 0));
+  const negTot = days.map((_,i) => shown.reduce((s,d) => s + Math.min(0, d.values[i]), 0));
+  const maxBar = Math.max(0, ...posTot) || 1;
+  const minBar = Math.min(0, ...negTot);
+  const maxLine = Math.max(1, ...(showLine ? cfg.line.values : [0]));
+
+  const TICKS = 5;
+  const stepL = niceStep(Math.max(maxBar - minBar, 1e-9), TICKS);
+  const topL = Math.ceil(maxBar/stepL)*stepL || stepL;
+  const botL = Math.floor(minBar/stepL)*stepL;
+  const stepR = niceStep(maxLine, TICKS), topR = Math.ceil(maxLine/stepR)*stepR;
+  const botR = topL ? botL * (topR/topL) : 0;
+
+  const yL = v => PAD.t + ih - ((v - botL)/(topL - botL))*ih;
+  const yR = v => PAD.t + ih - ((v - botR)/(topR - botR))*ih;
+  const bandW = iw / days.length;
+  const barW = Math.max(4, Math.min(72, bandW*0.6));
+  const cx = i => PAD.l + bandW*(i+0.5);
+
+  let s = '';
+  for (let v = botL; v <= topL + 1e-9; v += stepL){
+    const y = yL(v), zero = Math.abs(v) < 1e-9;
+    s += '<line x1="'+PAD.l+'" x2="'+(PAD.l+iw)+'" y1="'+y+'" y2="'+y+'" stroke="'+
+         (zero?'#5B7285':'#E5E5E5')+'" stroke-width="'+(zero?1.3:1)+'"/>';
+    s += '<text x="'+(PAD.l-7)+'" y="'+(y+3.5)+'" text-anchor="end" font-size="10.5" fill="#5B7285">'+
+         cfg.leftFmt(v)+'</text>';
+  }
+  if (showLine){
+    for (let v = Math.max(0, botR); v <= topR + 1e-9; v += stepR){
+      s += '<text x="'+(PAD.l+iw+7)+'" y="'+(yR(v)+3.5)+'" font-size="10.5" fill="'+LINE_COLOR+'">'+
+           cfg.rightFmt(v)+'</text>';
+    }
+  }
+
+  const segs = [];
+  days.forEach((d,i) => {
+    let accPos = 0, accNeg = 0;
+    shown.forEach(st => {
+      const v = st.values[i];
+      if (!v) return;
+      const base = v > 0 ? accPos : accNeg;
+      const y0 = yL(base), y1 = yL(base + v), h = Math.abs(y1-y0);
+      segs.push({ i, key: st.key, top: Math.min(y0,y1), bot: Math.max(y0,y1) });
+      s += '<rect x="'+(cx(i)-barW/2)+'" y="'+Math.min(y0,y1)+'" width="'+barW+
+           '" height="'+Math.max(0.6, h)+'" fill="'+st.color+'"/>';
+      if (barW >= 34 && h >= 15){
+        s += '<text x="'+cx(i)+'" y="'+(Math.min(y0,y1) + h/2 + 3.5)+'" text-anchor="middle" '+
+             'font-size="9.5" font-weight="600" fill="#FFFFFF" fill-opacity=".92">'+
+             cfg.leftFmt(v)+'</text>';
+      }
+      if (v > 0) accPos += v; else accNeg += v;
+    });
+    if (bandW >= 30){
+      const tot = accPos + accNeg;
+      const txt = cfg.leftFmt(tot);
+      const yTop = accPos > 0 ? yL(accPos) - 6 : yL(accNeg) + 14;
+      s += '<text x="'+cx(i)+'" y="'+yTop+'" text-anchor="middle" font-size="10.5" '+
+           'font-weight="700" fill="'+(tot < 0 ? '#C0392B' : '#0F2A43')+'">'+txt+'</text>';
+    }
+  });
+
+  if (showLine){
+    const pts = cfg.line.values.map((v,i) => cx(i)+','+yR(v)).join(' ');
+    s += '<polyline points="'+pts+'" fill="none" stroke="#FFFFFF" stroke-width="5" '+
+         'stroke-opacity=".85" stroke-linejoin="round" stroke-linecap="round"/>';
+    s += '<polyline class="depline" points="'+pts+'" fill="none" stroke="'+LINE_COLOR+'" '+
+         'stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+    cfg.line.values.forEach((v,i) => {
+      s += '<circle cx="'+cx(i)+'" cy="'+yR(v)+'" r="2.6" fill="#fff" stroke="'+LINE_COLOR+
+           '" stroke-width="1.6"/>';
+      const txt = cfg.rightFmt(v), wpx = txt.length * 5.6 + 6;
+      s += '<rect x="'+(cx(i)-wpx/2)+'" y="'+(yR(v)-17)+'" width="'+wpx+'" height="13" rx="3" '+
+           'fill="#FFFFFF" fill-opacity=".88"/>';
+      s += '<text x="'+cx(i)+'" y="'+(yR(v)-7)+'" text-anchor="middle" font-size="10" '+
+           'font-weight="700" fill="'+LINE_COLOR+'">'+txt+'</text>';
+    });
+  }
+
+  days.forEach((d,i) => {
+    s += '<text x="'+cx(i)+'" y="'+(PAD.t+ih+15)+'" text-anchor="middle" font-size="10" '+
+         'fill="#5B7285">'+cfg.labelAt(i)+'</text>';
+  });
+  s += '<text x="'+(PAD.l+iw/2)+'" y="'+(H-2)+'" text-anchor="middle" font-size="10.5" '+
+       'fill="#677181">'+cfg.axisTitle+'</text>';
+  days.forEach((d,i) => {
+    s += '<rect class="hit" data-i="'+i+'" x="'+(PAD.l+bandW*i)+'" y="'+PAD.t+'" width="'+bandW+
+         '" height="'+ih+'" fill="transparent" style="cursor:pointer"/>';
+  });
+
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  svg.setAttribute('width','100%');
+  svg.setAttribute('height',H);
+  svg.innerHTML = s;
+
+  const allKeys = cfg.stacks.map(st => st.key).concat(cfg.line ? ['__line'] : []);
+  const tt = document.getElementById('tt');
+  svg.querySelectorAll('.hit').forEach(r => {
+    r.onclick = e => {
+      const i = +r.dataset.i, box = svg.getBoundingClientRect();
+      if (!box.height) return;
+      const yUser = (e.clientY - box.top) * (H / box.height);
+      const seg = segs.find(g => g.i === i && yUser >= g.top - 1 && yUser <= g.bot + 1);
+      if (!seg) return;
+      pick(cfg.key, allKeys, seg.key, e.altKey || e.metaKey || e.ctrlKey);
+      render();
+    };
+    r.onmouseenter = e => {
+      tt.innerHTML = cfg.tip(+r.dataset.i, shown, showLine);
+      tt.style.opacity = 1;
+      r.onmousemove({clientX:e.clientX, clientY:e.clientY});
+    };
+    r.onmousemove = e => {
+      const pad = 14; let x = e.clientX + pad, y = e.clientY + pad;
+      const b = tt.getBoundingClientRect();
+      if (x + b.width  > innerWidth  - 8) x = e.clientX - b.width  - pad;
+      if (y + b.height > innerHeight - 8) y = e.clientY - b.height - pad;
+      tt.style.left = x+'px'; tt.style.top = y+'px';
+    };
+    r.onmouseleave = () => { tt.style.opacity = 0; };
+  });
+}
+
+/* A click means "show me only this one" — people click a thing because they
+   want to look at it. Clicking it again, or Show all, puts everything back.
+   Alt-click still hides a single series. */
+function pick(cfgKey, allKeys, key, hideOnly){
+  const off = state.off[cfgKey];
+  if (hideOnly){ off.has(key) ? off.delete(key) : off.add(key); return; }
+  const isolated = !off.has(key) && allKeys.every(k => k === key || off.has(k));
+  off.clear();
+  if (!isolated) allKeys.forEach(k => { if (k !== key) off.add(k); });
+}
+
+function renderLegend(cfg){
+  const el = document.getElementById(cfg.legendId);
+  const off = state.off[cfg.key];
+  const keys = cfg.stacks.map(st => st.key).concat(cfg.line ? ['__line'] : []);
+  el.innerHTML = cfg.stacks.map(st =>
+      '<span class="lg" data-cat="'+st.key+'" data-off="'+(off.has(st.key)?1:0)+'">'+
+      '<span class="sw" style="background:'+st.color+'"></span>'+st.label+
+      ' <span class="n">'+st.legendValue+'</span></span>').join('') +
+    (cfg.line ? '<span class="lg" data-cat="__line" data-off="'+(off.has('__line')?1:0)+'">'+
+      '<span class="sw" style="background:'+LINE_COLOR+';border-radius:50%"></span>'+
+      cfg.line.label+' <span class="n">'+cfg.line.legendValue+'</span></span>' : '') +
+    (off.size ? '<span class="lg showall" data-cat="__all">'+
+      '<span class="sw" style="background:transparent;border:1.5px solid #5B7285"></span>'+
+      'Show all</span>' : '');
+  el.querySelectorAll('.lg').forEach(n => {
+    if (n.dataset.cat !== '__all')
+      n.title = 'Click to show only this. Alt-click to hide just this one.';
+    n.onclick = e => {
+      if (n.dataset.cat === '__all') off.clear();
+      else pick(cfg.key, keys, n.dataset.cat, e.altKey || e.metaKey || e.ctrlKey);
+      render();
+    };
+  });
+}
+
+function figs(el, items){
+  document.getElementById(el).innerHTML = items.map(f =>
+    '<div class="fig"><div class="k">'+f[0]+'</div><div class="v'+
+    (f[3] ? ' '+f[3] : '')+'">'+f[1]+'</div><div class="s">'+(f[2]||'')+'</div></div>').join('');
+}
+
+/* ---------- render ---------- */
+function render(){
+  const v = V(), t = v.totals, ms = DATA.months, rs = rows(), sp = split(rs);
+  const mny = state.money;
+  const mnyTot = mny === 'adj' ? t.adj : t.ngr;
+  const posTot = sp.pos.reduce((s,r) => s + r.mny, 0);
+  const negTot = sp.neg.reduce((s,r) => s + r.mny, 0);
+
+  document.getElementById('sub').textContent =
+    longM(ms[0]) + ' – ' + longM(ms[ms.length-1]) + ' · ' + t.streamers +
+    ' streamers tested · ' + fmt(t.ftd) + ' first deposits · data to ' + DATA.generated;
+  document.getElementById('mnyTitle').textContent = MONEY_LABEL[mny];
+  document.getElementById('thMny').textContent = mny === 'adj' ? 'Adj GGR' : 'NGR';
+  document.querySelectorAll('[data-var]').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.var === state.variant));
+  document.querySelectorAll('[data-money]').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.money === state.money));
+  document.querySelectorAll('[data-res]').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.res === state.res));
+
+  figs('head', [
+    ['Streamers tested', fmt(t.streamers), 'with at least one first deposit'],
+    ['First deposits', fmt(t.ftd),
+     money(t.ftd ? t.ftdv/t.ftd : 0) + ' average, ' + money(t.ftdv) + ' in total'],
+    ['Super Qualified', fmt(t.sq), pctW(t.ftd ? t.sq/t.ftd*100 : 0) + ' of the cohort'],
+    ['Invested', money(t.inv),
+     (t.invFtd ? money(t.inv/t.invFtd) + ' per FTD, ' : '') +
+     t.nInv + ' of ' + t.streamers + ' on file'],
+    ['Deposited', money(t.dep), 'over ' + DATA.year],
+    ['Retained D7', t.r7n ? pctW(t.r7/t.r7n*100) : '—',
+     fmt(t.r7) + ' of ' + fmt(t.r7n) + ' eligible'],
+    ['Retained D30', t.r30n ? pctW(t.r30/t.r30n*100) : '—',
+     fmt(t.r30) + ' of ' + fmt(t.r30n) + ' eligible'],
+    [MONEY_LABEL[mny] + ', net', money(mnyTot),
+     pctW(t.dep ? mnyTot/t.dep*100 : null) + ' of deposits',
+     mnyTot < 0 ? 'neg' : 'pos'],
+    ['In profit', fmt(sp.pos.length) + ' / ' + t.streamers, money(posTot), 'pos'],
+    ['In loss', fmt(sp.neg.length) + ' / ' + t.streamers, money(negTot), 'neg']
+  ]);
+  /* --- FTD chart --- */
+  const ftdCfg = {
+    key: 'ftd', svgId: 'chartFtd', legendId: 'legFtd',
+    days: ms, labelAt: i => shortM(ms[i]),
+    axisTitle: 'month of first deposit — ' + DATA.year,
+    leftFmt: fmt, rightFmt: moneyShort,
+    stacks: DATA.types.map(ty => ({
+      key: ty, label: ty, color: COLOR[ty], values: v.series.ftd[ty],
+      legendValue: fmt(v.series.ftd[ty].reduce((a,b) => a+b, 0))
+    })),
+    line: { label: 'Deposited that month', values: v.series.dep,
+            legendValue: money(t.dep) },
+    tip: (i, shown, showLine) => {
+      let h = '<b>' + longM(ms[i]) + '</b>';
+      let tot = 0;
+      shown.forEach(st => {
+        if (!st.values[i]) return;
+        tot += st.values[i];
+        h += '<div class="r"><span><span class="sw" style="background:'+st.color+'"></span>'+
+             st.label+'</span><b>'+fmt(st.values[i])+'</b></div>';
+      });
+      h += '<div class="r sep"><span>First deposits shown</span><b>'+fmt(tot)+'</b></div>';
+      if (showLine)
+        h += '<div class="r"><span><span class="sw" style="background:'+LINE_COLOR+
+             ';border-radius:50%"></span>Cohort deposits this month</span><b>'+
+             money(v.series.dep[i])+'</b></div>';
+      h += '<div class="r"><span>'+MONEY_LABEL[mny]+' this month</span><b class="'+
+           ((mny==='adj'?v.series.adj[i]:v.series.ngr[i]) < 0 ? 'neg':'pos')+'">'+
+           money(mny==='adj'?v.series.adj[i]:v.series.ngr[i])+'</b></div>';
+      return h;
+    }
+  };
+  drawChart(ftdCfg); renderLegend(ftdCfg);
+  figs('totFtd', [
+    ['Streamers tested', fmt(t.streamers), ''],
+    ['First deposits', fmt(t.ftd), ''],
+    ['Qualified', fmt(t.q), pctW(t.ftd ? t.q/t.ftd*100 : 0)],
+    ['Super Qualified', fmt(t.sq), pctW(t.ftd ? t.sq/t.ftd*100 : 0)],
+    ['Average FTD', money(t.ftd ? t.ftdv/t.ftd : 0), money(t.ftdv) + ' in total'],
+    ['Deposits since', money(t.dep), money(t.ftd ? t.dep/t.ftd : 0) + ' per player']
+  ]);
+
+  /* --- money chart: the month's total split into the part earned from
+     streamers that finished the year up, and the part from those that
+     finished down. Two bands, signed, so the net is the visible gap. --- */
+  const posM = ms.map((_,i) => 0), negM = ms.map((_,i) => 0);
+  const want = new Set(sp.pos.map(r => r.a)), wantN = new Set(sp.neg.map(r => r.a));
+  const col = mny === 'adj' ? 5 : 6;
+  v.cells.forEach(c => {
+    const i = ms.indexOf(c[1]); if (i < 0) return;
+    if (want.has(c[0])) posM[i] += c[col];
+    else if (wantN.has(c[0])) negM[i] += c[col];
+  });
+  const adjCfg = {
+    key: 'adj', svgId: 'chartAdj', legendId: 'legAdj',
+    days: ms, labelAt: i => shortM(ms[i]),
+    axisTitle: 'month earned — ' + DATA.year,
+    leftFmt: moneyShort, rightFmt: moneyShort,
+    stacks: [
+      { key:'pos', label:'From streamers in profit', color:COLOR.pos, values:posM,
+        legendValue: money(posM.reduce((a,b)=>a+b,0)) },
+      { key:'neg', label:'From streamers in loss', color:COLOR.neg, values:negM,
+        legendValue: money(negM.reduce((a,b)=>a+b,0)) }
+    ],
+    line: null,
+    tip: i => {
+      const net = posM[i] + negM[i];
+      let h = '<b>' + longM(ms[i]) + '</b>';
+      h += '<div class="r"><span><span class="sw" style="background:'+COLOR.pos+
+           '"></span>From streamers in profit</span><b>'+money(posM[i])+'</b></div>';
+      h += '<div class="r"><span><span class="sw" style="background:'+COLOR.neg+
+           '"></span>From streamers in loss</span><b>'+money(negM[i])+'</b></div>';
+      h += '<div class="r sep"><span>Net '+MONEY_LABEL[mny]+'</span><b class="'+
+           (net<0?'neg':'pos')+'">'+money(net)+'</b></div>';
+      h += '<div class="r"><span>Cohort deposits</span><b>'+money(v.series.dep[i])+'</b></div>';
+      return h;
+    }
+  };
+  drawChart(adjCfg); renderLegend(adjCfg);
+  figs('totAdj', [
+    [MONEY_LABEL[mny] + ', net', money(mnyTot), '', mnyTot < 0 ? 'neg' : 'pos'],
+    ['From the ' + sp.pos.length + ' in profit', money(posTot), '', 'pos'],
+    ['From the ' + sp.neg.length + ' in loss', money(negTot), '', 'neg'],
+    ['Positive GGR', money(t.ggrPos), fmt(t.nWin) + ' players finished up', 'pos'],
+    ['Negative NGR', money(t.ngrNeg), fmt(t.nLose) + ' players finished down', 'neg'],
+    ['Margin on deposits', pctW(t.dep ? mnyTot/t.dep*100 : null),
+     money(t.dep) + ' deposited', mnyTot < 0 ? 'neg' : 'pos'],
+    ['Total bet', money(t.bet), ''],
+    ['Bonus cost', money(t.bonus), '']
+  ]);
+  document.getElementById('adjCap').innerHTML =
+    'Colour is the streamer’s whole-' + DATA.year + ' result, so a green band can hold a bad ' +
+    'month. Bar-top figure is the net.' +
+    (mny === 'adj'
+      ? ' Adjusted GGR comes from the source query — it is not GGR minus bonus cost.' : '');
+
+  /* --- rankings --- */
+  rankInto('rankPos', sp.pos.slice(0, 12), COLOR.pos,
+           Math.max(1, ...sp.pos.map(r => Math.abs(r.mny))));
+  rankInto('rankNeg', sp.neg.slice(0, 12), COLOR.neg,
+           Math.max(1, ...sp.neg.map(r => Math.abs(r.mny))));
+  const restP = sp.pos.slice(12).reduce((s,r) => s + r.mny, 0);
+  const restN = sp.neg.slice(12).reduce((s,r) => s + r.mny, 0);
+  document.getElementById('posSub').textContent =
+    sp.pos.length + ' streamers · ' + money(posTot) +
+    (sp.pos.length > 12 ? ' · ' + (sp.pos.length-12) + ' more below the cut, ' + money(restP) : '');
+  document.getElementById('negSub').textContent =
+    sp.neg.length + ' streamers · ' + money(negTot) +
+    (sp.neg.length > 12 ? ' · ' + (sp.neg.length-12) + ' more below the cut, ' + money(restN) : '');
+
+  /* --- table --- */
+  const q = state.q.trim().toLowerCase();
+  let list = rs;
+  if (state.res === 'pos') list = list.filter(r => r.mny > 0);
+  if (state.res === 'neg') list = list.filter(r => r.mny < 0);
+  if (q) list = list.filter(r => (r.a + ' ' + r.ctry).toLowerCase().includes(q));
+  const { key, dir } = state.sort;
+  list = list.slice().sort((a,b) => {
+    const x = a[key], y = b[key];
+    if (typeof x === 'string') return dir * x.localeCompare(y);
+    const xn = x === null ? -Infinity : x, yn = y === null ? -Infinity : y;
+    return dir * (xn - yn);
+  });
+  document.querySelectorAll('#tbl th').forEach(th => {
+    if (th.dataset.s === key) th.setAttribute('aria-sort', dir < 0 ? 'descending' : 'ascending');
+    else th.removeAttribute('aria-sort');
+  });
+  const maxAbs = Math.max(1, ...list.map(r => Math.abs(r.mny)));
+  /* Large figures are shortened to keep the table readable at a glance; the
+     exact dollar is on every one of them as a tooltip, because people copy
+     numbers out of this table. Per-player figures stay exact — $104 and $96
+     are the whole point of a cost-per-FTD column and both round to $0k. */
+  const S$ = (v, extra) => '<td title="' + money(v) + (extra ? ' · ' + extra : '') + '">' +
+                           moneyShort(v) + '</td>';
+  const ret = (p, k, n) =>
+    '<td title="'+fmt(k)+' of '+fmt(n)+' eligible">'+
+    (p === null ? '<span style="color:var(--grey-3)">—</span>' : pctW(p))+'</td>';
+  const gap = '<span style="color:var(--grey-3)">—</span>';
+  document.querySelector('#tbl tbody').innerHTML = list.map(r =>
+    '<tr><td class="l" title="'+esc(r.a)+'">'+esc(r.a)+'</td>'+
+    '<td class="l" title="'+esc(r.ctry)+'">'+esc(r.ctry)+'</td>'+
+    '<td>'+fmt(r.ftd)+'</td><td>'+fmt(r.sq)+'</td><td>'+money(r.avg)+'</td>'+
+    (r.inv === null ? '<td title="no deal on file">'+gap+'</td><td>'+gap+'</td>'
+                    : S$(r.inv, r.deals + ' deal' + (r.deals === 1 ? '' : 's')) +
+                      '<td>'+money(r.cpf)+'</td>') +
+    S$(r.dep) + '<td>'+money(r.dpf)+'</td>' +
+    ret(r.r7p, r.r7, r.r7n) + ret(r.r30p, r.r30, r.r30n) +
+    '<td class="pos" title="'+money(r.ggrPos)+' · '+fmt(r.nWin)+' players finished up">'+
+      moneyShort(r.ggrPos)+'</td>'+
+    '<td class="neg" title="'+money(r.ngrNeg)+' · '+fmt(r.nLose)+' players finished down">'+
+      moneyShort(r.ngrNeg)+'</td>'+
+    '<td data-c="mny" class="'+(r.mny<0?'neg':'pos')+'" title="'+money(r.mny)+'">'+
+      bar(r.mny, maxAbs)+moneyShort(r.mny)+'</td>'+
+    '<td class="'+(r.ngrDep===null?'':(r.ngrDep<0?'neg':'pos'))+'">'+pctW(r.ngrDep)+'</td>'+
+    '<td>'+r.mo+'</td></tr>').join('');
+
+  /* Totals over the rows CURRENTLY SHOWN, not over the whole cohort — a fixed
+     total under a filtered table reads as a bug. Rates are recomputed from the
+     summed counts, never averaged across streamers: a streamer with 4 eligible
+     players would otherwise weigh the same as one with 400. */
+  const S = f => list.reduce((s,r) => s + (r[f] || 0), 0);
+  const tDep = S('dep'), tMny = S('mny'), tFtd = S('ftd'), tSq = S('sq'), tNgr = S('ngr');
+  const t7k = S('r7'), t7n = S('r7n'), t30k = S('r30'), t30n = S('r30n');
+  const tInv = S('inv');
+  /* Cost per FTD divides by the FTDs of the streamers we actually have a deal
+     for. Dividing by every FTD would let the streamers with no cost row on file
+     silently discount the programme's CPA. */
+  const withInv = list.filter(r => r.inv !== null);
+  const tInvFtd = withInv.reduce((s,r) => s + r.ftd, 0);
+  const T$ = v => '<td title="'+money(v)+'">'+moneyShort(v)+'</td>';
+  document.querySelector('#tbl tfoot tr').innerHTML =
+    '<td class="l">'+list.length+' streamers</td><td class="l">—</td>'+
+    '<td>'+fmt(tFtd)+'</td><td>'+fmt(tSq)+'</td>'+
+    /* The average of the averages is not the average. Every ratio in this row
+       is recomputed from the summed numerator and denominator. */
+    '<td>'+money(tFtd ? S('ftdv')/tFtd : 0)+'</td>'+
+    '<td title="'+money(tInv)+' · '+withInv.length+' of '+list.length+' have a deal on file">'+
+      moneyShort(tInv)+'</td>'+
+    '<td title="over the '+fmt(tInvFtd)+' FTDs from streamers with a deal on file">'+
+      (tInvFtd ? money(tInv/tInvFtd) : '—')+'</td>'+
+    T$(tDep) + '<td>'+money(tFtd ? tDep/tFtd : 0)+'</td>'+
+    '<td title="'+fmt(t7k)+' of '+fmt(t7n)+' eligible">'+(t7n ? pctW(t7k/t7n*100) : '—')+'</td>'+
+    '<td title="'+fmt(t30k)+' of '+fmt(t30n)+' eligible">'+(t30n ? pctW(t30k/t30n*100) : '—')+'</td>'+
+    '<td class="pos" title="'+money(S('ggrPos'))+'">'+moneyShort(S('ggrPos'))+'</td>'+
+    '<td class="neg" title="'+money(S('ngrNeg'))+'">'+moneyShort(S('ngrNeg'))+'</td>'+
+    '<td data-c="mny" class="'+(tMny<0?'neg':'pos')+'" title="'+money(tMny)+'">'+
+      moneyShort(tMny)+'</td>'+
+    '<td class="'+(tNgr<0?'neg':'pos')+'">'+pctW(tDep ? tNgr/tDep*100 : null)+'</td>'+
+    '<td>—</td>';
+
+  document.getElementById('tblCount').textContent =
+    list.length + ' of ' + rs.length + ' streamers shown';
+  document.getElementById('tblSub').textContent =
+    VAR_LABEL[state.variant] + ' · ' + MONEY_LABEL[mny];
+  /* Kept short on purpose. The definitions live in README-streamers.md; what a
+     reader needs at the table is only what a column would otherwise be misread
+     as. Hover any retention cell for its retained-of-eligible counts. */
+  document.getElementById('tblCap').innerHTML =
+    'Figures are shortened — hover any cell for the exact number. ' +
+    'D7 / D30: another deposit within 7 / 30 days of the first, counting only players observed ' +
+    'that long, em-dash under ' + DATA.minEligible + ' eligible. ' +
+    '+GGR and −NGR are split per player on their whole-year result and overlap. ' +
+    'NGR / Dep is always NGR, whichever metric the toggle shows. ' +
+    'Invested is the whole deal cost from ' + (DATA.costFile || 'the CPA sheet') +
+    ', not just the part attributable to these players; ' +
+    (t.streamers - t.nInv) + ' streamers have no deal on file and show an em-dash rather than $0.';
+
+  document.getElementById('foot').innerHTML =
+    'Cohort: ' + fmt(DATA.cohortPlayers) + ' players whose first deposit landed in ' + DATA.year +
+    ' through a streamer. Money is their whole-' + DATA.year + ' activity. ' +
+    'Query 1732 caches, ' + ms[0] + ' to ' + ms[ms.length-1] + ', data through ' + DATA.generated + '.';
+}
+
+function bar(v, maxAbs){
+  const w = Math.round(Math.abs(v) / maxAbs * 46);
+  if (!w) return '';
+  return '<span class="mini" style="width:'+w+'px;background:'+(v<0?COLOR.neg:COLOR.pos)+
+         ';opacity:.28;margin-right:6px"></span>';
+}
+function rankInto(id, list, color, maxAbs){
+  const el = document.getElementById(id);
+  if (!list.length){ el.innerHTML = '<p class="cap">None in this view.</p>'; return; }
+  el.innerHTML = list.map(r => {
+    const w = Math.max(1, Math.abs(r.mny) / maxAbs * 100);
+    return '<div class="row"><span class="nm" title="'+esc(r.a)+'">'+esc(r.a)+'</span>'+
+      '<span class="bar"><i style="left:0;width:'+w.toFixed(1)+'%;background:'+color+'"></i></span>'+
+      '<span class="amt '+(r.mny<0?'neg':'pos')+'">'+money(r.mny)+'</span></div>';
+  }).join('');
+}
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll('[data-var]').forEach(b => b.onclick = () => {
+  state.variant = b.dataset.var; render();
+});
+document.querySelectorAll('[data-money]').forEach(b => b.onclick = () => {
+  state.money = b.dataset.money; render();
+});
+document.querySelectorAll('[data-res]').forEach(b => b.onclick = () => {
+  state.res = b.dataset.res; render();
+});
+document.getElementById('q').oninput = e => { state.q = e.target.value; render(); };
+document.querySelectorAll('#tbl th').forEach(th => th.onclick = () => {
+  const k = th.dataset.s;
+  if (state.sort.key === k) state.sort.dir = -state.sort.dir;
+  else state.sort = { key: k, dir: k === 'a' || k === 'ctry' ? 1 : -1 };
+  render();
+});
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 120); });
+
+/* `const` is script-scoped and never reaches window, so the test harness and
+   the console cannot see any of the above. Hand it over explicitly. */
+window.OV = { DATA, state, rows, split, render, drawChart, money, moneyShort, pctW, fmt,
+              niceStep, V };
+
+render();
+</script>
+</body>
+</html>
