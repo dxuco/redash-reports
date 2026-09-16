@@ -1,0 +1,8 @@
+name = "reports"
+account_id = "448f87fe2dd6ba4178c3024242bb8b29"
+workers_dev = true
+compatibility_date = "2026-09-15"
+main = "src/index.js"
+
+[env.production]
+name = "reports"
