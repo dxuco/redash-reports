@@ -3,15 +3,20 @@
 
 echo "🔨 Building reports..."
 
-# Copy retention.html to publish folder (for backup)
-mkdir -p publish/retention
-cp retention.html publish/retention/index.html
+# Validate HTML before building
+echo "🔍 Validating HTML..."
+node validate.js retention.html || exit 1
 
-# Encode HTML as base64 and embed in Worker script with improved structure
+# Minify HTML using Node.js minifier
+echo "📦 Minifying HTML..."
+mkdir -p build
+node minify.js retention.html build/retention.min.html
+
+# Encode minified HTML as base64 and embed in Worker script
 mkdir -p src
 
 # Write base64 to temp file first (avoids argument list too long error)
-base64 < retention.html | tr -d '\n' > /tmp/html_b64.txt
+base64 < build/retention.min.html | tr -d '\n' > /tmp/html_b64.txt
 
 # Create Worker script with base64 embedded from file
 cat > src/index.js << 'WORKER_EOF'
@@ -72,6 +77,17 @@ WORKER_EOF
 perl -i -pe 's/PLACEHOLDER/`cat \/tmp\/html_b64.txt`/e' src/index.js
 rm /tmp/html_b64.txt
 
+ORIGINAL_SIZE=$(wc -c < retention.html)
+MINIFIED_SIZE=$(wc -c < build/retention.min.html)
+COMPRESSION=$(echo "scale=1; (($ORIGINAL_SIZE - $MINIFIED_SIZE) * 100) / $ORIGINAL_SIZE" | bc)
+WORKER_SIZE=$(wc -c < src/index.js)
+
 echo "✅ Build complete!"
-echo "📦 File size: $(wc -c < src/index.js | numfmt --to=iec-i --suffix=B 2>/dev/null || wc -c < src/index.js)"
-echo "📦 Ready to deploy with: wrangler deploy"
+echo "📊 Compression:"
+echo "   Original:  $(numfmt --to=iec-i --suffix=B $ORIGINAL_SIZE 2>/dev/null || echo "$ORIGINAL_SIZE bytes")"
+echo "   Minified:  $(numfmt --to=iec-i --suffix=B $MINIFIED_SIZE 2>/dev/null || echo "$MINIFIED_SIZE bytes")"
+echo "   Saved:     $COMPRESSION%"
+echo "📦 Worker file: $(numfmt --to=iec-i --suffix=B $WORKER_SIZE 2>/dev/null || echo "$WORKER_SIZE bytes")"
+echo ""
+echo "📁 Cleanup: build/ and src/ are temporary, not committed to git"
+echo "🚀 Ready to deploy with: npm run deploy"

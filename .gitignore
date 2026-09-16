@@ -14,7 +14,10 @@ _cover-backup/
 *.log
 .wrangler/
 dist/
+
+# Generated files (created by build script)
 build/
+src/index.js
 
 # Secrets
 .env
@@ -23,3 +26,4 @@ build/
 # Temp
 *.lock.bak
 *.tmp
+/tmp/

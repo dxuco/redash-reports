@@ -7,6 +7,7 @@
     "build": "bash build.sh",
     "deploy": "wrangler deploy src/index.js",
     "dev": "wrangler dev src/index.js",
+    "validate": "node validate.js retention.html",
     "deployments": "wrangler deployments list"
   },
   "devDependencies": {

@@ -18,11 +18,14 @@ jobs:
       - name: Install Wrangler
         run: npm install -g wrangler
 
+      - name: Validate HTML
+        run: npm run validate
+
       - name: Build
         run: bash build.sh
 
       - name: Check build output
-        run: ls -lh src/index.js publish/retention/index.html
+        run: ls -lh src/index.js
 
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy src/index.js
