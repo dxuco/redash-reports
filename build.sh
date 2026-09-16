@@ -11,16 +11,19 @@ node validate.js retention.html || exit 1
 echo "📦 Minifying HTML..."
 mkdir -p build
 node minify.js retention.html build/retention.min.html
+node minify.js bonus.html build/bonus.min.html
 
-# Encode minified HTML as base64 and embed in Worker script
+# Encode minified HTML files as base64 and embed in Worker script
 mkdir -p src
 
-# Write base64 to temp file first (avoids argument list too long error)
-base64 < build/retention.min.html | tr -d '\n' > /tmp/html_b64.txt
+# Write base64 to temp files
+base64 < build/retention.min.html | tr -d '\n' > /tmp/retention_b64.txt
+base64 < build/bonus.min.html | tr -d '\n' > /tmp/bonus_b64.txt
 
-# Create Worker script with base64 embedded from file
+# Create Worker script with base64 embedded from files
 cat > src/index.js << 'WORKER_EOF'
-const htmlB64 = 'PLACEHOLDER';
+const retentionB64 = 'RETENTION_PLACEHOLDER';
+const bonusB64 = 'BONUS_PLACEHOLDER';
 
 export default {
   async fetch(request, env) {
@@ -28,13 +31,27 @@ export default {
       const url = new URL(request.url);
       const path = url.pathname;
 
-      // Serve HTML for all report pages
-      if (path === '/' || path === '/retention' || path === '/bonus' || path === '/pivot' ||
+      // Serve bonus report on /bonus route
+      if (path === '/bonus' || path === '/bonus/') {
+        const html = atob(bonusB64);
+        return new Response(html, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'public, max-age=1800, must-revalidate',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'SAMEORIGIN',
+          },
+        });
+      }
+
+      // Serve retention report on other routes
+      if (path === '/' || path === '/retention' || path === '/pivot' ||
           path === '/ftd-share' || path === '/september-2026' || path === '/ftd' ||
           path === '/ftd-bonus' || path === '/ftd-countries' || path === '/vip-transfer' ||
           path === '/acquisition-2026' || path === '/acquisition-2025' || path === '/community' ||
           path === '/ux-funnel' || path === '/logout') {
-        const html = atob(htmlB64);
+        const html = atob(retentionB64);
         return new Response(html, {
           status: 200,
           headers: {
@@ -77,20 +94,22 @@ export default {
 };
 WORKER_EOF
 
-# Replace placeholder with actual base64 from temp file
-perl -i -pe 's/PLACEHOLDER/`cat \/tmp\/html_b64.txt`/e' src/index.js
-rm /tmp/html_b64.txt
+# Replace placeholders with actual base64 from temp files
+perl -i -pe 's/RETENTION_PLACEHOLDER/`cat \/tmp\/retention_b64.txt`/e' src/index.js
+perl -i -pe 's/BONUS_PLACEHOLDER/`cat \/tmp\/bonus_b64.txt`/e' src/index.js
+rm /tmp/retention_b64.txt /tmp/bonus_b64.txt
 
-ORIGINAL_SIZE=$(wc -c < retention.html)
-MINIFIED_SIZE=$(wc -c < build/retention.min.html)
-COMPRESSION=$(echo "scale=1; (($ORIGINAL_SIZE - $MINIFIED_SIZE) * 100) / $ORIGINAL_SIZE" | bc)
+RETENTION_SIZE=$(wc -c < retention.html)
+BONUS_SIZE=$(wc -c < bonus.html)
+RETENTION_MIN=$(wc -c < build/retention.min.html)
+BONUS_MIN=$(wc -c < build/bonus.min.html)
 WORKER_SIZE=$(wc -c < src/index.js)
 
 echo "✅ Build complete!"
-echo "📊 Compression:"
-echo "   Original:  $(numfmt --to=iec-i --suffix=B $ORIGINAL_SIZE 2>/dev/null || echo "$ORIGINAL_SIZE bytes")"
-echo "   Minified:  $(numfmt --to=iec-i --suffix=B $MINIFIED_SIZE 2>/dev/null || echo "$MINIFIED_SIZE bytes")"
-echo "   Saved:     $COMPRESSION%"
+echo "📊 Files:"
+echo "   Retention:  $(numfmt --to=iec-i --suffix=B $RETENTION_SIZE 2>/dev/null || echo "$RETENTION_SIZE bytes")"
+echo "   Bonus:      $(numfmt --to=iec-i --suffix=B $BONUS_SIZE 2>/dev/null || echo "$BONUS_SIZE bytes")"
+echo "   Minified:   $(numfmt --to=iec-i --suffix=B $RETENTION_MIN 2>/dev/null || echo "$RETENTION_MIN bytes") + $(numfmt --to=iec-i --suffix=B $BONUS_MIN 2>/dev/null || echo "$BONUS_MIN bytes")"
 echo "📦 Worker file: $(numfmt --to=iec-i --suffix=B $WORKER_SIZE 2>/dev/null || echo "$WORKER_SIZE bytes")"
 echo ""
 echo "📁 Cleanup: build/ and src/ are temporary, not committed to git"
