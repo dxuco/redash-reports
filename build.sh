@@ -31,38 +31,6 @@ export default {
       const url = new URL(request.url);
       const path = url.pathname;
 
-      // Serve bonus report on /bonus route
-      if (path === '/bonus' || path === '/bonus/') {
-        const html = atob(bonusB64);
-        return new Response(html, {
-          status: 200,
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'public, max-age=1800, must-revalidate',
-            'X-Content-Type-Options': 'nosniff',
-            'X-Frame-Options': 'SAMEORIGIN',
-          },
-        });
-      }
-
-      // Serve retention report on other routes
-      if (path === '/' || path === '/retention' || path === '/pivot' ||
-          path === '/ftd-share' || path === '/september-2026' || path === '/ftd' ||
-          path === '/ftd-bonus' || path === '/ftd-countries' || path === '/vip-transfer' ||
-          path === '/acquisition-2026' || path === '/acquisition-2025' || path === '/community' ||
-          path === '/ux-funnel' || path === '/logout') {
-        const html = atob(retentionB64);
-        return new Response(html, {
-          status: 200,
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'public, max-age=1800, must-revalidate',
-            'X-Content-Type-Options': 'nosniff',
-            'X-Frame-Options': 'SAMEORIGIN',
-          },
-        });
-      }
-
       // Health check endpoint for monitoring
       if (path === '/health') {
         return new Response(JSON.stringify({
@@ -78,10 +46,31 @@ export default {
         });
       }
 
-      // 404 for all other paths
-      return new Response(JSON.stringify({ error: 'Not Found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
+      // Serve bonus report on /bonus route
+      if (path === '/bonus' || path === '/bonus/') {
+        const html = atob(bonusB64);
+        return new Response(html, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'public, max-age=1800, must-revalidate',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'SAMEORIGIN',
+          },
+        });
+      }
+
+      // Serve retention report for ALL other routes (including all navigation tabs)
+      // This way clicking any tab works - reactivation, ftd-countries, etc.
+      const html = atob(retentionB64);
+      return new Response(html, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'public, max-age=1800, must-revalidate',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'SAMEORIGIN',
+        },
       });
     } catch (error) {
       console.error('Worker error:', error.message);
