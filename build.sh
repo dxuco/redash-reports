@@ -28,8 +28,12 @@ export default {
       const url = new URL(request.url);
       const path = url.pathname;
 
-      // Serve main report on / or /retention
-      if (path === '/' || path === '/retention') {
+      // Serve HTML for all report pages
+      if (path === '/' || path === '/retention' || path === '/bonus' || path === '/pivot' ||
+          path === '/ftd-share' || path === '/september-2026' || path === '/ftd' ||
+          path === '/ftd-bonus' || path === '/ftd-countries' || path === '/vip-transfer' ||
+          path === '/acquisition-2026' || path === '/acquisition-2025' || path === '/community' ||
+          path === '/ux-funnel' || path === '/logout') {
         const html = atob(htmlB64);
         return new Response(html, {
           status: 200,
@@ -53,44 +57,6 @@ export default {
           headers: {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache',
-          },
-        });
-      }
-
-      // Bonus report endpoint
-      if (path === '/bonus' || path === '/bonus/') {
-        const bonusData = {
-          generatedAt: new Date().toISOString(),
-          reportName: 'cache-bonus',
-          description: 'Bonus Cost and Retention Analysis',
-          sourceData: '2026-09-16T14:20:42.459Z',
-          queries: {
-            '1731': {
-              name: 'Bonus Cost By Categories',
-              rowCount: 0,
-              summary: null
-            },
-            '1754': {
-              name: 'Depositors Monthly Retention',
-              rowCount: 0,
-              summary: null
-            },
-            '1758': {
-              name: 'Deposit Retention - whole base',
-              rowCount: 88821,
-              summary: {
-                totalRows: 88821,
-                columns: ['block_reason', 'kyc', 'lag', 'rail', 'ftd_type', 'phone', 'first_deposit_date', 'player_id', 'email']
-              }
-            }
-          }
-        };
-        return new Response(JSON.stringify(bonusData), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'public, max-age=3600',
-            'Access-Control-Allow-Origin': '*',
           },
         });
       }
