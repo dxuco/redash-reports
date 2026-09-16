@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Large data files
+cache-bonus/
+ftd-report/
+_mcp-exports/
+_cover-backup/
+
+# Build & OS
+.DS_Store
+*.log
+.wrangler/
+dist/
+build/
+
+# Secrets
+.env
+.env.local
+
+# Temp
+*.lock.bak
+*.tmp

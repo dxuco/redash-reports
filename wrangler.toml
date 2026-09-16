@@ -1,0 +1,10 @@
+name = "reports"
+type = "javascript"
+account_id = "448f87fe2dd6ba4178c3024242bb8b29"
+workers_dev = true
+route = "reports.wayzen.workers.dev/*"
+zone_id = ""
+
+[env.production]
+name = "reports"
+route = "reports.wayzen.workers.dev/*"
