@@ -4,6 +4,7 @@ account_id = "448f87fe2dd6ba4178c3024242bb8b29"
 workers_dev = true
 route = "reports.wayzen.workers.dev/*"
 zone_id = ""
+compatibility_date = "2026-09-15"
 
 [env.production]
 name = "reports"
