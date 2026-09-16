@@ -1,0 +1,106 @@
+name: Build & Deploy Reports
+
+on:
+  # Run daily at 07:05 AM UTC (same as Windows schedule)
+  schedule:
+    - cron: '5 7 * * *'
+
+  # Also allow manual trigger from GitHub
+  workflow_dispatch:
+
+  # Run on push to main
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure Redash API key
+        run: |
+          cat > config.env << 'EOF'
+          REDASH_HOST=https://redash.veis.tech
+          REDASH_USER_API_KEY=${{ secrets.REDASH_API_KEY }}
+          BUILD_FROM=2026-01
+          BUILD_TO=auto
+          CLOSED_MONTH_REFRESH_DAYS=7
+          CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}
+          CF_PROJECT=reports
+          CF_SUBDOMAIN=wayzen
+          CF_ALLOWED_EMAILS=khutsishvilidato@gmail.com
+          BUILD_HOUR=7
+          BUILD_MINUTE=5
+          EOF
+
+      - name: Build Bonus Cost Report
+        run: node build.js
+        continue-on-error: true
+
+      - name: Build FTD Report
+        run: node build-ftd.js
+        continue-on-error: true
+
+      - name: Build This Month Report
+        run: node build-month.js
+        continue-on-error: true
+
+      - name: Build Business Overview
+        run: |
+          cd overview || true
+          python build_overview.py || true
+          python make_overview_html.py || true
+        continue-on-error: true
+
+      - name: Build Retention Report
+        run: |
+          cd retention || true
+          python build_retention.py || true
+          python make_retention_html.py || true
+        continue-on-error: true
+
+      - name: Build Reactivation Report
+        run: |
+          cd reactivation || true
+          python build_reactivation.py || true
+          python make_reactivation_html.py || true
+        continue-on-error: true
+
+      - name: Publish to Cloudflare
+        run: node publish-worker.js
+        continue-on-error: true
+
+      - name: Verify deployment
+        run: node verify-public.js
+        continue-on-error: true
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Automated build: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || true
+          git push
+        continue-on-error: true
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "⚠️ Build failed - check logs above"
