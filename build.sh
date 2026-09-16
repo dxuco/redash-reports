@@ -7,19 +7,16 @@ echo "🔨 Building reports..."
 mkdir -p publish/retention
 cp retention.html publish/retention/index.html
 
-# Embed HTML into Worker script
+# Encode HTML as base64 and embed in Worker script
 mkdir -p src
-cat > src/index.js << 'EOF'
-const html = `
-EOF
+HTML_B64=$(base64 < retention.html | tr -d '\n')
 
-cat retention.html >> src/index.js
-
-cat >> src/index.js << 'EOF'
-`;
+cat > src/index.js << EOF
+const htmlB64 = '${HTML_B64}';
 
 export default {
   async fetch(request) {
+    const html = atob(htmlB64);
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
