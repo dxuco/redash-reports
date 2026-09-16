@@ -12,6 +12,6 @@ jobs:
       - name: Run build
         run: bash build.sh
       - name: Deploy with Wrangler Pages
-        run: npx wrangler pages deploy publish/
+        run: npx wrangler pages deploy publish/ --project-name reports
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
